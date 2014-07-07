@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 //and ...:          http://www.brianpeek.com/blog/archive/2006/04/18/415.aspx
 //and ...:          http://www.codeproject.com/KB/miscctrl/Excel_data_access.aspx
 
-namespace IEADPC.DataAccess.AdoWrapper
+namespace DataAccess.AdoWrapper
 {
     internal abstract class AbstractDsExcel : IDatabaseStrategy
     {

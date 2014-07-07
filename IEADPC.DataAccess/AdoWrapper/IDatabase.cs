@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace IEADPC.DataAccess.AdoWrapper
+namespace DataAccess.AdoWrapper
 {
     public interface IDatabase : IDisposable
     {

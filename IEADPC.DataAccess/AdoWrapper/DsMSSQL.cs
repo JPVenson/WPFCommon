@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace IEADPC.DataAccess.AdoWrapper
+namespace DataAccess.AdoWrapper
 {
     internal class DsMSSQL : IDatabaseStrategy
     {

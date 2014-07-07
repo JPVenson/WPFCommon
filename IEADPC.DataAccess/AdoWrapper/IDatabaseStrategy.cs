@@ -1,7 +1,7 @@
 using System;
 using System.Data;
 
-namespace IEADPC.DataAccess.AdoWrapper
+namespace DataAccess.AdoWrapper
 {
     public interface IDatabaseStrategy : ICloneable
     {

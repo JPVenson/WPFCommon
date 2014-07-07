@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IEADPC.DataAccess.AdoWrapper
+namespace DataAccess.AdoWrapper
 {
     internal class DsExcel_XLSX : AbstractDsExcel
     {

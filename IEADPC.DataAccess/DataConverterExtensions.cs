@@ -7,20 +7,31 @@
 #region
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using IEADPC.DataAccess.AdoWrapper;
-using IEADPC.DataAccess.Manager;
-using IEADPC.DataAccess.ModelsAnotations;
+using DataAccess.AdoWrapper;
+using DataAccess.Manager;
+using DataAccess.ModelsAnotations;
 
 #endregion
 
-namespace IEADPC.DataAccess
+namespace DataAccess
 {
+    public static class DataHelperExtensions
+    {
+        public static IDataParameter AddWithValue<T>(this IDataParameterCollection source, string name, T value)
+        {
+            var dbDataParameter = new SqlParameter(name, value);
+            source.Add(dbDataParameter);
+            return dbDataParameter;
+        }
+    }
+
     public static class DataConverterExtensions
     {
         public static string GetTableName<T>()
@@ -131,20 +142,52 @@ namespace IEADPC.DataAccess
             return prop;
         }
 
+        public static bool CheckForListInterface(this PropertyInfo info)
+        {
+            return info.PropertyType != typeof (string)
+                   && info.PropertyType.GetInterface(typeof (IEnumerable).Name) != null
+                   && info.PropertyType.GetInterface(typeof (IEnumerable<>).Name) != null;
+        }
+
+        public static bool CheckForListInterface(this object info)
+        {
+            return CheckForListInterface(info.GetType());
+        }
+
         public static T LoadNavigationProps<T>(this T source, IDatabase accessLayer)
         {
+            return (T)LoadNavigationProps(source as object,accessLayer);
+        }
+
+        public static object LoadNavigationProps(this object source, IDatabase accessLayer)
+        {
             var virtualProps =
-                typeof(T).GetProperties().Where(s => s.GetGetMethod(false).IsVirtual);
+                source.GetType().GetProperties().Where(s => s.GetGetMethod(false).IsVirtual);
             foreach (var propertyInfo in virtualProps)
             {
                 var firstOrDefault =
                     propertyInfo.GetCustomAttributes(false).FirstOrDefault(s => s is ForeignKeyAttribute) as
-                    ForeignKeyAttribute;
-                if (firstOrDefault != null)
+                        ForeignKeyAttribute;
+                if (firstOrDefault == null)
+                    continue;
+
+                var sqlCommand =
+                    DbAccessLayer.CreateSelect<dynamic>(source.GetFK<dynamic, long>(firstOrDefault.AlternatingName),
+                        accessLayer);
+                var orDefault = DbAccessLayer.RunSelect<dynamic>(accessLayer, sqlCommand);
+                propertyInfo.SetValue(source, orDefault, null);
+
+                if (CheckForListInterface(orDefault))
                 {
-                    var sqlCommand = DbAccessLayer.CreateSelect(propertyInfo.PropertyType,
-                                                                source.GetFK<T, long>(
-                                                                    firstOrDefault.AlternatingName), accessLayer);
+                    var listOfObj = orDefault as IEnumerable;
+                    foreach (var item in listOfObj)
+                    {
+                        item.LoadNavigationProps(accessLayer);
+                    }
+                }
+                else
+                {
+                    ((object) orDefault).LoadNavigationProps(accessLayer);
                 }
             }
 

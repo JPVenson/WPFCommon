@@ -4,7 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 
-namespace IEADPC.DataAccess.AdoWrapper
+namespace DataAccess.AdoWrapper
 {
     public sealed class Database : IDatabase
     {
@@ -812,6 +812,11 @@ namespace IEADPC.DataAccess.AdoWrapper
             var db = new Database();
             db.Attach(strategy);
             return db;
+        }
+
+        public static Database CreateMySQL(string strServer, string strDatabase)
+        {
+            return Create(new DsMSSQL(strServer, strDatabase));
         }
 
         public static Database CreateMSSQL(string strServer, string strDatabase)
