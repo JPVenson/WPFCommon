@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DataAccess.AdoWrapper;
 using DataAccess.Manager;
@@ -18,9 +17,7 @@ namespace testing
         public void CheckDbAccess()
         {
             var dbaccess = new DbAccessLayer();
-            dbaccess.Database = Database.Create(new Mysql("192.168.1.7", "test", "Any", ""));
-            bool checkDatabase = dbaccess.CheckDatabase();
-            Assert.AreEqual(checkDatabase, true);
+            dbaccess.Database = Database.Create(new Mysql("192.168.1.4", "test", "Any", ""));
 
             dbaccess.Database.Run(s => s.ExecuteNonQuery("DELETE FROM users"));
 
@@ -44,8 +41,17 @@ namespace testing
             user.Name += "_1";
             access.InsertRange(new List<User> { user });
             user.Name += "_2";
-            var insertWithSelect = access.InsertWithSelect(user);
-            Assert.AreEqual(insertWithSelect.Name, user.Name);
+
+            var img = new Image();
+            img.Text = "BLA";
+            img = access.InsertWithSelect(img);
+
+            user.ID_Image = img.Id;
+
+            var updatedUser = access.InsertWithSelect(user);
+
+            updatedUser.ID_Image = img.Id;
+            access.Update(updatedUser);
         }
 
         public void CheckSelects(DbAccessLayer access)
@@ -53,7 +59,7 @@ namespace testing
             var @select = access.Select<User>();
             Assert.AreEqual(@select.Count, 3);
 
-            int lastID = (int)access.Database.Run(s => s.GetSkalar("SELECT User_ID FROM users limit 1"));
+            long lastID = (long)access.Database.Run(s => s.GetSkalar("SELECT User_ID FROM users limit 1"));
             long count = (long)access.Database.Run(s => s.GetSkalar("SELECT COUNT(*) FROM users"));
 
             var user = access.Select<User>(lastID);
@@ -83,8 +89,10 @@ namespace testing
         [ForModel("UserName")]
         public string Name { get; set; }
 
-        [ForeignKey("Image_ID")]
-        public virtual Image Image { get; set; }
+        public long? ID_Image { get; set; }
+
+        [ForeignKey("ID_Image")]
+        public virtual Image Img { get; set; }
     }
 
     [ForModel("Images")]
@@ -94,7 +102,7 @@ namespace testing
         [ForModel("Image_ID")]
         public long Id { get; set; }
 
-        [ForModel("ID_User")]
-        public long UserID { get; set; }
+        [ForModel("Content")]
+        public string Text { get; set; }
     }
 }

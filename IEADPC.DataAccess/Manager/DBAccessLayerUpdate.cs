@@ -32,6 +32,7 @@ namespace DataAccess.Manager
                 type.GetProperties()
                     .Where(s => s.CheckForPK() || s.GetCustomAttributes(false).Any(e => e is InsertIgnore))
                     .Select(s => s.Name)
+                    .Concat(CreateIgnoreList(type))
                     .ToArray();
 
             string[] propertyInfos = CreatePropertyNames<T>(ignore).ToArray();

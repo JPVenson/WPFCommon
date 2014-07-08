@@ -193,7 +193,7 @@ namespace JPB.DataAccess.MySQL
 
         public IDbCommand GetlastInsertedID_Cmd(IDbConnection conn)
         {
-            throw new NotImplementedException();
+            return CreateCommand("SELECT LAST_INSERT_ID()", conn);
         }
 
         public string GetViewsSql(String strName)

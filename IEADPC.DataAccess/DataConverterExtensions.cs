@@ -78,6 +78,12 @@ namespace DataAccess
             return info.GetCustomAttributes(false).Any(s => s is PrimaryKeyAttribute);
         }
 
+        public static string GetPKPropertyName(this Type type)
+        {
+            var name = type.GetProperties().FirstOrDefault(CheckForPK);
+            return name == null ? null : name.Name;
+        }
+
         public static string GetPK(this Type type)
         {
             var name = type.GetProperties().FirstOrDefault(CheckForPK);
@@ -93,14 +99,20 @@ namespace DataAccess
 
         public static long GetPK<T>(this T source)
         {
-            string pk = typeof(T).GetPK();
-            return (long)typeof(T).GetProperty(pk).GetValue(source, null);
+            return GetPK<T, long>(source);
         }
 
         public static E GetPK<T, E>(this T source)
         {
-            string pk = typeof(T).GetPK();
+            string pk = typeof(T).GetPKPropertyName();
             return (E)typeof(T).GetProperty(pk).GetValue(source, null);
+        }
+
+        public static E GetFK<E>(this object source, string name)
+        {
+            var type = source.GetType();
+            string pk = type.GetFK(name);
+            return (E)type.GetProperty(pk).GetValue(source, null);
         }
 
         public static E GetFK<T, E>(this T source, string name)
@@ -109,21 +121,25 @@ namespace DataAccess
             return (E)typeof(T).GetProperty(pk).GetValue(source, null);
         }
 
-        public static E GetFK<E>(this Type targetType, string name)
-        {
-            string pk = targetType.GetFK(name);
-            var propertyInfo = targetType.GetProperty(pk);
-            var value = propertyInfo.GetValue(source, null);
-            return (E)value;
-        }
+        //public static E GetFK<E>(this Type targetType, string name)
+        //{
+        //    string pk = targetType.GetFK(name);
+        //    var propertyInfo = targetType.GetProperty(pk);
+        //    var value = propertyInfo.GetValue(source, null);
+        //    return (E)value;
+        //}
 
-        public static IEnumerable<string> MapEntiyToSchema<T>(string[] ignore)
+        public static IEnumerable<string> MapEntiyToSchema(Type type, string[] ignore)
         {
-            Type type = typeof(T);
             return from propertyInfo in type.GetProperties().Where(s => !s.GetGetMethod().IsVirtual)
                    where !ignore.Contains(propertyInfo.Name)
                    let formodle = propertyInfo.GetCustomAttributes(false).FirstOrDefault(s => s is ForModel) as ForModel
                    select formodle != null ? formodle.AlternatingName : propertyInfo.Name;
+        }
+
+        public static IEnumerable<string> MapEntiyToSchema<T>(string[] ignore)
+        {
+            return MapEntiyToSchema(typeof(T), ignore);
         }
 
         public static string MapEntiysPropToSchema(this Type source, string prop)
@@ -143,7 +159,7 @@ namespace DataAccess
 
         public static string ReMapSchemaToEntiysProp<T>(string prop)
         {
-            return typeof (T).ReMapSchemaToEntiysProp(prop);
+            return ReMapSchemaToEntiysProp(typeof(T), prop);
         }
 
         public static string ReMapSchemaToEntiysProp(this Type source, string prop)
@@ -162,19 +178,21 @@ namespace DataAccess
 
         public static bool CheckForListInterface(this PropertyInfo info)
         {
-            return info.PropertyType != typeof (string)
-                   && info.PropertyType.GetInterface(typeof (IEnumerable).Name) != null
-                   && info.PropertyType.GetInterface(typeof (IEnumerable<>).Name) != null;
+            return info.PropertyType != typeof(string)
+                   && info.PropertyType.GetInterface(typeof(IEnumerable).Name) != null
+                   && info.PropertyType.GetInterface(typeof(IEnumerable<>).Name) != null;
         }
 
         public static bool CheckForListInterface(this object info)
         {
-            return CheckForListInterface(info.GetType());
+            return !(info is string) &&
+                   info.GetType().GetInterface(typeof (IEnumerable).Name) != null &&
+                   info.GetType().GetInterface(typeof (IEnumerable<>).Name) != null;
         }
 
         public static T LoadNavigationProps<T>(this T source, IDatabase accessLayer)
         {
-            return (T)LoadNavigationProps(source as object,accessLayer);
+            return (T)LoadNavigationProps(source as object, accessLayer);
         }
 
         public static object LoadNavigationProps(this object source, IDatabase accessLayer)
@@ -184,41 +202,46 @@ namespace DataAccess
             foreach (var propertyInfo in virtualProps)
             {
                 var firstOrDefault =
-                    propertyInfo.GetCustomAttributes(false).FirstOrDefault(s => s is ForeignKeyAttribute) as
-                        ForeignKeyAttribute;
+                    propertyInfo.GetCustomAttributes(false).FirstOrDefault(s => s is ForeignKeyAttribute) as ForeignKeyAttribute;
                 if (firstOrDefault == null)
                     continue;
 
-                var sqlCommand =
-                    DbAccessLayer.CreateSelect<dynamic>(propertyInfo.PropertyType.GetFK<long>(firstOrDefault.AlternatingName),
-                        accessLayer);
-                var orDefault = DbAccessLayer.RunSelect<dynamic>(accessLayer, sqlCommand);
-                propertyInfo.SetValue(source, orDefault, null);
+                var fkproperty = source.GetParamaterValue(firstOrDefault.KeyName);
 
-                if (CheckForListInterface(orDefault))
+                if (fkproperty == null)
+                    continue;
+
+                var sqlCommand =
+                    DbAccessLayer.CreateSelect(propertyInfo.PropertyType, accessLayer, (long)fkproperty);
+                var orDefault = DbAccessLayer.RunSelect(propertyInfo.PropertyType, accessLayer, sqlCommand);
+
+                if (CheckForListInterface(orDefault) && CheckForListInterface(propertyInfo))
                 {
+                    propertyInfo.SetValue(source, orDefault, null);
                     var listOfObj = orDefault as IEnumerable;
                     foreach (var item in listOfObj)
                     {
                         item.LoadNavigationProps(accessLayer);
                     }
                 }
-                else
+                if (!CheckForListInterface(propertyInfo))
                 {
-                    ((object) orDefault).LoadNavigationProps(accessLayer);
+                    var @default = orDefault.FirstOrDefault();
+                    propertyInfo.SetValue(source, @default, null);
+                    @default.LoadNavigationProps(accessLayer);
                 }
             }
 
             return source;
         }
-
+        
         public static T SetPropertysViaRefection<T>(this T source, IDataRecord reader)
             where T : new()
         {
             var listofpropertys = new Dictionary<string, object>();
 
             for (int i = 0; i < reader.FieldCount; i++)
-                listofpropertys.Add(ReMapSchemaToEntiysProp<T>(reader.GetName(i)), reader.GetValue(i));
+                listofpropertys.Add(ReMapSchemaToEntiysProp(typeof(T), reader.GetName(i)), reader.GetValue(i));
 
             foreach (var item in listofpropertys)
             {

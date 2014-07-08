@@ -12,11 +12,14 @@ namespace DataAccess.ModelsAnotations
         
     }
 
-    public class ForeignKeyAttribute : ForModel
+    public class ForeignKeyAttribute : InsertIgnore
     {
-        public ForeignKeyAttribute(string alternatingName) : base(alternatingName)
+        public ForeignKeyAttribute(string keyname)
         {
+            KeyName = keyname;
         }
+
+        public string KeyName { get; set; }
     }
 
     public class PrimaryKeyAttribute : DataAccessAttribute

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -56,7 +57,7 @@ namespace DataAccess.Manager
                 s.GetEntitiesList(command, e => new T().SetPropertysViaRefection(e))
                  .ToList());
         }
-        
+
         public static object GetDataValue(object value)
         {
             return value ?? DBNull.Value;
@@ -64,37 +65,46 @@ namespace DataAccess.Manager
 
         protected static IDbCommand CreateCommand(IDatabase batchRemotingDb, string query)
         {
-            //var conn = batchRemotingDb.GetConnection();
-            //var trans = batchRemotingDb.GetTransaction();
             return batchRemotingDb.CreateCommand(query);
-
-            //SqlCommand cmd;
-            //if (trans != null)
-            //    cmd = new SqlCommand(query, conn, trans);
-            //else
-            //    cmd = new SqlCommand(query, conn);
-            //return conn;
         }
 
         public static IDbCommand CreateCommandWithParameterValues<T>(string query, string[] propertyInfos, T entry,
                                                                         IDatabase batchRemotingDb)
         {
+            var type = typeof (T);
             var propertyvalues =
                 propertyInfos.Select(
-                    propertyInfo => GetDataValue(typeof(T).GetProperty(propertyInfo).GetValue(entry, null))).ToArray();
+                    propertyInfo =>
+                    {
+                        var property = type.GetProperty(DataConverterExtensions.ReMapSchemaToEntiysProp<T>(propertyInfo));
+                        var dataValue = GetDataValue(property.GetValue(entry, null));
+                        return dataValue;
+                    }).ToArray();
             return CreateCommandWithParameterValues(query, batchRemotingDb, propertyvalues);
         }
 
         public static IDbCommand CreateCommandWithParameterValues(string query, IDatabase batchRemotingDb,
                                                                      object[] values)
         {
-            var cmd = CreateCommand(batchRemotingDb, query);
-            for (int index = 0; index < values.Length; index++)
+            var listofQueryParamter = new List<IQueryParameter>();
+            for (int i = 0; i < values.Count(); i++)
             {
-                object propertyInfo = values[index];
+                listofQueryParamter.Add(new QueryParameter() { Name = i.ToString(), Value = values[i] });
+            }
+            return CreateCommandWithParameterValues(query, batchRemotingDb, listofQueryParamter);
+        }
+
+        public static IDbCommand CreateCommandWithParameterValues(string query, IDatabase batchRemotingDb,
+                                                             IEnumerable<IQueryParameter> values)
+        {
+            var cmd = CreateCommand(batchRemotingDb, query);
+            foreach (var queryParameter in values)
+            {
                 var dbDataParameter = cmd.CreateParameter();
-                dbDataParameter.Value = propertyInfo;
-                dbDataParameter.ParameterName = "@" + index;
+                dbDataParameter.Value = queryParameter.Value;
+                dbDataParameter.ParameterName = !queryParameter.Name.StartsWith("@")
+                    ? "@" + queryParameter.Name
+                    : queryParameter.Name;
                 cmd.Parameters.Add(dbDataParameter);
             }
             return cmd;
@@ -116,20 +126,39 @@ namespace DataAccess.Manager
             return list;
         }
 
+        protected static string CreatePropertyCSV(Type type, bool ignorePK = false)
+        {
+            return CreatePropertyNames(type, ignorePK).Aggregate((e, f) => e + ", " + f);
+        }
+
         protected static string CreatePropertyCSV<T>(bool ignorePK = false)
         {
-            return CreatePropertyNames<T>(ignorePK).Aggregate((e, f) => e + ", " + f);
+            return CreatePropertyCSV(typeof(T), ignorePK);
+        }
+
+        protected static string CreatePropertyCSV(Type type, params string[] ignore)
+        {
+            return CreatePropertyNames(type, ignore).Aggregate((e, f) => e + ", " + f);
         }
 
         protected static string CreatePropertyCSV<T>(params string[] ignore)
         {
-            return CreatePropertyNames<T>(ignore).Aggregate((e, f) => e + ", " + f);
+            return CreatePropertyCSV(typeof(T), ignore);
+        }
+
+        protected static IEnumerable<string> CreatePropertyNames(Type type, params string[] ignore)
+        {
+            return DataConverterExtensions.MapEntiyToSchema(type, ignore).ToList();
         }
 
         protected static IEnumerable<string> CreatePropertyNames<T>(params string[] ignore)
         {
-            List<string> propnames = DataConverterExtensions.MapEntiyToSchema<T>(ignore).ToList();
-            return propnames;
+            return CreatePropertyNames(typeof(T), ignore);
+        }
+
+        protected static IEnumerable<string> CreatePropertyNames(Type type, bool ignorePK = false)
+        {
+            return ignorePK ? CreatePropertyNames(type, type.GetPK()) : CreatePropertyNames(type, new string[0]);
         }
 
         protected static IEnumerable<string> CreatePropertyNames<T>(bool ignorePK = false)

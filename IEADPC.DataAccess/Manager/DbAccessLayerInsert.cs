@@ -35,6 +35,7 @@ namespace DataAccess.Manager
                 type.GetProperties()
                     .Where(s => s.CheckForPK() || s.GetCustomAttributes(false).Any(e => e is InsertIgnore))
                     .Select(s => s.Name)
+                    .Concat(CreateIgnoreList(type))
                     .ToArray();
             string[] propertyInfos = CreatePropertyNames<T>(ignore).ToArray();
             string csvprops = CreatePropertyCSV<T>(ignore);
@@ -60,9 +61,9 @@ namespace DataAccess.Manager
             return db.Run(s =>
             {
                 var dbCommand = CreateInsert(entry, s);
-                dbCommand.CommandText += "; SELECT @@Identity;";
-                object executeScalar = dbCommand.ExecuteScalar();
-                return Select<T>(Convert.ToInt64(executeScalar), s);
+                dbCommand.ExecuteNonQuery();
+                var getlastInsertedId = s.GetlastInsertedID();
+                return Select<T>(Convert.ToInt64(getlastInsertedId), s);
             });
         }
     }
