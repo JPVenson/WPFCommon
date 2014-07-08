@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFBase", "IEADPC.WPFBase\W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testing", "testing\testing.csproj", "{B3D1161A-3C53-4459-865F-D586D1100E76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DataAccess.MySQL", "..\..\Dropbox\Projekte\IEADPC.BatchRemoting.DataAccess\JPB.DataAccess.MySQL\JPB.DataAccess.MySQL.csproj", "{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DataAccess.MySQL", "JPB.DataAccess.MySQL\JPB.DataAccess.MySQL.csproj", "{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

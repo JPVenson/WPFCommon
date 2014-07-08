@@ -13,16 +13,18 @@ namespace DataAccess.AdoWrapper
         IDbCommand CreateCommand(string strSql, IDbConnection conn);
         IDbCommand CreateCommand(IDbConnection conn, string strSql, params IDbDataParameter[] fields);
 
-        IDbDataParameter CreateParameter_Bit(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_Int(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_SmallInt(string strName);
-        IDbDataParameter CreateParameter_BigInt(string strName);
-        IDbDataParameter CreateParameter_VarChar(string strName, int iSize, bool nullable = false);
-        IDbDataParameter CreateParameter_NVarChar(string strName, int iSize, bool nullable = false);
-        IDbDataParameter CreateParameter_NVarChar_MAX(string strName);
-        IDbDataParameter CreateParameter_DateTime(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_Time(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_SmallDateTime(string strName);
+        //IDbDataParameter CreateParameter_Bit(string strName, bool nullable = false);
+        //IDbDataParameter CreateParameter_Int(string strName, bool nullable = false);
+        //IDbDataParameter CreateParameter_SmallInt(string strName);
+        //IDbDataParameter CreateParameter_BigInt(string strName);
+        //IDbDataParameter CreateParameter_VarChar(string strName, int iSize, bool nullable = false);
+        //IDbDataParameter CreateParameter_NVarChar(string strName, int iSize, bool nullable = false);
+        //IDbDataParameter CreateParameter_NVarChar_MAX(string strName);
+        //IDbDataParameter CreateParameter_DateTime(string strName, bool nullable = false);
+        //IDbDataParameter CreateParameter_Time(string strName, bool nullable = false);
+        //IDbDataParameter CreateParameter_SmallDateTime(string strName);
+
+        IDataParameter CreateParameter(string strName, object value);
 
         IDbDataAdapter CreateDataAdapter(IDbCommand cmd);
 

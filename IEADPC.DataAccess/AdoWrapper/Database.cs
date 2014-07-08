@@ -8,7 +8,7 @@ namespace DataAccess.AdoWrapper
 {
     public sealed class Database : IDatabase
     {
-        private IDbConnection _conn;
+        private IDbConnection _conn2;
         private volatile int _handlecounter;
         private IDatabaseStrategy _strategy;
         private IDbTransaction _trans;
@@ -17,14 +17,14 @@ namespace DataAccess.AdoWrapper
 
         public void Attach(IDatabaseStrategy strategy)
         {
-            CloseConnection();
             _strategy = strategy;
+            CloseConnection();
         }
 
         public void Detach()
         {
-            CloseConnection();
             _strategy = null;
+            CloseConnection();
         }
 
         public bool IsAttached
@@ -54,7 +54,7 @@ namespace DataAccess.AdoWrapper
 
         public IDbConnection GetConnection()
         {
-            return _conn ?? (_conn = _strategy.CreateConnection());
+            return _conn2 ?? (_conn2 = _strategy.CreateConnection());
         }
 
         public IDbTransaction GetTransaction()
@@ -64,16 +64,16 @@ namespace DataAccess.AdoWrapper
 
         public void Connect(bool bUseTransaction)
         {
-            if (null == _conn)
-                _conn = _strategy.CreateConnection();
+            if (null == GetConnection())
+                _conn2 = _strategy.CreateConnection();
             _handlecounter++;
 
-            if (_conn.State != ConnectionState.Open)
-                _conn.Open();
+            if (GetConnection().State != ConnectionState.Open)
+                GetConnection().Open();
 
             if (_handlecounter == 0)
                 if (bUseTransaction)
-                    _trans = _conn.BeginTransaction();
+                    _trans = GetConnection().BeginTransaction();
         }
 
         public void TransactionCommit()
@@ -95,74 +95,79 @@ namespace DataAccess.AdoWrapper
         {
             if (_handlecounter > 0)
                 _handlecounter--;
-            if (_conn != null && _handlecounter == 0)
+            if (GetConnection() != null && _handlecounter == 0)
             {
                 _trans = null;
-                _conn.Close();
+                GetConnection().Close();
             }
         }
 
         public IDbCommand CreateCommand(string strSql, params IDbDataParameter[] fields)
         {
-            IDbCommand cmd = _strategy.CreateCommand(_conn, strSql, fields);
+            IDbCommand cmd = _strategy.CreateCommand(GetConnection(), strSql, fields);
             if (_trans != null)
                 cmd.Transaction = _trans;
             return cmd;
         }
 
-        public IDbDataParameter CreateParameter_Bit(string strName, bool nullable = false)
+        public IDataParameter CreateParameter(string strName, object value)
         {
-            return _strategy.CreateParameter_Bit(strName, nullable);
+            return _strategy.CreateParameter(strName, value);
         }
 
-        public IDbDataParameter CreateParameter_Int(string strName, bool nullable = false)
-        {
-            return _strategy.CreateParameter_Int(strName, nullable);
-        }
+        //public IDbDataParameter CreateParameter_Bit(string strName, bool nullable = false)
+        //{
+        //    return _strategy.CreateParameter_Bit(strName, nullable);
+        //}
 
-        public IDbDataParameter CreateParameter_SmallInt(string strName)
-        {
-            return _strategy.CreateParameter_SmallInt(strName);
-        }
+        //public IDbDataParameter CreateParameter_Int(string strName, bool nullable = false)
+        //{
+        //    return _strategy.CreateParameter_Int(strName, nullable);
+        //}
 
-        public IDbDataParameter CreateParameter_BigInt(string strName)
-        {
-            return _strategy.CreateParameter_BigInt(strName);
-        }
+        //public IDbDataParameter CreateParameter_SmallInt(string strName)
+        //{
+        //    return _strategy.CreateParameter_SmallInt(strName);
+        //}
 
-        public IDbDataParameter CreateParameter_VarChar(string strName, int iSize, bool nullable = false)
-        {
-            return _strategy.CreateParameter_VarChar(strName, iSize, nullable);
-        }
+        //public IDbDataParameter CreateParameter_BigInt(string strName)
+        //{
+        //    return _strategy.CreateParameter_BigInt(strName);
+        //}
 
-        public IDbDataParameter CreateParameter_NVarChar(string strName, int iSize, bool nullable = false)
-        {
-            return _strategy.CreateParameter_NVarChar(strName, iSize, nullable);
-        }
+        //public IDbDataParameter CreateParameter_VarChar(string strName, int iSize, bool nullable = false)
+        //{
+        //    return _strategy.CreateParameter_VarChar(strName, iSize, nullable);
+        //}
 
-        public IDbDataParameter CreateParameter_NVarChar_MAX(string strName)
-        {
-            return _strategy.CreateParameter_NVarChar_MAX(strName);
-        }
+        //public IDbDataParameter CreateParameter_NVarChar(string strName, int iSize, bool nullable = false)
+        //{
+        //    return _strategy.CreateParameter_NVarChar(strName, iSize, nullable);
+        //}
 
-        public IDbDataParameter CreateParameter_DateTime(string strName, bool nullable = false)
-        {
-            return _strategy.CreateParameter_DateTime(strName, nullable);
-        }
+        //public IDbDataParameter CreateParameter_NVarChar_MAX(string strName)
+        //{
+        //    return _strategy.CreateParameter_NVarChar_MAX(strName);
+        //}
 
-        public IDbDataParameter CreateParameter_Time(string strName, bool nullable = false)
-        {
-            return _strategy.CreateParameter_Time(strName, nullable);
-        }
+        //public IDbDataParameter CreateParameter_DateTime(string strName, bool nullable = false)
+        //{
+        //    return _strategy.CreateParameter_DateTime(strName, nullable);
+        //}
 
-        public IDbDataParameter CreateParameter_SmallDateTime(string strName)
-        {
-            return _strategy.CreateParameter_SmallDateTime(strName);
-        }
+        //public IDbDataParameter CreateParameter_Time(string strName, bool nullable = false)
+        //{
+        //    return _strategy.CreateParameter_Time(strName, nullable);
+        //}
+
+        //public IDbDataParameter CreateParameter_SmallDateTime(string strName)
+        //{
+        //    return _strategy.CreateParameter_SmallDateTime(strName);
+        //}
 
         public int ExecuteNonQuery(IDbCommand cmd)
         {
-            if (null == _conn)
+            if (null == GetConnection())
                 throw new Exception("DB2.ExecuteNonQuery: void connection");
 
             if (_trans != null)
@@ -177,10 +182,10 @@ namespace DataAccess.AdoWrapper
 
         public object GetlastInsertedID()
         {
-            if (null == _conn)
+            if (null == GetConnection())
                 throw new Exception("DB2.ExecuteNonQuery: void connection");
 
-            using (IDbCommand cmd = _strategy.GetlastInsertedID_Cmd(_conn))
+            using (IDbCommand cmd = _strategy.GetlastInsertedID_Cmd(GetConnection()))
                 return GetSkalar(cmd);
         }
 
@@ -213,7 +218,7 @@ namespace DataAccess.AdoWrapper
         {
             lock (this)
             {
-                using (IDbCommand cmd = _strategy.CreateCommand(strSql, _conn))
+                using (IDbCommand cmd = _strategy.CreateCommand(strSql, GetConnection()))
                 {
                     if (_trans != null)
                         cmd.Transaction = _trans;
@@ -227,7 +232,7 @@ namespace DataAccess.AdoWrapper
         {
             lock (this)
             {
-                using (IDbCommand cmd = _strategy.CreateCommand(strSql, _conn))
+                using (IDbCommand cmd = _strategy.CreateCommand(strSql, GetConnection()))
                 {
                     IDataAdapter da = _strategy.CreateDataAdapter(cmd); //todo//
 
@@ -255,12 +260,12 @@ namespace DataAccess.AdoWrapper
             IDbCommand cmdTo = null;
             try
             {
-                if (_conn == null) throw new Exception("~blur?~");
+                if (GetConnection() == null) throw new Exception("~blur?~");
 
                 dtFrom = dbFrom.GetDataTable("from", strSqlFrom);
                 dtTo = dtFrom.Copy();
 
-                cmdTo = _strategy.CreateCommand(strSqlTo, _conn);
+                cmdTo = _strategy.CreateCommand(strSqlTo, GetConnection());
                 if (_trans != null)
                     cmdTo.Transaction = _trans;
 
@@ -276,28 +281,28 @@ namespace DataAccess.AdoWrapper
 
         public void Import(DataTable dt, string strSql)
         {
-            using (IDbCommand cmd = _strategy.CreateCommand(strSql, _conn))
+            using (IDbCommand cmd = _strategy.CreateCommand(strSql, GetConnection()))
                 _strategy.Import(dt, cmd);
         }
 
         public string[] GetTables()
         {
-            return _strategy.GetTables(_conn, "%");
+            return _strategy.GetTables(GetConnection(), "%");
         }
 
         public string[] GetTables(String strFilter)
         {
-            return _strategy.GetTables(_conn, strFilter);
+            return _strategy.GetTables(GetConnection(), strFilter);
         }
 
         public string[] GetTableColumns(string strTableName, params object[] exclude)
         {
-            return _strategy.GetTableColumns(_conn, strTableName);
+            return _strategy.GetTableColumns(GetConnection(), strTableName);
         }
 
         public int DropTable(string strTableName)
         {
-            return _strategy.DropTable(_conn, strTableName);
+            return _strategy.DropTable(GetConnection(), strTableName);
         }
 
         public void CompactDatabase()
@@ -314,7 +319,7 @@ namespace DataAccess.AdoWrapper
 
         public void ShrinkDatabase()
         {
-            if (null == _conn) throw new Exception("DB2.ExecuteNonQuery: void connection");
+            if (null == GetConnection()) throw new Exception("DB2.ExecuteNonQuery: void connection");
 
             _strategy.ShrinkDatabase(ConnectionString);
         }
@@ -375,7 +380,7 @@ namespace DataAccess.AdoWrapper
                 if (hsColumns2Export.Contains(column.ColumnName))
                 {
                     cmd.Parameters.Add(
-                        CreateParameter_VarChar(
+                        CreateParameter(
                             htPars[column.Caption],
                             column.MaxLength));
                 }
@@ -398,7 +403,7 @@ namespace DataAccess.AdoWrapper
 
         public bool SupportsView(String strName)
         {
-            return _strategy.SupportsView(_conn, strName);
+            return _strategy.SupportsView(GetConnection(), strName);
         }
 
         public IEnumerable<string> GetViews(String strName)
@@ -415,7 +420,7 @@ namespace DataAccess.AdoWrapper
 
         public bool SupportsStoredProcedure(String strName)
         {
-            return _strategy.SupportsStoredProcedure(_conn, strName);
+            return _strategy.SupportsStoredProcedure(GetConnection(), strName);
         }
 
         public IEnumerable<string> GetStoredProcedure(String strName)
@@ -796,10 +801,10 @@ namespace DataAccess.AdoWrapper
         {
             if (disposing)
             {
-                if (_conn != null)
+                if (GetConnection() != null)
                 {
-                    _conn.Dispose();
-                    _conn = null;
+                    _conn2.Dispose();
+                    _conn2 = null;
                 }
             }
         }
@@ -834,19 +839,19 @@ namespace DataAccess.AdoWrapper
             return Create(new DsMSSQL(strConnStr));
         }
 
-        public static Database CreateExcel(string strFilename, bool bAssumeHeader, bool bUseImex, bool bNewExcel)
-        {
-            return Create(bNewExcel
-                              ? new DsExcel_XLSX(strFilename, bAssumeHeader, bUseImex)
-                              : (AbstractDsExcel)new DsExcel_XLS(strFilename, bAssumeHeader, bUseImex));
-        }
+        //public static Database CreateExcel(string strFilename, bool bAssumeHeader, bool bUseImex, bool bNewExcel)
+        //{
+        //    return Create(bNewExcel
+        //                      ? new DsExcel_XLSX(strFilename, bAssumeHeader, bUseImex)
+        //                      : (AbstractDsExcel)new DsExcel_XLS(strFilename, bAssumeHeader, bUseImex));
+        //}
 
         private int DoExecuteNonQuery(string strSql)
         {
-            if (null == _conn)
+            if (null == GetConnection())
                 throw new Exception("DB2.ExecuteNonQuery: void connection");
 
-            using (IDbCommand cmd = _strategy.CreateCommand(strSql, _conn))
+            using (IDbCommand cmd = _strategy.CreateCommand(strSql, GetConnection()))
             {
                 if (_trans != null)
                     cmd.Transaction = _trans;
@@ -857,9 +862,9 @@ namespace DataAccess.AdoWrapper
 
         private IDataReader DoGetDataReader(string strSql)
         {
-            if (null == _conn) throw new Exception("DB2.GetDataReader: void connection");
+            if (null == GetConnection()) throw new Exception("DB2.GetDataReader: void connection");
 
-            using (IDbCommand cmd = _strategy.CreateCommand(strSql, _conn))
+            using (IDbCommand cmd = _strategy.CreateCommand(strSql, GetConnection()))
             {
                 if (_trans != null)
                     cmd.Transaction = _trans;
@@ -869,9 +874,9 @@ namespace DataAccess.AdoWrapper
 
         private object DoGetSkalar(string strSql)
         {
-            if (null == _conn) throw new Exception("DB2.GetSkalar: void connection");
+            if (null == GetConnection()) throw new Exception("DB2.GetSkalar: void connection");
 
-            using (IDbCommand cmd = _strategy.CreateCommand(strSql, _conn))
+            using (IDbCommand cmd = _strategy.CreateCommand(strSql, GetConnection()))
             {
                 if (_trans != null)
                     cmd.Transaction = _trans;

@@ -43,16 +43,18 @@ namespace DataAccess.AdoWrapper
 
         IDbCommand CreateCommand(string strSql, params IDbDataParameter[] fields);
 
-        IDbDataParameter CreateParameter_Bit(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_Int(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_SmallInt(string strName);
-        IDbDataParameter CreateParameter_BigInt(string strName);
-        IDbDataParameter CreateParameter_VarChar(string strName, int iSize, bool nullable = false);
-        IDbDataParameter CreateParameter_NVarChar(string strName, int iSize, bool nullable = false);
-        IDbDataParameter CreateParameter_NVarChar_MAX(string strName);
-        IDbDataParameter CreateParameter_DateTime(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_Time(string strName, bool nullable = false);
-        IDbDataParameter CreateParameter_SmallDateTime(string strName);
+        IDataParameter CreateParameter(string strName, object value);
+
+        //IDataParameter CreateParameter_Bit(string strName, bool nullable = false);
+        //IDataParameter CreateParameter_Int(string strName, bool nullable = false);
+        //IDataParameter CreateParameter_SmallInt(string strName);
+        //IDataParameter CreateParameter_BigInt(string strName);
+        //IDataParameter CreateParameter_VarChar(string strName, int iSize, bool nullable = false);
+        //IDataParameter CreateParameter_NVarChar(string strName, int iSize, bool nullable = false);
+        //IDataParameter CreateParameter_NVarChar_MAX(string strName);
+        //IDataParameter CreateParameter_DateTime(string strName, bool nullable = false);
+        //IDataParameter CreateParameter_Time(string strName, bool nullable = false);
+        //IDataParameter CreateParameter_SmallDateTime(string strName);
 
         string[] GetTables();
         string[] GetTables(String strFilter);

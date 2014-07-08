@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
@@ -22,13 +23,12 @@ using DataAccess.ModelsAnotations;
 
 namespace DataAccess
 {
+
     public static class DataHelperExtensions
     {
-        public static IDataParameter AddWithValue<T>(this IDataParameterCollection source, string name, T value)
+        public static void AddWithValue(this IDataParameterCollection source, string name, object parameter, IDatabase db)
         {
-            var dbDataParameter = new SqlParameter(name, value);
-            source.Add(dbDataParameter);
-            return dbDataParameter;
+            source.Add(db.CreateParameter(name, parameter));
         }
     }
 
@@ -75,17 +75,18 @@ namespace DataAccess
         {
             if (info.Name != name)
                 return false;
-            return info.GetCustomAttributes(false).Any(s => s is ForeignKeyAttribute);
+            return info.GetCustomAttributes(false).Any(s => s is PrimaryKeyAttribute);
         }
 
         public static string GetPK(this Type type)
         {
             var name = type.GetProperties().FirstOrDefault(CheckForPK);
-            return name == null ? null : name.Name;
+            return MapEntiysPropToSchema(type, name == null ? null : name.Name);
         }
 
         public static string GetFK(this Type type, string name)
         {
+            name = type.ReMapSchemaToEntiysProp(name);
             var prop = type.GetProperties().FirstOrDefault(info => CheckForFK(info, name));
             return prop == null ? null : prop.Name;
         }
@@ -108,6 +109,14 @@ namespace DataAccess
             return (E)typeof(T).GetProperty(pk).GetValue(source, null);
         }
 
+        public static E GetFK<E>(this Type targetType, string name)
+        {
+            string pk = targetType.GetFK(name);
+            var propertyInfo = targetType.GetProperty(pk);
+            var value = propertyInfo.GetValue(source, null);
+            return (E)value;
+        }
+
         public static IEnumerable<string> MapEntiyToSchema<T>(string[] ignore)
         {
             Type type = typeof(T);
@@ -117,10 +126,9 @@ namespace DataAccess
                    select formodle != null ? formodle.AlternatingName : propertyInfo.Name;
         }
 
-        public static string MapEntiysPropToSchema<T>(string prop)
+        public static string MapEntiysPropToSchema(this Type source, string prop)
         {
-            Type type = typeof(T);
-            PropertyInfo[] propertys = type.GetProperties();
+            PropertyInfo[] propertys = source.GetProperties();
             return (from propertyInfo in propertys
                     where propertyInfo.Name == prop
                     let formodle =
@@ -128,9 +136,19 @@ namespace DataAccess
                     select formodle != null ? formodle.AlternatingName : propertyInfo.Name).FirstOrDefault();
         }
 
+        public static string MapEntiysPropToSchema<T>(string prop)
+        {
+            return MapEntiysPropToSchema(typeof(T), prop);
+        }
+
         public static string ReMapSchemaToEntiysProp<T>(string prop)
         {
-            foreach (PropertyInfo propertyInfo in from propertyInfo in typeof(T).GetProperties()
+            return typeof (T).ReMapSchemaToEntiysProp(prop);
+        }
+
+        public static string ReMapSchemaToEntiysProp(this Type source, string prop)
+        {
+            foreach (PropertyInfo propertyInfo in from propertyInfo in source.GetProperties()
                                                   let customAttributes =
                                                       propertyInfo.GetCustomAttributes(false)
                                                                   .FirstOrDefault(s => s is ForModel) as ForModel
@@ -172,7 +190,7 @@ namespace DataAccess
                     continue;
 
                 var sqlCommand =
-                    DbAccessLayer.CreateSelect<dynamic>(source.GetFK<dynamic, long>(firstOrDefault.AlternatingName),
+                    DbAccessLayer.CreateSelect<dynamic>(propertyInfo.PropertyType.GetFK<long>(firstOrDefault.AlternatingName),
                         accessLayer);
                 var orDefault = DbAccessLayer.RunSelect<dynamic>(accessLayer, sqlCommand);
                 propertyInfo.SetValue(source, orDefault, null);

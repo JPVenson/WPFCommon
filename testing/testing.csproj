@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B3D1161A-3C53-4459-865F-D586D1100E76}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>testing</RootNamespace>
     <AssemblyName>testing</AssemblyName>
@@ -34,8 +34,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -50,17 +54,18 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="program.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Dropbox\Projekte\IEADPC.BatchRemoting.DataAccess\JPB.DataAccess.MySQL\JPB.DataAccess.MySQL.csproj">
-      <Project>{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}</Project>
-      <Name>JPB.DataAccess.MySQL</Name>
-    </ProjectReference>
     <ProjectReference Include="..\IEADPC.DataAccess\DataAccess.csproj">
       <Project>{A5412B57-DC13-476A-B77B-9C7960DBB052}</Project>
       <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JPB.DataAccess.MySQL\JPB.DataAccess.MySQL.csproj">
+      <Project>{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}</Project>
+      <Name>JPB.DataAccess.MySQL</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

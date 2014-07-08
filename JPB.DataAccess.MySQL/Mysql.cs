@@ -57,7 +57,18 @@ namespace JPB.DataAccess.MySQL
 
         public IDbCommand CreateCommand(IDbConnection conn, string strSql, params IDbDataParameter[] fields)
         {
-            throw new NotImplementedException();
+            var mySqlCommand = new MySqlCommand(strSql, conn as MySqlConnection);
+            foreach (var dbDataParameter in fields)
+            {
+                mySqlCommand.Parameters.Add(dbDataParameter);
+            }
+
+            return mySqlCommand;
+        }
+
+        public IDataParameter CreateParameter(string strName, object value)
+        {
+            return new MySqlParameter(strName, value);
         }
 
         public IDbDataParameter CreateParameter_Bit(string strName, bool nullable = false)
