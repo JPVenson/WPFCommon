@@ -4,9 +4,9 @@
 
 #endregion
 
-using IEADPC.ErrorValidation.ValidationRules;
+using ErrorValidation.ValidationRules;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp
+namespace DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionViewModel : QuestionAbstrViewModelBase<QuestionViewModel, QuestionViewModelValidation>
     {

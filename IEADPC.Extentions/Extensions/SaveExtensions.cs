@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
-namespace IEADPC.Extentions.Extensions
+namespace Extentions.Extensions
 {
     public static class SaveExtensions
     {

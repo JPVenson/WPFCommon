@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace IEADPC.WPFBase.MVVM.ViewModel
+namespace WPFBase.MVVM.ViewModel
 {
     public class ThreadSaveCollectionModel<T, E> : ThreadSaveViewModelBase
         where T : IEnumerable<E>, new()

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
-namespace IEADPC.WPFBase.MVVM.ViewModel
+namespace WPFBase.MVVM.ViewModel
 {
     [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
     public class ThreadSaveObservableCollection<T> : Collection<T>, INotifyCollectionChanged, IList<T>, IList, INotifyPropertyChanged

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using DataAccess.AdoWrapper;
-using MySql.Data.MySqlClient;
 
-namespace JPB.DataAccess.MySQL
+namespace DataAccess.MySQL
 {
     public class Mysql : IDatabaseStrategy
     {

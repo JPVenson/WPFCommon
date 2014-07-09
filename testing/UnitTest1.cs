@@ -3,7 +3,7 @@ using System.Linq;
 using DataAccess.AdoWrapper;
 using DataAccess.Manager;
 using DataAccess.ModelsAnotations;
-using JPB.DataAccess.MySQL;
+using DataAccess.MySQL;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace testing

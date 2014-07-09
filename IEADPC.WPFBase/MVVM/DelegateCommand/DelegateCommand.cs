@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace IEADPC.WPFBase.MVVM.DelegateCommand
+namespace WPFBase.MVVM.DelegateCommand
 {
     public class DelegateCommand : ICommand
     {

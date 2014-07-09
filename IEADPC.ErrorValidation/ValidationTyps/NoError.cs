@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IEADPC.ErrorValidation.ValidationTyps
+namespace ErrorValidation.ValidationTyps
 {
     /// <summary>
     ///     Wird als Dummy benutzt um einen "kein" error zu simulieren

@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using IEADPC.DynamicInputBox.InfoWindow.Wrapper;
+using DynamicInputBox.InfoWindow.Wrapper;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp
+namespace DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionComplexList : QuestionMultipleChoiceAbstrViewModel
     {

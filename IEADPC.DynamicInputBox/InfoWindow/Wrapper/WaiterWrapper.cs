@@ -5,9 +5,9 @@
 #endregion
 
 using System;
-using IEADPC.WPFBase.MVVM.ViewModel;
+using WPFBase.MVVM.ViewModel;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Wrapper
+namespace DynamicInputBox.InfoWindow.Wrapper
 {
     public abstract class WaiterWrapper : ViewModelBase, IWaiterWrapper
     {

@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace IEADPC.WPFBase.Converter
+namespace WPFBase.Converter
 {
     public abstract class TypedValueConverter<T, E> : IValueConverter
     {

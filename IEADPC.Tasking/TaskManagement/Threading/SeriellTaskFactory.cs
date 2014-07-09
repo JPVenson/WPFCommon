@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 
-namespace IEADPC.Tasking.TaskManagement.Threading
+namespace Tasking.TaskManagement.Threading
 {
     public class SeriellTaskFactory
     {

@@ -4,12 +4,12 @@
 
 #endregion
 
-using IEADPC.DynamicInputBox.InfoWindow.Interfaces;
-using IEADPC.ErrorValidation;
-using IEADPC.ErrorValidation.ValidationRules;
-using IEADPC.ErrorValidation.ValidationTyps;
+using DynamicInputBox.InfoWindow.Interfaces;
+using ErrorValidation;
+using ErrorValidation.ValidationRules;
+using ErrorValidation.ValidationTyps;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp
+namespace DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public abstract class QuestionAbstrViewModelBase<T, TE> : ErrorProviderBase<T, TE>, IQuestionViewModel<T>
         where T : class

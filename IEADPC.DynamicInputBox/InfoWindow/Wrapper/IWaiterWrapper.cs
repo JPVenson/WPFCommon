@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Wrapper
+namespace DynamicInputBox.InfoWindow.Wrapper
 {
     public interface IWaiterWrapper
     {

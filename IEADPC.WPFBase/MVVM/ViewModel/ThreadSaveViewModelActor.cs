@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Threading;
 
-namespace IEADPC.WPFBase.MVVM.ViewModel
+namespace WPFBase.MVVM.ViewModel
 {
     public abstract class ThreadSaveViewModelActor
     {

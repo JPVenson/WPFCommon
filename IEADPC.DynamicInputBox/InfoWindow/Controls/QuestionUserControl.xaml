@@ -1,7 +1,6 @@
-﻿<UserControl x:Class="IEADPC.DynamicInputBox.InfoWindow.Controls.QuestionUserControl"
+﻿<UserControl x:Class="DynamicInputBox.InfoWindow.Controls.QuestionUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:wrapper2="clr-namespace:IEADPC.DynamicInputBox.InfoWindow.Wrapper">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <UserControl.Resources>
         <Style x:Key="ProgressBarStyle" TargetType="ProgressBar">

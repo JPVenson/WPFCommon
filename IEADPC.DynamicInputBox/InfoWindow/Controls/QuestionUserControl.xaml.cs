@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Controls
+namespace DynamicInputBox.InfoWindow.Controls
 {
     public partial class QuestionUserControl : UserControl
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace IEADPC.Extentions.Extensions
+namespace Extentions.Extensions
 {
     public interface ITypContainer
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{31EC091D-98AF-4F41-B8B8-E382B94BFFEC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IEADPC.Tasking</RootNamespace>
-    <AssemblyName>IEADPC.Tasking</AssemblyName>
+    <RootNamespace>Tasking</RootNamespace>
+    <AssemblyName>Tasking</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

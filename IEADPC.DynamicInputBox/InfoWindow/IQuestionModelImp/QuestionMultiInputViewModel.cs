@@ -4,10 +4,10 @@
 
 #endregion
 
-using IEADPC.DynamicInputBox.InfoWindow.Wrapper;
-using IEADPC.WPFBase.MVVM.DelegateCommand;
+using DynamicInputBox.InfoWindow.Wrapper;
+using WPFBase.MVVM.DelegateCommand;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp
+namespace DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionMultiInputViewModel : QuestionMultipleChoiceAbstrViewModel
     {

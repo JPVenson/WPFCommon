@@ -7,8 +7,8 @@
     <ProjectGuid>{0058C72B-2796-456E-84FB-6FD33A1C15BF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IEADPC.Extentions</RootNamespace>
-    <AssemblyName>IEADPC.Extentions</AssemblyName>
+    <RootNamespace>Extentions</RootNamespace>
+    <AssemblyName>Extentions</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

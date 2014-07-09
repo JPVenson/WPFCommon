@@ -7,8 +7,8 @@
     <ProjectGuid>{535181FB-8192-44CB-9859-4D5A2484B971}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IEADPC.DynamicInputBox</RootNamespace>
-    <AssemblyName>IEADPC.DynamicInputBox</AssemblyName>
+    <RootNamespace>DynamicInputBox</RootNamespace>
+    <AssemblyName>DynamicInputBox</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

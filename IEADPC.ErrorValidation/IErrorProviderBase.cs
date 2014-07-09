@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using IEADPC.ErrorValidation.ValidationTyps;
+using ErrorValidation.ValidationTyps;
 
-namespace IEADPC.ErrorValidation
+namespace ErrorValidation
 {
     public interface IErrorProviderBase<T> : IDataErrorInfo, INotifyPropertyChanged where T : class
     {

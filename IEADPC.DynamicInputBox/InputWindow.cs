@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using IEADPC.DynamicInputBox.InfoWindow;
-using IEADPC.DynamicInputBox.InfoWindow.Controls;
-using IEADPC.DynamicInputBox.InfoWindow.Wrapper;
+using DynamicInputBox.InfoWindow;
+using DynamicInputBox.InfoWindow.Controls;
+using DynamicInputBox.InfoWindow.Wrapper;
 
-namespace IEADPC.DynamicInputBox
+namespace DynamicInputBox
 {
     public static class InputWindow
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Controls
+namespace DynamicInputBox.InfoWindow.Controls
 {
     public partial class UserInputWindow : Window
     {

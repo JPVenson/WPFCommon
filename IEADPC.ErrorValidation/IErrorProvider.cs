@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using IEADPC.ErrorValidation.ValidationTyps;
+using ErrorValidation.ValidationTyps;
 
-namespace IEADPC.ErrorValidation
+namespace ErrorValidation
 {
     public interface IErrorProvider<T> : ICollection<IValidation<T>>
     {

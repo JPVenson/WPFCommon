@@ -7,8 +7,8 @@
     <ProjectGuid>{5FB1FACD-D060-4188-BB0D-B5D27B83F081}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IEADPC.ErrorValidation</RootNamespace>
-    <AssemblyName>IEADPC.ErrorValidation</AssemblyName>
+    <RootNamespace>ErrorValidation</RootNamespace>
+    <AssemblyName>ErrorValidation</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace IEADPC.Extentions.Extensions
+namespace Extentions.Extensions
 {
     public static class IEnumerableManagerExtensions
     {

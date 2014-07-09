@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using IEADPC.ErrorValidation.ValidationTyps;
+using ErrorValidation.ValidationTyps;
 
-namespace IEADPC.ErrorValidation.ValidationRules
+namespace ErrorValidation.ValidationRules
 {
     public abstract class ValidationRuleBase<T> : IErrorProvider<T>
     {

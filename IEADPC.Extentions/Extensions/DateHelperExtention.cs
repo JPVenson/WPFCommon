@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace IEADPC.Extentions.Extensions
+namespace Extentions.Extensions
 {
     public static class DateHelperExtention
     {

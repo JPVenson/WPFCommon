@@ -9,13 +9,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using IEADPC.DynamicInputBox.InfoWindow.Controls;
-using IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp;
-using IEADPC.ErrorValidation;
-using IEADPC.ErrorValidation.ValidationRules;
-using IEADPC.WPFBase.MVVM.DelegateCommand;
+using DynamicInputBox.InfoWindow.Controls;
+using DynamicInputBox.InfoWindow.IQuestionModelImp;
+using ErrorValidation;
+using ErrorValidation.ValidationRules;
+using WPFBase.MVVM.DelegateCommand;
 
-namespace IEADPC.DynamicInputBox.InfoWindow
+namespace DynamicInputBox.InfoWindow
 {
     public class UserInputViewModel : ErrorProviderBase<UserInputViewModel, UserInputViewModelValidation>, IEnumerator
     {

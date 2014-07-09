@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace IEADPC.WPFBase.MVVM.ViewModel
+namespace WPFBase.MVVM.ViewModel
 {
     public abstract class AsyncViewModelBase : ThreadSaveViewModelBase
     {

@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace IEADPC.WPFBase.Converter
+namespace WPFBase.Converter
 {
     [ValueConversion(typeof (bool), typeof (bool))]
     public class BooleanInverseConverter : TypedValueConverter<bool, bool>

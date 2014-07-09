@@ -4,7 +4,7 @@
 
 #endregion
 
-namespace IEADPC.DynamicInputBox.InfoWindow
+namespace DynamicInputBox.InfoWindow
 {
     public enum EingabeModus
     {

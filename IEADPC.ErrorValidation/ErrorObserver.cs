@@ -1,4 +1,4 @@
-﻿namespace IEADPC.ErrorValidation
+﻿namespace ErrorValidation
 {
     public class ErrorObserver<T>
     {

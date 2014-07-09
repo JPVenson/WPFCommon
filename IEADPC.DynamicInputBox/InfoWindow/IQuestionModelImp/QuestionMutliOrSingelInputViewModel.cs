@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using IEADPC.DynamicInputBox.InfoWindow.Wrapper;
-using IEADPC.ErrorValidation.ValidationTyps;
+using DynamicInputBox.InfoWindow.Wrapper;
+using ErrorValidation.ValidationTyps;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp
+namespace DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionMutliOrSingelInputViewModel : QuestionMultipleChoiceAbstrViewModel
     {

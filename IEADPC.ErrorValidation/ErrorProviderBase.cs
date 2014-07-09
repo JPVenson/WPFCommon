@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
-using IEADPC.ErrorValidation.ValidationTyps;
-using IEADPC.WPFBase.MVVM.ViewModel;
+using ErrorValidation.ValidationTyps;
+using WPFBase.MVVM.ViewModel;
 
-namespace IEADPC.ErrorValidation
+namespace ErrorValidation
 {
     public abstract class ErrorProviderBase<T, TE> : AsyncViewModelBase, IErrorProviderBase<T>
         where T : class

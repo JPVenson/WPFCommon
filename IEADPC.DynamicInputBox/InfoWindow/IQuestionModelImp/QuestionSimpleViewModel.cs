@@ -4,7 +4,7 @@
 
 #endregion
 
-namespace IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp
+namespace DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionSimpleViewModel : QuestionViewModel
     {

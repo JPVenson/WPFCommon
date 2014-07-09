@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IEADPC.ErrorValidation.ValidationTyps
+namespace ErrorValidation.ValidationTyps
 {
     public class Warning<T> : IValidation<T>
     {

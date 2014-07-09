@@ -8,11 +8,11 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using IEADPC.DynamicInputBox.InfoWindow.Wrapper;
-using IEADPC.ErrorValidation.ValidationTyps;
-using IEADPC.WPFBase.MVVM.DelegateCommand;
+using DynamicInputBox.InfoWindow.Wrapper;
+using ErrorValidation.ValidationTyps;
+using WPFBase.MVVM.DelegateCommand;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.IQuestionModelImp
+namespace DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionActionViewModel : QuestionViewModel
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace IEADPC.WPFBase.Converter
+namespace WPFBase.Converter
 {
     public abstract class TypedParamValueConverter<T, TE, Parm> : TypedValueConverter<T, TE>
     {

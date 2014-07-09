@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace IEADPC.WPFBase.Converter
+namespace WPFBase.Converter
 {
     [ValueConversion(typeof (Visibility), typeof (bool))]
     public class BooleanVisibilityConverter : IValueConverter

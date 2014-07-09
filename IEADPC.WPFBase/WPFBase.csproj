@@ -7,8 +7,8 @@
     <ProjectGuid>{4615BF6C-DB8E-4124-9D92-C8977ACE2898}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IEADPC.WPFBase</RootNamespace>
-    <AssemblyName>IEADPC.WPFBase</AssemblyName>
+    <RootNamespace>WPFBase</RootNamespace>
+    <AssemblyName>WPFBase</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

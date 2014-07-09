@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 
-namespace IEADPC.WPFBase.MVVM.ViewModel
+namespace WPFBase.MVVM.ViewModel
 {
     public class ThreadSaveViewModelBase : ThreadSaveViewModelActor, INotifyPropertyChanged
     {

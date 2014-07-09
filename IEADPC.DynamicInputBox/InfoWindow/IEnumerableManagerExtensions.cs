@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace IEADPC.DynamicInputBox.InfoWindow
+namespace DynamicInputBox.InfoWindow
 {
     public static class IEnumerableManagerExtensions
     {

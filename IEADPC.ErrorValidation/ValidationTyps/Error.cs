@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IEADPC.ErrorValidation.ValidationTyps
+namespace ErrorValidation.ValidationTyps
 {
     /// <summary>
     ///     Endhält ein gültigen Error

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace IEADPC.Extentions.Extensions
+namespace Extentions.Extensions
 {
     public static class Extensions
     {

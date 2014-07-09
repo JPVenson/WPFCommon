@@ -7,8 +7,8 @@
     <ProjectGuid>{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JPB.DataAccess.MySQL</RootNamespace>
-    <AssemblyName>JPB.DataAccess.MySQL</AssemblyName>
+    <RootNamespace>DataAccess.MySQL</RootNamespace>
+    <AssemblyName>DataAccess.MySQL</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,7 +44,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\WPFCommon\trunk\IEADPC.DataAccess\DataAccess.csproj">
+    <ProjectReference Include="..\IEADPC.DataAccess\DataAccess.csproj">
       <Project>{A5412B57-DC13-476A-B77B-9C7960DBB052}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
