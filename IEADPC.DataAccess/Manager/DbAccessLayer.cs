@@ -138,7 +138,8 @@ namespace DataAccess.Manager
 
         protected static string CreatePropertyCSV(Type type, params string[] ignore)
         {
-            return CreatePropertyNames(type, ignore).Aggregate((e, f) => e + ", " + f);
+            var propertyNames = CreatePropertyNames(type, ignore);
+            return propertyNames.Aggregate((e, f) => e + ", " + f);
         }
 
         protected static string CreatePropertyCSV<T>(params string[] ignore)

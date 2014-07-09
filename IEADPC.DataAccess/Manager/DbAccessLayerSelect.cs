@@ -65,7 +65,7 @@ namespace DataAccess.Manager
         #endregion
 
         #region CreateCommands
-
+        
         public static IDbCommand CreateSelect(Type type, IDatabase batchRemotingDb, string query)
         {
             return CreateCommand(batchRemotingDb, CreateSelect(type, batchRemotingDb).CommandText + " " + query);
@@ -105,8 +105,7 @@ namespace DataAccess.Manager
         public static IDbCommand CreateSelect(Type type, IDatabase batchRemotingDb, long pk)
         {
             string proppk = type.GetPK();
-            string propertyInfos = CreatePropertyCSV(type, CreateIgnoreList(type));
-            string query = "SELECT " + propertyInfos + " FROM " + type.GetTableName() + " WHERE " + proppk + " = @pk";
+            string query = CreateSelect(type) + " WHERE " + proppk + " = @pk";
             var cmd = CreateCommand(batchRemotingDb, query);
             cmd.Parameters.AddWithValue("@pk", pk, batchRemotingDb);
             return cmd;
@@ -117,10 +116,19 @@ namespace DataAccess.Manager
             return CreateSelect(typeof(T), batchRemotingDb, pk);
         }
 
+        public static string CreateSelect<T>()
+        {
+            return CreateSelect(typeof (T));
+        }
+
+        public static string CreateSelect(Type type)
+        {
+            return "SELECT " + CreatePropertyCSV(type, CreateIgnoreList(type)) + " FROM " + type.GetTableName();
+        }
+
         public static IDbCommand CreateSelect(Type type, IDatabase batchRemotingDb)
         {
-            string query = "SELECT " + CreatePropertyCSV(type, CreateIgnoreList(type)) + " FROM " + type.GetTableName();
-            IDbCommand cmd = CreateCommand(batchRemotingDb, query);
+            IDbCommand cmd = CreateCommand(batchRemotingDb, CreateSelect(type));
             return cmd;
         }
 
@@ -133,7 +141,7 @@ namespace DataAccess.Manager
 
         #region Runs
 
-        public static List<object> RunSelect(Type type, IDatabase database, IDbCommand query)
+        public static object RunDynamicSelect(Type type, IDatabase database, IDbCommand query)
         {
             return
                 database.Run(
@@ -145,6 +153,11 @@ namespace DataAccess.Manager
                             DataConverterExtensions.SetPropertysViaRefection(instance, e);
                             return instance;
                         }).ToList());
+        }
+
+        public static List<object> RunSelect(Type type, IDatabase database, IDbCommand query)
+        {
+            return RunDynamicSelect(type, database, query) as List<object>;
         }
 
         public static List<T> RunSelect<T>(IDatabase database, IDbCommand query) where T : new()
@@ -315,7 +328,7 @@ namespace DataAccess.Manager
 
 //private List<T> RunPrimetivSelect<T>(string query) where T : class
 //{
-//    return RunPrimetivSelect(typeof(T), query).Cast<T>().ToList();
+//    return RunPrimetivSelect(typeof(T), query).CastToEnumerable<T>().ToList();
 //}
 
 //public List<T> SelectNative<T>(string query) where T : class
