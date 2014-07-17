@@ -8,38 +8,25 @@ namespace Extentions.Extensions
 {
     public static class SaveExtensions
     {
-        public static T LoadGeneric<T>([In, Out] this T Class, string Filename) where T : ITypContainer, new()
-        {
-            if (File.Exists(Filename))
-            {
-                var ts = new TypeStore();
-                ts = ts.LoadFromBinary<TypeStore>("TypeStore.bin");
-                T newc = Class.LoadFromXML(Filename, ts.Typen.ToArray());
-                return newc;
-            }
-            return new T();
-        }
+        //public static T LoadGeneric<T>([In, Out] this T Class, string Filename) where T : ITypContainer, new()
+        //{
+        //    if (File.Exists(Filename))
+        //    {
+        //        var ts = new TypeStore();
+        //        ts = LoadFromBinary<TypeStore>("TypeStore.bin");
+        //        T newc = LoadFromXML(Filename, ts.Typen.ToArray());
+        //        return newc;
+        //    }
+        //    return new T();
+        //}
 
-        public static void SaveGeneric<T>(this T Class, string Filename) where T : ITypContainer
-        {
-            var ts = new TypeStore();
-            ts.Typen = Class.GetTyps();
-            ts.SaveAsBinary("TypeStore.bin");
-            Class.SaveAsXML(Filename, ts.Typen.ToArray());
-        }
-
-        public static T LoadFromXML<T>(this Object A, string FileName) where T : class
-        {
-            if (File.Exists(FileName))
-            {
-                using (var textReader = new StreamReader(FileName))
-                {
-                    var deserializer = new XmlSerializer(A.GetType());
-                    return (T) (deserializer.Deserialize(textReader));
-                }
-            }
-            return default(T);
-        }
+        //public static void SaveGeneric<T>(this T Class, string Filename) where T : ITypContainer
+        //{
+        //    var ts = new TypeStore();
+        //    ts.Typen = Class.GetTyps();
+        //    ts.SaveAsBinary("TypeStore.bin");
+        //    Class.SaveAsXML(Filename, ts.Typen.ToArray());
+        //}
 
         public static T LoadFromXMLString<T>(this string source, params Type[] typs) where T : class
         {
@@ -75,19 +62,17 @@ namespace Extentions.Extensions
             }
         }
 
-        public static T LoadFromXML<T>(this T A, string FileName, Type[] typs) where T : new()
+        public static T LoadFromXML<T>(string FileName, Type[] typs) where T : new()
         {
             if (File.Exists(FileName))
             {
                 using (var textReader = new StreamReader(FileName))
                 {
-                    if (A == null)
-                        A = new T();
-                    var deserializer = new XmlSerializer(A.GetType(), typs);
+                    var deserializer = new XmlSerializer(typeof(T), typs);
                     return (T) (deserializer.Deserialize(textReader));
                 }
             }
-            return A;
+            return new T();
         }
 
         public static Stream SaveAsXML(this Object A)
@@ -152,18 +137,7 @@ namespace Extentions.Extensions
             return new A();
         }
 
-        public static A LoadFromBinary<A>(this Object source, string FileName) where A : new()
-        {
-            if (File.Exists(FileName))
-            {
-                var fs = new FileStream(FileName, FileMode.Open);
-                var formatter = new BinaryFormatter();
-                return (A) formatter.Deserialize(fs);
-            }
-            return new A();
-        }
-
-        public static object LoadFromBinary(this Object T, string FileName)
+        public static object LoadFromBinary(string FileName)
         {
             if (File.Exists(FileName))
             {

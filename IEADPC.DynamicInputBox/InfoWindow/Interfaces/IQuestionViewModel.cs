@@ -5,9 +5,9 @@
 #endregion
 
 using System;
-using IEADPC.ErrorValidation;
+using ErrorValidation;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Interfaces
+namespace DynamicInputBox.InfoWindow.Interfaces
 {
     public interface IQuestionViewModel<T> : IErrorProviderBase<T>
         where T : class

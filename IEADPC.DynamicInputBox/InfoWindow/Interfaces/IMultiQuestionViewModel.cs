@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using IEADPC.DynamicInputBox.InfoWindow.Wrapper;
+using DynamicInputBox.InfoWindow.Wrapper;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Interfaces
+namespace DynamicInputBox.InfoWindow.Interfaces
 {
     public interface IMultiQuestionViewModel<T> : IQuestionViewModel<T> where T : class
     {

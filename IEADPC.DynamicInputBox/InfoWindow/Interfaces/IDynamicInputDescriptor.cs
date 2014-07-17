@@ -6,7 +6,7 @@
 
 using System.ComponentModel;
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Interfaces
+namespace DynamicInputBox.InfoWindow.Interfaces
 {
     public interface IDynamicInputDescriptor : ICustomTypeDescriptor, IInputDescriptor
     {

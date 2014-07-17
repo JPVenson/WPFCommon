@@ -173,7 +173,7 @@ namespace WPFBase.MVVM.ViewModel
             }
             this.SendPropertyChanged("Count");
             this.SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item, index)));
+            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index)));
         }
 
         protected override void SetItem(int index, T item)

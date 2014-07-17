@@ -4,7 +4,7 @@
 
 #endregion
 
-namespace IEADPC.DynamicInputBox.InfoWindow.Interfaces
+namespace DynamicInputBox.InfoWindow.Interfaces
 {
     public interface IInputDescriptor
     {
