@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
@@ -68,7 +67,7 @@ namespace Extentions.Extensions
             {
                 using (var textReader = new StreamReader(FileName))
                 {
-                    var deserializer = new XmlSerializer(typeof(T), typs);
+                    var deserializer = new XmlSerializer(typeof (T), typs);
                     return (T) (deserializer.Deserialize(textReader));
                 }
             }
@@ -126,6 +125,16 @@ namespace Extentions.Extensions
             }
         }
 
+        public static byte[] SaveAsBinary(this Object A)
+        {
+            using (var fs = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(fs, A);
+                return fs.ToArray();
+            }
+        }
+
         public static A LoadFromBinary<A>(string FileName) where A : new()
         {
             if (File.Exists(FileName))
@@ -146,6 +155,15 @@ namespace Extentions.Extensions
                 return formatter.Deserialize(fs);
             }
             return null;
+        }
+
+        public static object LoadFromBinary(this byte[] FileName)
+        {
+            using (var memstream = new MemoryStream(FileName))
+            {
+                var formatter = new BinaryFormatter();
+                return formatter.Deserialize(memstream);
+            }
         }
     }
 }

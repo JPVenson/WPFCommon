@@ -22,15 +22,15 @@ namespace DynamicInputBox.InfoWindow
         private readonly Action _abort;
 
         public Dictionary<string, string> Localisation = new Dictionary<string, string>
-            {
-                {"GoTo", "Go to page:"},
-                {"Close", "OK"},
-                {"Back", "Back"},
-                {"Quit", "Quit"},
-            };
+        {
+            {"GoTo", "Go to page:"},
+            {"Close", "OK"},
+            {"Back", "Back"},
+            {"Quit", "Quit"},
+        };
 
         public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort,
-                                  IEnumerable<EingabeModus> inputmode)
+            IEnumerable<EingabeModus> inputmode)
         {
             Inputmode = inputmode;
             Returnlist = returnlist;
@@ -274,8 +274,8 @@ namespace DynamicInputBox.InfoWindow
         private EingabeModus GetInput(int i)
         {
             return Inputmode != null && Inputmode.Count() > i
-                       ? Inputmode.ElementAt(i)
-                       : EingabeModus.Text;
+                ? Inputmode.ElementAt(i)
+                : EingabeModus.Text;
         }
 
         private QuestionViewModel SwitchTypes(EingabeModus eingabemodi, object question)

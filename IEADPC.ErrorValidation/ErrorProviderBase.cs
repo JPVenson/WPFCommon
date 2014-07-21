@@ -81,11 +81,11 @@ namespace ErrorValidation
 
             IEnumerable<IValidation<T>> listOfErrors =
                 ErrorObserver<T>.Instance.GetProviderViaType()
-                                .Where(s => s.ErrorIndicator == errorIndicator || s.ErrorIndicator == string.Empty);
+                    .Where(s => s.ErrorIndicator == errorIndicator || s.ErrorIndicator == string.Empty);
 
             string errortext =
                 listOfErrors.Select(vaildValidation => ManageError(obj, vaildValidation))
-                            .Aggregate("", (current, error) => string.IsNullOrEmpty(error) ? current : error);
+                    .Aggregate("", (current, error) => string.IsNullOrEmpty(error) ? current : error);
 
             if (!refference.Any(s => s is Error<T> || s is Warning<T>))
                 refference.Add(DefaultNoError);

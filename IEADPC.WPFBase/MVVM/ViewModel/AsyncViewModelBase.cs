@@ -56,7 +56,7 @@ namespace WPFBase.MVVM.ViewModel
             {
                 var task = new Task<T>(delegatetask.Invoke);
                 SimpleWork(task, new Action<Task<T>>(s =>
-                                                     base.ThreadSaveAction(() => continueWith(s.Result))), setWorking);
+                    base.ThreadSaveAction(() => continueWith(s.Result))), setWorking);
             }
         }
 

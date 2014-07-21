@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using DataAccess.AdoWrapper;
 using DataAccess.Helper;
-using DataAccess.ModelsAnotations;
 
 namespace DataAccess.Manager
 {
@@ -19,7 +18,7 @@ namespace DataAccess.Manager
 
         public T Select<T>(long pk) where T : new()
         {
-            return (T)Select(typeof(T), pk);
+            return (T) Select(typeof (T), pk);
         }
 
         protected static object Select(Type type, long pk, IDatabase batchRemotingDb)
@@ -39,7 +38,7 @@ namespace DataAccess.Manager
 
         public List<T> Select<T>() where T : new()
         {
-            return Select(typeof(T)).Cast<T>().ToList();
+            return Select(typeof (T)).Cast<T>().ToList();
         }
 
         protected static List<object> Select(Type type, IDatabase batchRemotingDb)
@@ -49,7 +48,7 @@ namespace DataAccess.Manager
 
         protected static List<T> Select<T>(IDatabase batchRemotingDb) where T : new()
         {
-            return Select(typeof(T), batchRemotingDb).Cast<T>().ToList();
+            return Select(typeof (T), batchRemotingDb).Cast<T>().ToList();
         }
 
         protected static List<object> Select(Type type, IDatabase batchRemotingDb, IDbCommand command)
@@ -59,13 +58,13 @@ namespace DataAccess.Manager
 
         protected static List<T> Select<T>(IDatabase batchRemotingDb, IDbCommand command) where T : new()
         {
-            return Select(typeof(T), batchRemotingDb, command).Cast<T>().ToList();
+            return Select(typeof (T), batchRemotingDb, command).Cast<T>().ToList();
         }
 
         #endregion
 
         #region CreateCommands
-        
+
         public static IDbCommand CreateSelect(Type type, IDatabase batchRemotingDb, string query)
         {
             return CreateCommand(batchRemotingDb, CreateSelect(type, batchRemotingDb).CommandText + " " + query);
@@ -73,23 +72,23 @@ namespace DataAccess.Manager
 
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb, string query)
         {
-            return CreateSelect(typeof(T), batchRemotingDb, query);
+            return CreateSelect(typeof (T), batchRemotingDb, query);
         }
 
         public static IDbCommand CreateSelect(Type type, IDatabase batchRemotingDb, string query,
-                                  IEnumerable<IQueryParameter> paramenter)
+            IEnumerable<IQueryParameter> paramenter)
         {
-            var plainCommand = CreateCommand(batchRemotingDb,
-                                             CreateSelect(type, batchRemotingDb).CommandText + " " + query);
-            foreach (var para in paramenter)
+            IDbCommand plainCommand = CreateCommand(batchRemotingDb,
+                CreateSelect(type, batchRemotingDb).CommandText + " " + query);
+            foreach (IQueryParameter para in paramenter)
                 plainCommand.Parameters.AddWithValue(para.Name, para.Value, batchRemotingDb);
             return plainCommand;
         }
 
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb, string query,
-                                          IEnumerable<IQueryParameter> paramenter)
+            IEnumerable<IQueryParameter> paramenter)
         {
-            return CreateSelect(typeof(T), batchRemotingDb, query, paramenter);
+            return CreateSelect(typeof (T), batchRemotingDb, query, paramenter);
         }
 
         public static string[] CreateIgnoreList(Type type)
@@ -106,14 +105,14 @@ namespace DataAccess.Manager
         {
             string proppk = type.GetPK();
             string query = CreateSelect(type) + " WHERE " + proppk + " = @pk";
-            var cmd = CreateCommand(batchRemotingDb, query);
+            IDbCommand cmd = CreateCommand(batchRemotingDb, query);
             cmd.Parameters.AddWithValue("@pk", pk, batchRemotingDb);
             return cmd;
         }
 
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb, long pk) where T : new()
         {
-            return CreateSelect(typeof(T), batchRemotingDb, pk);
+            return CreateSelect(typeof (T), batchRemotingDb, pk);
         }
 
         public static string CreateSelect<T>()
@@ -134,7 +133,7 @@ namespace DataAccess.Manager
 
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb)
         {
-            return CreateSelect(typeof(T), batchRemotingDb);
+            return CreateSelect(typeof (T), batchRemotingDb);
         }
 
         #endregion
@@ -162,30 +161,29 @@ namespace DataAccess.Manager
 
         public static List<T> RunSelect<T>(IDatabase database, IDbCommand query) where T : new()
         {
-            return RunSelect(typeof(T), database, query).Cast<T>().ToList();
+            return RunSelect(typeof (T), database, query).Cast<T>().ToList();
         }
 
-        public static List<object> RunSelect(Type type, IDatabase database, string query, IEnumerable<IQueryParameter> paramenter)
+        public static List<object> RunSelect(Type type, IDatabase database, string query,
+            IEnumerable<IQueryParameter> paramenter)
         {
-
             return
                 database.Run(
                     s =>
                     {
-                        var command = CreateCommand(s, query);
+                        IDbCommand command = CreateCommand(s, query);
 
-                        foreach (var item in paramenter)
-                        {
+                        foreach (IQueryParameter item in paramenter)
                             command.Parameters.AddWithValue(item.Name, item.Value, s);
-                        }
                         return RunSelect(type, database, command);
                     }
                     );
         }
 
-        public static List<T> RunSelect<T>(IDatabase database, string query, IEnumerable<IQueryParameter> paramenter) where T : new()
+        public static List<T> RunSelect<T>(IDatabase database, string query, IEnumerable<IQueryParameter> paramenter)
+            where T : new()
         {
-            return RunSelect(typeof(T), database, query, paramenter).Cast<T>().ToList();
+            return RunSelect(typeof (T), database, query, paramenter).Cast<T>().ToList();
         }
 
         private List<object> RunSelect(Type type, IDbCommand command)
@@ -195,7 +193,7 @@ namespace DataAccess.Manager
 
         private List<T> RunSelect<T>(IDbCommand command) where T : new()
         {
-            return RunSelect(typeof(T), Database, command).Cast<T>().ToList();
+            return RunSelect(typeof (T), Database, command).Cast<T>().ToList();
         }
 
         #endregion
@@ -204,24 +202,24 @@ namespace DataAccess.Manager
 
         public List<object> SelectWhere(Type type, String @where)
         {
-            var query = CreateSelect(type, Database, @where);
+            IDbCommand query = CreateSelect(type, Database, @where);
             return RunSelect(type, query);
         }
 
         public List<T> SelectWhere<T>(String @where) where T : new()
         {
-            return SelectWhere(typeof(T), @where).Cast<T>().ToList();
+            return SelectWhere(typeof (T), @where).Cast<T>().ToList();
         }
 
         public List<object> SelectWhere(Type type, String @where, IEnumerable<IQueryParameter> paramenter)
         {
-            var query = CreateSelect(type, Database, @where, paramenter);
+            IDbCommand query = CreateSelect(type, Database, @where, paramenter);
             return RunSelect(type, query);
         }
 
         public List<T> SelectWhere<T>(String @where, IEnumerable<IQueryParameter> paramenter) where T : new()
         {
-            return SelectWhere(typeof(T), where, paramenter).Cast<T>().ToList();
+            return SelectWhere(typeof (T), where, paramenter).Cast<T>().ToList();
         }
 
         public List<object> SelectWhere(Type type, String @where, dynamic paramenter)
@@ -244,14 +242,14 @@ namespace DataAccess.Manager
         {
             return
                 Database.Run(
-                s =>
-                s.GetEntitiesList(CreateCommand(s, query), e => e[0])
-            ).ToList();
+                    s =>
+                        s.GetEntitiesList(CreateCommand(s, query), e => e[0])
+                    ).ToList();
         }
 
         private List<T> RunPrimetivSelect<T>(string query) where T : class
         {
-            return RunPrimetivSelect(typeof(T), query).Cast<T>().ToList();
+            return RunPrimetivSelect(typeof (T), query).Cast<T>().ToList();
         }
 
         public List<object> SelectNative(Type type, string query)
@@ -261,14 +259,14 @@ namespace DataAccess.Manager
 
         public List<T> SelectNative<T>(string query) where T : class
         {
-            return SelectNative(typeof(T), query).Cast<T>().ToList();
+            return SelectNative(typeof (T), query).Cast<T>().ToList();
         }
 
         public static List<object> SelectNative(Type type, IDatabase database, IDbCommand command)
         {
-            var objects = RunSelect(type, database, command);
+            List<object> objects = RunSelect(type, database, command);
 
-            foreach (var model in objects)
+            foreach (object model in objects)
                 model.LoadNavigationProps(database);
 
             return objects;
@@ -281,7 +279,7 @@ namespace DataAccess.Manager
 
         public List<object> SelectNative(Type type, string query, IEnumerable<IQueryParameter> paramenter)
         {
-            var dbCommand = CreateCommandWithParameterValues(query, Database, paramenter);
+            IDbCommand dbCommand = CreateCommandWithParameterValues(query, Database, paramenter);
             return SelectNative(type, dbCommand);
         }
 
@@ -298,14 +296,13 @@ namespace DataAccess.Manager
 
         public List<T> SelectNative<T>(string query, dynamic paramenter) where T : new()
         {
-            List<object> objects = ((List<object>) SelectNative(typeof (T), query, paramenter));
+            var objects = ((List<object>) SelectNative(typeof (T), query, paramenter));
             return objects.Cast<T>().ToList();
         }
 
         #endregion
     }
 }
-
 
 //public List<T> SelectWhere<T>(String @where, long top) where T : new()
 //{

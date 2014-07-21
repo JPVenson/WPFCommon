@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -24,19 +23,17 @@ namespace DataAccess.Manager
 
         public int ExecuteGenericCommand(string query, IEnumerable<IQueryParameter> values)
         {
-            var command = CreateCommand(Database, query);
+            IDbCommand command = CreateCommand(Database, query);
 
-            foreach (var item in values)
-            {
-                command.Parameters.AddWithValue(item.Name, item.Value, this.Database);
-            }
+            foreach (IQueryParameter item in values)
+                command.Parameters.AddWithValue(item.Name, item.Value, Database);
 
             return Database.Run(s => s.ExecuteNonQuery(command));
         }
 
         public int ExecuteGenericCommand(string query, dynamic paramenter)
         {
-            return ExecuteGenericCommand(query, (IEnumerable<IQueryParameter>)EnumarateFromDynamics(paramenter));
+            return ExecuteGenericCommand(query, (IEnumerable<IQueryParameter>) EnumarateFromDynamics(paramenter));
         }
 
         public int ExecuteGenericCommand(IDbCommand command)
@@ -54,8 +51,8 @@ namespace DataAccess.Manager
         {
             return batchRemotingDb.Run(
                 s =>
-                s.GetEntitiesList(command, e => new T().SetPropertysViaRefection(e))
-                 .ToList());
+                    s.GetEntitiesList(command, e => new T().SetPropertysViaRefection(e))
+                        .ToList());
         }
 
         public static object GetDataValue(object value)
@@ -69,38 +66,37 @@ namespace DataAccess.Manager
         }
 
         public static IDbCommand CreateCommandWithParameterValues<T>(string query, string[] propertyInfos, T entry,
-                                                                        IDatabase batchRemotingDb)
+            IDatabase batchRemotingDb)
         {
-            var type = typeof (T);
-            var propertyvalues =
+            Type type = typeof (T);
+            object[] propertyvalues =
                 propertyInfos.Select(
                     propertyInfo =>
                     {
-                        var property = type.GetProperty(DataConverterExtensions.ReMapSchemaToEntiysProp<T>(propertyInfo));
-                        var dataValue = GetDataValue(property.GetValue(entry, null));
+                        PropertyInfo property =
+                            type.GetProperty(DataConverterExtensions.ReMapSchemaToEntiysProp<T>(propertyInfo));
+                        object dataValue = GetDataValue(property.GetValue(entry, null));
                         return dataValue;
                     }).ToArray();
             return CreateCommandWithParameterValues(query, batchRemotingDb, propertyvalues);
         }
 
         public static IDbCommand CreateCommandWithParameterValues(string query, IDatabase batchRemotingDb,
-                                                                     object[] values)
+            object[] values)
         {
             var listofQueryParamter = new List<IQueryParameter>();
             for (int i = 0; i < values.Count(); i++)
-            {
-                listofQueryParamter.Add(new QueryParameter() { Name = i.ToString(), Value = values[i] });
-            }
+                listofQueryParamter.Add(new QueryParameter {Name = i.ToString(), Value = values[i]});
             return CreateCommandWithParameterValues(query, batchRemotingDb, listofQueryParamter);
         }
 
         public static IDbCommand CreateCommandWithParameterValues(string query, IDatabase batchRemotingDb,
-                                                             IEnumerable<IQueryParameter> values)
+            IEnumerable<IQueryParameter> values)
         {
-            var cmd = CreateCommand(batchRemotingDb, query);
-            foreach (var queryParameter in values)
+            IDbCommand cmd = CreateCommand(batchRemotingDb, query);
+            foreach (IQueryParameter queryParameter in values)
             {
-                var dbDataParameter = cmd.CreateParameter();
+                IDbDataParameter dbDataParameter = cmd.CreateParameter();
                 dbDataParameter.Value = queryParameter.Value;
                 dbDataParameter.ParameterName = !queryParameter.Name.StartsWith("@")
                     ? "@" + queryParameter.Name
@@ -114,13 +110,13 @@ namespace DataAccess.Manager
         {
             var list = new List<IQueryParameter>();
 
-            var propertys = ((Type)parameter.GetType()).GetProperties();
+            PropertyInfo[] propertys = ((Type) parameter.GetType()).GetProperties();
 
             for (int i = 0; i < propertys.Length; i++)
             {
                 PropertyInfo element = propertys[i];
-                var value = DataConverterExtensions.GetParamaterValue(parameter, element.Name);
-                list.Add(new QueryParameter() { Name = "@" + element.Name, Value = value });
+                dynamic value = DataConverterExtensions.GetParamaterValue(parameter, element.Name);
+                list.Add(new QueryParameter {Name = "@" + element.Name, Value = value});
             }
 
             return list;
@@ -133,18 +129,18 @@ namespace DataAccess.Manager
 
         protected static string CreatePropertyCSV<T>(bool ignorePK = false)
         {
-            return CreatePropertyCSV(typeof(T), ignorePK);
+            return CreatePropertyCSV(typeof (T), ignorePK);
         }
 
         protected static string CreatePropertyCSV(Type type, params string[] ignore)
         {
-            var propertyNames = CreatePropertyNames(type, ignore);
+            IEnumerable<string> propertyNames = CreatePropertyNames(type, ignore);
             return propertyNames.Aggregate((e, f) => e + ", " + f);
         }
 
         protected static string CreatePropertyCSV<T>(params string[] ignore)
         {
-            return CreatePropertyCSV(typeof(T), ignore);
+            return CreatePropertyCSV(typeof (T), ignore);
         }
 
         protected static IEnumerable<string> CreatePropertyNames(Type type, params string[] ignore)
@@ -154,7 +150,7 @@ namespace DataAccess.Manager
 
         protected static IEnumerable<string> CreatePropertyNames<T>(params string[] ignore)
         {
-            return CreatePropertyNames(typeof(T), ignore);
+            return CreatePropertyNames(typeof (T), ignore);
         }
 
         protected static IEnumerable<string> CreatePropertyNames(Type type, bool ignorePK = false)
@@ -164,7 +160,7 @@ namespace DataAccess.Manager
 
         protected static IEnumerable<string> CreatePropertyNames<T>(bool ignorePK = false)
         {
-            return ignorePK ? CreatePropertyNames<T>(typeof(T).GetPK()) : CreatePropertyNames<T>(new string[0]);
+            return ignorePK ? CreatePropertyNames<T>(typeof (T).GetPK()) : CreatePropertyNames<T>(new string[0]);
         }
     }
 }

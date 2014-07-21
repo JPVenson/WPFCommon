@@ -16,7 +16,8 @@ namespace Tasking.TaskManagement.Threading
         #region Implementation of IDisposable
 
         /// <summary>
-        ///     Führt anwendungsspezifische Aufgaben durch, die mit der Freigabe, der Zurückgabe oder dem Zurücksetzen von nicht verwalteten Ressourcen zusammenhängen.
+        ///     Führt anwendungsspezifische Aufgaben durch, die mit der Freigabe, der Zurückgabe oder dem Zurücksetzen von nicht
+        ///     verwalteten Ressourcen zusammenhängen.
         /// </summary>
         public void Dispose()
         {

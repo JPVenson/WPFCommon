@@ -83,7 +83,7 @@ namespace DynamicInputBox.InfoWindow.IQuestionModelImp
         public QuestionAbstrViewModelBaseValidation()
         {
             Add(new Error<QuestionAbstrViewModelBase<T, TE>>("Bitte gebe etwas in das Eingabefeld ein", "Input",
-                                                             s => s.Input == null));
+                s => s.Input == null));
         }
     }
 }

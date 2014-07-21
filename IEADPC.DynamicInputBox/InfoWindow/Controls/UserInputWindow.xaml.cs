@@ -8,7 +8,7 @@ namespace DynamicInputBox.InfoWindow.Controls
     public partial class UserInputWindow : Window
     {
         internal UserInputWindow(List<object> inputQuestions, Func<List<object>> returnlist,
-                                 IEnumerable<EingabeModus> eingabeModi)
+            IEnumerable<EingabeModus> eingabeModi)
         {
             DataContext = new UserInputViewModel(inputQuestions, returnlist, () =>
             {

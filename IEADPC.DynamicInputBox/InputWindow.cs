@@ -43,7 +43,7 @@ namespace DynamicInputBox
         {
             var returns = new List<object>();
             if (WindowThread(new List<object> {inputQuestion}, () => returns,
-                             new List<EingabeModus> {EingabeModus.ShowProgress}))
+                new List<EingabeModus> {EingabeModus.ShowProgress}))
                 return returns.First();
             return null;
         }
@@ -52,7 +52,7 @@ namespace DynamicInputBox
         {
             var returns = new List<object>();
             if (WindowThread(new List<object> {inputQuestion}, () => returns,
-                             new List<EingabeModus> {EingabeModus.ShowProgress}))
+                new List<EingabeModus> {EingabeModus.ShowProgress}))
                 return returns.First();
             return null;
         }
@@ -74,7 +74,7 @@ namespace DynamicInputBox
         }
 
         public static bool ShowInput(Func<List<object>> updateDelegate, List<object> inputQuestions,
-                                     List<EingabeModus> eingabeModi)
+            List<EingabeModus> eingabeModi)
         {
             return WindowThread(inputQuestions, updateDelegate, eingabeModi);
         }
@@ -94,7 +94,7 @@ namespace DynamicInputBox
         }
 
         private static bool WindowThread(List<object> inputQuestions, Func<List<object>> returnlist,
-                                         IEnumerable<EingabeModus> eingabeModi)
+            IEnumerable<EingabeModus> eingabeModi)
         {
             bool? ret = false;
             var windowThread = new Thread(() =>
@@ -107,6 +107,11 @@ namespace DynamicInputBox
             windowThread.Start();
             windowThread.Join();
             return ret.HasValue && ret.Value;
+        }
+
+        public static string ParseListWithQustion(string pleaseSelectTheServer, string[] toArray)
+        {
+            return toArray.Aggregate(pleaseSelectTheServer, (current, s) => current + ("#q" + s));
         }
     }
 }

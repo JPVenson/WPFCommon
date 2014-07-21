@@ -68,7 +68,7 @@ namespace DataAccess.AdoWrapper
         void CreateTable(DataTable table, string strTableName, HashSet<string> hsColumns2Export);
 
         void InsertTable(DataTable table, string strTableName, HashSet<string> hsColumns2Export,
-                         string strFilterExpression);
+            string strFilterExpression);
 
         bool SupportsView(String strName);
         IEnumerable<string> GetViews(String strName);
@@ -78,24 +78,24 @@ namespace DataAccess.AdoWrapper
         void ProcessEntitiesList(string strQuery, Action<IDataRecord> action, bool bHandleConnection);
 
         Exception TryOnEntitiesList(string strQuery, Action<IDataRecord> action, string strMessageOnEmpty,
-                                    bool bHandleConnection);
+            bool bHandleConnection);
 
         IEnumerable<T> GetEntitiesList<T>(string strQuery, Func<IDataRecord, T> func, bool bHandleConnection);
         IEnumerable<T> GetEntitiesList<T>(IDbCommand cmd, Func<IDataRecord, T> func);
 
         IEnumerable<T> GetEntitiesListWithIndex<T>(string strQuery, Func<long, IDataRecord, T> func,
-                                                   bool bHandleConnection);
+            bool bHandleConnection);
 
         IDictionary<K, V> GetEntitiesDictionary<K, V>(string strQuery, Func<IDataRecord, KeyValuePair<K, V>> func,
-                                                      bool bHandleConnection, string strExceptionMessage = null);
+            bool bHandleConnection, string strExceptionMessage = null);
 
         IDictionary<K, V> GetEntitiesDictionary<K, V>(IDbCommand cmd, Func<IDataRecord, KeyValuePair<K, V>> func);
 
         V GetNextPagingStep<V>(string strQuery, Func<IDataRecord, V> func, long iPageSize, V @default,
-                               bool bHandleConnection, string strExceptionMessage = null);
+            bool bHandleConnection, string strExceptionMessage = null);
 
         IDictionary<long, V> GetPagedEntitiesDictionary<V>(string strQuery, Func<IDataRecord, V> func, long iPageSize,
-                                                           bool bHandleConnection, string strExceptionMessage = null);
+            bool bHandleConnection, string strExceptionMessage = null);
 
         void Run(Action<IDatabase> action);
         T Run<T>(Func<IDatabase, T> func);

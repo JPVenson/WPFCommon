@@ -27,8 +27,7 @@ namespace DynamicInputBox.InfoWindow.IQuestionModelImp
             {
                 if (!(Question is Func<object>))
                     throw new ArgumentException("can not parse parameter");
-                else
-                    Question = PreEncapsulateAction(Question as Func<object>);
+                Question = PreEncapsulateAction(Question as Func<object>);
             }
         }
 

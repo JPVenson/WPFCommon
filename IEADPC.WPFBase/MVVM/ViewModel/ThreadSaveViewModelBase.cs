@@ -37,7 +37,7 @@ namespace WPFBase.MVVM.ViewModel
 
         public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
         {
-            var lambda = (LambdaExpression)property;
+            var lambda = (LambdaExpression) property;
 
             MemberExpression memberExpression;
             var body = lambda.Body as UnaryExpression;
@@ -45,10 +45,10 @@ namespace WPFBase.MVVM.ViewModel
             if (body != null)
             {
                 UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression)unaryExpression.Operand;
+                memberExpression = (MemberExpression) unaryExpression.Operand;
             }
             else
-                memberExpression = (MemberExpression)lambda.Body;
+                memberExpression = (MemberExpression) lambda.Body;
             SendPropertyChanged(memberExpression.Member.Name);
         }
     }

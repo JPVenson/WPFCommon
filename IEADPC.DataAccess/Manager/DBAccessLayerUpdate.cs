@@ -25,7 +25,7 @@ namespace DataAccess.Manager
 
         public static IDbCommand CreateUpdate<T>(T entry, IDatabase batchRemotingDb) where T : new()
         {
-            Type type = typeof(T);
+            Type type = typeof (T);
             string pk = type.GetPK();
 
             string[] ignore =

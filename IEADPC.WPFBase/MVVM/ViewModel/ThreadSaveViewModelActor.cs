@@ -24,7 +24,6 @@ namespace WPFBase.MVVM.ViewModel
 
         public void ThreadSaveAction(Action action)
         {
-
             try
             {
                 IsLocked = true;
@@ -37,7 +36,6 @@ namespace WPFBase.MVVM.ViewModel
             {
                 IsLocked = false;
             }
-
         }
 
         public void BeginThreadSaveAction(Action action)
@@ -46,10 +44,8 @@ namespace WPFBase.MVVM.ViewModel
             {
                 try
                 {
-
                     IsLocked = true;
                     action();
-
                 }
                 finally
                 {

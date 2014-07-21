@@ -4,12 +4,10 @@ namespace DataAccess.ModelsAnotations
 {
     public class DataAccessAttribute : Attribute
     {
-        
     }
 
     public class InsertIgnore : DataAccessAttribute
     {
-        
     }
 
     public class ForeignKeyAttribute : InsertIgnore
@@ -24,10 +22,6 @@ namespace DataAccess.ModelsAnotations
 
     public class PrimaryKeyAttribute : DataAccessAttribute
     {
-        public PrimaryKeyAttribute()
-        {
-
-        }
     }
 
     public class ForModel : DataAccessAttribute

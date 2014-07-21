@@ -27,7 +27,7 @@ namespace DataAccess.AdoWrapper
             else
             {
                 _conn_str = string.Format(TEMPLATE_MSSQL_UNTRUSTED, strServer.Trim(), strDatabase.Trim(),
-                                          strLogin.Trim(), strPassword.Trim());
+                    strLogin.Trim(), strPassword.Trim());
             }
         }
 
@@ -52,7 +52,7 @@ namespace DataAccess.AdoWrapper
         {
             get
             {
-                var cn = (SqlConnection)CreateConnection();
+                var cn = (SqlConnection) CreateConnection();
                 return cn.DataSource;
             }
         }
@@ -80,17 +80,17 @@ namespace DataAccess.AdoWrapper
         public IDbCommand CreateCommand(string strSql, IDbConnection conn)
         {
             var cmd = new SqlCommand(strSql);
-            cmd.Connection = (SqlConnection)conn;
+            cmd.Connection = (SqlConnection) conn;
             return cmd;
         }
 
         public IDbCommand CreateCommand(IDbConnection conn, string strSql, params IDbDataParameter[] fields)
         {
-            var cmd = (SqlCommand)CreateCommand(strSql, conn);
+            var cmd = (SqlCommand) CreateCommand(strSql, conn);
             for (int i = 0; i < fields.Length; i++)
             {
-                cmd.Parameters.Add(new SqlParameter(fields[i].ParameterName, (SqlDbType)fields[i].DbType,
-                                                    fields[i].Size));
+                cmd.Parameters.Add(new SqlParameter(fields[i].ParameterName, (SqlDbType) fields[i].DbType,
+                    fields[i].Size));
             }
             return cmd;
         }
@@ -153,7 +153,7 @@ namespace DataAccess.AdoWrapper
         public IDbDataAdapter CreateDataAdapter(IDbCommand cmd)
         {
             var adapter = new SqlDataAdapter();
-            adapter.SelectCommand = (SqlCommand)cmd;
+            adapter.SelectCommand = (SqlCommand) cmd;
             return adapter;
         }
 
@@ -161,7 +161,7 @@ namespace DataAccess.AdoWrapper
         {
             using (var adapter = new SqlDataAdapter())
             {
-                adapter.SelectCommand = (SqlCommand)cmd;
+                adapter.SelectCommand = (SqlCommand) cmd;
 
                 var table = new DataTable(name);
                 adapter.Fill(table);
@@ -177,7 +177,7 @@ namespace DataAccess.AdoWrapper
         {
             using (var adapter = new SqlDataAdapter())
             {
-                adapter.SelectCommand = (SqlCommand)cmd;
+                adapter.SelectCommand = (SqlCommand) cmd;
 
                 foreach (DataRow row in dt.Rows)
                     row.SetAdded();
@@ -204,12 +204,12 @@ namespace DataAccess.AdoWrapper
         public string[] GetTables(IDbConnection conn, String strFilter)
         {
             const string sql = "select NAME from SYSOBJECTS where TYPE = 'U' AND NAME <> 'dtproperties' order by NAME";
-            using (var cmd = new SqlCommand(sql, (SqlConnection)conn))
+            using (var cmd = new SqlCommand(sql, (SqlConnection) conn))
             using (IDataReader dr = cmd.ExecuteReader())
             {
                 var list = new List<string>();
                 while (dr.Read())
-                    list.Add((string)dr[0]);
+                    list.Add((string) dr[0]);
                 return list.ToArray();
             }
         }
@@ -219,12 +219,12 @@ namespace DataAccess.AdoWrapper
             string sql = string.Format(
                 "select NAME from SYSCOLUMNS where ID=(select ID from SYSOBJECTS where TYPE = 'U' AND NAME = '{0}')",
                 strTableName);
-            using (var cmd = new SqlCommand(sql, (SqlConnection)conn))
+            using (var cmd = new SqlCommand(sql, (SqlConnection) conn))
             using (IDataReader dr = cmd.ExecuteReader())
             {
                 var list = new List<string>();
                 while (dr.Read())
-                    list.Add((string)dr[0]);
+                    list.Add((string) dr[0]);
                 return list.ToArray();
             }
         }
@@ -232,7 +232,7 @@ namespace DataAccess.AdoWrapper
         public int DropTable(IDbConnection conn, String strTableName)
         {
             string sql = String.Format("DROP TABLE {0}", strTableName);
-            using (var cmd = new SqlCommand(sql, (SqlConnection)conn))
+            using (var cmd = new SqlCommand(sql, (SqlConnection) conn))
                 return cmd.ExecuteNonQuery();
         }
 
@@ -255,7 +255,7 @@ namespace DataAccess.AdoWrapper
         public bool SupportsView(IDbConnection conn, String strName)
         {
             string sql = string.Format("SELECT name FROM sysobjects WHERE type in (N'V') AND name LIKE '{0}'", strName);
-            using (var cmd = new SqlCommand(sql, (SqlConnection)conn))
+            using (var cmd = new SqlCommand(sql, (SqlConnection) conn))
             using (IDataReader dr = cmd.ExecuteReader())
                 return (dr.Read());
         }
@@ -263,7 +263,7 @@ namespace DataAccess.AdoWrapper
         public bool SupportsStoredProcedure(IDbConnection conn, String strName)
         {
             string sql = string.Format("SELECT name FROM sysobjects WHERE type in (N'P') AND name LIKE '{0}'", strName);
-            using (var cmd = new SqlCommand(sql, (SqlConnection)conn))
+            using (var cmd = new SqlCommand(sql, (SqlConnection) conn))
             using (IDataReader dr = cmd.ExecuteReader())
                 return (dr.Read());
         }

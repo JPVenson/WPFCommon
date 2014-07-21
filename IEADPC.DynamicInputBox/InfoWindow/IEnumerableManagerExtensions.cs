@@ -100,7 +100,7 @@ namespace DynamicInputBox.InfoWindow
         /// </exception>
         /// <returns>The new Selectet item</returns>
         public static void AddAndSetSelectetItem<T>(this ObservableCollection<T> sourcelist,
-                                                    Func<T> additionalAddingAction, [Out, In] T selecteditem)
+            Func<T> additionalAddingAction, [Out, In] T selecteditem)
         {
             selecteditem = additionalAddingAction.Invoke();
         }
@@ -148,7 +148,7 @@ namespace DynamicInputBox.InfoWindow
         /// <param name="additionalAddingAction"></param>
         /// <returns></returns>
         public static T RemoveAndSetSelectetItem<T>(this IEnumerable<T> sourcelist, T SelectetItem,
-                                                    Func<T, IEnumerable<T>> additionalAddingAction)
+            Func<T, IEnumerable<T>> additionalAddingAction)
         {
             if (SelectetItem == null)
                 return default(T);
@@ -253,8 +253,8 @@ namespace DynamicInputBox.InfoWindow
         }
 
         public static T RemoveItemsAndSetSelectetItem<T>(this IEnumerable<T> sourcelist,
-                                                         ObservableCollection<T> listtoremove,
-                                                         Action<T> additionalAddingAction)
+            ObservableCollection<T> listtoremove,
+            Action<T> additionalAddingAction)
         {
             if (listtoremove == null && !listtoremove.Any())
                 return default(T);

@@ -13,17 +13,17 @@ namespace DynamicInputBox.InfoWindow.IQuestionModelImp
             : base(question, eingabeModus)
         {
             base.ErrorProviderSimpleAccessAdapter.Add(new Error<QuestionViewModel>(
-                                                          "Bitte wähle mindestens ein Item aus", "Input", s =>
-                                                          {
-                                                              if (s.Input == null)
-                                                                  return true;
-                                                              if (s.Input is List<ListBoxItemWrapper>)
-                                                              {
-                                                                  if (!(s.Input as List<ListBoxItemWrapper>).Any())
-                                                                      return true;
-                                                              }
-                                                              return false;
-                                                          }));
+                "Bitte wähle mindestens ein Item aus", "Input", s =>
+                {
+                    if (s.Input == null)
+                        return true;
+                    if (s.Input is List<ListBoxItemWrapper>)
+                    {
+                        if (!(s.Input as List<ListBoxItemWrapper>).Any())
+                            return true;
+                    }
+                    return false;
+                }));
         }
 
         public string ParsexQuestionText(object input)
@@ -41,7 +41,7 @@ namespace DynamicInputBox.InfoWindow.IQuestionModelImp
                 new ObservableCollection<IListBoxItemWrapper>(
                     allquestions.Select(
                         allquestion =>
-                        new ListBoxItemWrapper {Text = allquestion, Index = allquestions.IndexOf(allquestion)}));
+                            new ListBoxItemWrapper {Text = allquestion, Index = allquestions.IndexOf(allquestion)}));
 
             foreach (ListBoxItemWrapper item in PossibleInput)
             {

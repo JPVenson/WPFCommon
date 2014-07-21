@@ -16,14 +16,14 @@ namespace Extentions.Extensions
                 ignoreList.Add("Item");
                 return
                     !(from pi in
-                          type.GetProperties(BindingFlags.Public |
-                                             BindingFlags.Instance)
-                      where self.GetType() == to.GetType()
-                      where !ignoreList.Contains(pi.Name)
-                      let selfValue = type.GetProperty(pi.Name).GetValue(self, null)
-                      let toValue = type.GetProperty(pi.Name).GetValue(to, null)
-                      where selfValue != toValue && (selfValue == null || !selfValue.Equals(toValue))
-                      select selfValue).Any();
+                        type.GetProperties(BindingFlags.Public |
+                                           BindingFlags.Instance)
+                        where self.GetType() == to.GetType()
+                        where !ignoreList.Contains(pi.Name)
+                        let selfValue = type.GetProperty(pi.Name).GetValue(self, null)
+                        let toValue = type.GetProperty(pi.Name).GetValue(to, null)
+                        where selfValue != toValue && (selfValue == null || !selfValue.Equals(toValue))
+                        select selfValue).Any();
             }
             return self == to;
         }

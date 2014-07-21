@@ -12,43 +12,17 @@ using System.Runtime.InteropServices;
 namespace WPFBase.MVVM.ViewModel
 {
     [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
-    public class ThreadSaveObservableCollection<T> : Collection<T>, INotifyCollectionChanged, IList<T>, IList, INotifyPropertyChanged
+    public class ThreadSaveObservableCollection<T> : Collection<T>, INotifyCollectionChanged, IList<T>, IList,
+        INotifyPropertyChanged
     {
-        public ThreadSaveObservableCollection(IEnumerable<T> collection)
-        {
-            if (collection == null)
-            {
-                throw new ArgumentNullException("collection");
-            }
-            this.CopyFrom(collection);
-            actorHelper = new ThreadSaveViewModelBase();
-        }
-
-        public ThreadSaveObservableCollection(List<T> list)
-            : base((list != null) ? new List<T>(list.Count) : list)
-        {
-            this.CopyFrom(list);
-            actorHelper = new ThreadSaveViewModelBase();
-        }
-
-        public ThreadSaveObservableCollection()
-        {
-            actorHelper = new ThreadSaveViewModelBase();
-        }
-
-        [field: NonSerialized]
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-        private ThreadSaveViewModelActor actorHelper;
-        public event PropertyChangedEventHandler PropertyChanged;
-        private object LockObject = new object();
+        private readonly object LockObject = new object();
+        private readonly ThreadSaveViewModelActor actorHelper;
 
         #region INotifyPropertyChanged
 
         /// <summary>
         ///     Raised when a property on this object has a new value
         /// </summary>
-
-
         /// <summary>
         ///     Raises this ViewModels PropertyChanged event
         /// </summary>
@@ -71,7 +45,7 @@ namespace WPFBase.MVVM.ViewModel
 
         public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
         {
-            var lambda = (LambdaExpression)property;
+            var lambda = (LambdaExpression) property;
 
             MemberExpression memberExpression;
             var body = lambda.Body as UnaryExpression;
@@ -79,44 +53,82 @@ namespace WPFBase.MVVM.ViewModel
             if (body != null)
             {
                 UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression)unaryExpression.Operand;
+                memberExpression = (MemberExpression) unaryExpression.Operand;
             }
             else
-                memberExpression = (MemberExpression)lambda.Body;
+                memberExpression = (MemberExpression) lambda.Body;
             SendPropertyChanged(memberExpression.Member.Name);
         }
+
+        #endregion
+
+        public ThreadSaveObservableCollection(IEnumerable<T> collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException("collection");
+            CopyFrom(collection);
+            actorHelper = new ThreadSaveViewModelBase();
+        }
+
+        public ThreadSaveObservableCollection(List<T> list)
+            : base((list != null) ? new List<T>(list.Count) : list)
+        {
+            CopyFrom(list);
+            actorHelper = new ThreadSaveViewModelBase();
+        }
+
+        public ThreadSaveObservableCollection()
+        {
+            actorHelper = new ThreadSaveViewModelBase();
+        }
+
+        #region INotifyCollectionChanged Members
+
+        [field: NonSerialized]
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        #endregion
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         #endregion
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            var handler = CollectionChanged;
+            NotifyCollectionChangedEventHandler handler = CollectionChanged;
             if (handler != null)
                 handler(this, e);
         }
 
         protected override void InsertItem(int index, T item)
         {
-            var tempitem = item;
+            T tempitem = item;
             lock (LockObject)
             {
-
             }
             base.InsertItem(index, tempitem);
-            this.SendPropertyChanged("Count");
-            this.SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem)));
+            SendPropertyChanged("Count");
+            SendPropertyChanged("Item[]");
+            actorHelper.ThreadSaveAction(
+                () =>
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem)));
         }
 
         public void AddRange(IEnumerable<T> item)
         {
-            var tempitem = item;
-            var enumerable = tempitem as T[] ?? tempitem.ToArray();
-            foreach (var variable in enumerable)
-            {
+            IEnumerable<T> tempitem = item;
+            T[] enumerable = tempitem as T[] ?? tempitem.ToArray();
+            foreach (T variable in enumerable)
                 base.Add(variable);
-            }
             if (enumerable.Any())
-            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable.Last())));
+            {
+                actorHelper.ThreadSaveAction(
+                    () =>
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
+                            enumerable.Last())));
+            }
         }
 
         protected override void ClearItems()
@@ -125,10 +137,11 @@ namespace WPFBase.MVVM.ViewModel
             {
                 base.ClearItems();
             }
-           
-            this.SendPropertyChanged("Count");
-            this.SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
+
+            SendPropertyChanged("Count");
+            SendPropertyChanged("Item[]");
+            actorHelper.ThreadSaveAction(
+                () => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
         }
 
         protected virtual void MoveItem(int oldIndex, int newIndex)
@@ -140,8 +153,11 @@ namespace WPFBase.MVVM.ViewModel
                 base.RemoveItem(oldIndex);
                 base.InsertItem(newIndex, item);
             }
-            this.SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item, newIndex, oldIndex)));
+            SendPropertyChanged("Item[]");
+            actorHelper.ThreadSaveAction(
+                () =>
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item,
+                        newIndex, oldIndex)));
         }
 
         private void CopyFrom(IEnumerable<T> collection)
@@ -154,13 +170,10 @@ namespace WPFBase.MVVM.ViewModel
                     using (IEnumerator<T> enumerator = collection.GetEnumerator())
                     {
                         while (enumerator.MoveNext())
-                        {
                             items.Add(enumerator.Current);
-                        }
                     }
                 }
             }
-
         }
 
         protected override void RemoveItem(int index)
@@ -171,9 +184,12 @@ namespace WPFBase.MVVM.ViewModel
                 item = base[index];
                 base.RemoveItem(index);
             }
-            this.SendPropertyChanged("Count");
-            this.SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index)));
+            SendPropertyChanged("Count");
+            SendPropertyChanged("Item[]");
+            actorHelper.ThreadSaveAction(
+                () =>
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
+                        index)));
         }
 
         protected override void SetItem(int index, T item)
@@ -184,8 +200,11 @@ namespace WPFBase.MVVM.ViewModel
                 oldItem = base[index];
                 base.SetItem(index, item);
             }
-            this.SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldItem, item, index)));
+            SendPropertyChanged("Item[]");
+            actorHelper.ThreadSaveAction(
+                () =>
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
+                        oldItem, item, index)));
         }
     }
 }

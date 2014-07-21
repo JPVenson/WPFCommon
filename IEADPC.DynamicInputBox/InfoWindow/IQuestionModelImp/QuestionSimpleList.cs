@@ -86,7 +86,7 @@ namespace DynamicInputBox.InfoWindow.IQuestionModelImp
                 new ObservableCollection<IListBoxItemWrapper>(
                     allquestions.Select(
                         allquestion =>
-                        new ListBoxItemWrapper {Text = allquestion, Index = allquestions.IndexOf(allquestion)}));
+                            new ListBoxItemWrapper {Text = allquestion, Index = allquestions.IndexOf(allquestion)}));
             return text;
         }
     }

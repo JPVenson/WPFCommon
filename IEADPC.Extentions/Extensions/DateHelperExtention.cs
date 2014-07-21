@@ -15,8 +15,8 @@ namespace Extentions.Extensions
 
             // Kalenderwoche über das Calendar-Objekt ermitteln
             int calendarWeek = calendar.GetWeekOfYear(date,
-                                                      currentCulture.DateTimeFormat.CalendarWeekRule,
-                                                      currentCulture.DateTimeFormat.FirstDayOfWeek);
+                currentCulture.DateTimeFormat.CalendarWeekRule,
+                currentCulture.DateTimeFormat.FirstDayOfWeek);
 
             // Überprüfen, ob eine Kalenderwoche größer als 52
             // ermittelt wurde und ob die Kalenderwoche des Datums
@@ -29,8 +29,8 @@ namespace Extentions.Extensions
             {
                 date = date.AddDays(7);
                 int testCalendarWeek = calendar.GetWeekOfYear(date,
-                                                              currentCulture.DateTimeFormat.CalendarWeekRule,
-                                                              currentCulture.DateTimeFormat.FirstDayOfWeek);
+                    currentCulture.DateTimeFormat.CalendarWeekRule,
+                    currentCulture.DateTimeFormat.FirstDayOfWeek);
                 if (testCalendarWeek == 2)
                     calendarWeek = 1;
             }

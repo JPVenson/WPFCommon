@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using DataAccess.AdoWrapper;
 
 namespace DataAccess.Manager
@@ -17,28 +18,28 @@ namespace DataAccess.Manager
 
         public static void Delete<T>(T entry, IDatabase batchRemotingDb)
         {
-            Type type = typeof(T);
+            Type type = typeof (T);
             string proppk = type.GetPK();
             string query = "DELETE FROM " + type.GetTableName() + " WHERE " + proppk + " = @pk";
 
             batchRemotingDb.Run(s =>
             {
-                var cmd = CreateCommand(s, query);
-                cmd.Parameters.AddWithValue("@pk", entry.GetPK<T, long>(),s);
+                IDbCommand cmd = CreateCommand(s, query);
+                cmd.Parameters.AddWithValue("@pk", entry.GetPK<T, long>(), s);
                 s.ExecuteNonQuery(cmd);
             });
         }
 
         public static void Delete<T, E>(T entry, IDatabase batchRemotingDb)
         {
-            Type type = typeof(T);
+            Type type = typeof (T);
             string proppk = type.GetPK();
             string query = "DELETE FROM " + type.GetTableName() + " WHERE " + proppk + " = @pk";
 
             batchRemotingDb.Run(s =>
             {
-                var cmd = CreateCommand(s, query);
-                cmd.Parameters.AddWithValue("@pk", entry.GetPK<T, E>(),s);
+                IDbCommand cmd = CreateCommand(s, query);
+                cmd.Parameters.AddWithValue("@pk", entry.GetPK<T, E>(), s);
                 s.ExecuteNonQuery(cmd);
             });
         }

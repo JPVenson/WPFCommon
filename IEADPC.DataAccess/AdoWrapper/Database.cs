@@ -72,8 +72,10 @@ namespace DataAccess.AdoWrapper
                 GetConnection().Open();
 
             if (_handlecounter == 0)
+            {
                 if (bUseTransaction)
                     _trans = GetConnection().BeginTransaction();
+            }
         }
 
         public void TransactionCommit()
@@ -309,7 +311,7 @@ namespace DataAccess.AdoWrapper
         {
             string tmpFile = string.Format("{0}.tmp", Guid.NewGuid());
             string tmpFilename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                                              tmpFile);
+                tmpFile);
 
             _strategy.CompactDatabase(DatabaseFile, tmpFilename);
 
@@ -335,16 +337,16 @@ namespace DataAccess.AdoWrapper
         public void CreateTable(DataTable table, string strTableName, HashSet<string> hsColumns2Export)
         {
             string sql = string.Format("CREATE TABLE [{0}] ({1})",
-                                       strTableName,
-                                       string.Join(",", table.Columns
-                                                             .Cast<DataColumn>()
-                                                             .Where(
-                                                                 column => hsColumns2Export.Contains(column.ColumnName))
-                                                             .Select(column => string.Format("[{0}] {1}",
-                                                                                             column.ColumnName,
-                                                                                             TypeToString(
-                                                                                                 column.DataType)))
-                                                             .ToArray()));
+                strTableName,
+                string.Join(",", table.Columns
+                    .Cast<DataColumn>()
+                    .Where(
+                        column => hsColumns2Export.Contains(column.ColumnName))
+                    .Select(column => string.Format("[{0}] {1}",
+                        column.ColumnName,
+                        TypeToString(
+                            column.DataType)))
+                    .ToArray()));
 
             //using(TextWriter w = new StreamWriter(@"E:\__OUT\xxxx.txt", false))
             //{
@@ -355,18 +357,18 @@ namespace DataAccess.AdoWrapper
         }
 
         public void InsertTable(DataTable table, string strTableName, HashSet<string> hsColumns2Export,
-                                string strFilterExpression)
+            string strFilterExpression)
         {
             DataRow[] rows = table.Select(strFilterExpression);
             if (0 == rows.Length) return;
 
             Dictionary<string, string> htPars = table.Columns
-                                                     .Cast<DataColumn>()
-                                                     .Where(column => hsColumns2Export.Contains(column.ColumnName))
-                                                     .ToDictionary(
-                                                         column => column.Caption,
-                                                         column =>
-                                                         string.Format("@{0}", column.Caption.Replace(' ', '_')));
+                .Cast<DataColumn>()
+                .Where(column => hsColumns2Export.Contains(column.ColumnName))
+                .ToDictionary(
+                    column => column.Caption,
+                    column =>
+                        string.Format("@{0}", column.Caption.Replace(' ', '_')));
 
             //-------------------------------------------------------------------------------------------------
 
@@ -393,7 +395,7 @@ namespace DataAccess.AdoWrapper
                 {
                     if (hsColumns2Export.Contains(column.ColumnName))
                     {
-                        var param = (IDbDataParameter)cmd.Parameters[htPars[column.Caption]];
+                        var param = (IDbDataParameter) cmd.Parameters[htPars[column.Caption]];
                         param.Value = rows[i][column];
                     }
                 }
@@ -412,7 +414,7 @@ namespace DataAccess.AdoWrapper
             using (IDataReader dr = GetDataReader(_strategy.GetViewsSql(strName)))
             {
                 while (dr.Read())
-                    lst.Add((string)dr[0]);
+                    lst.Add((string) dr[0]);
                 dr.Close();
             }
             return lst;
@@ -429,7 +431,7 @@ namespace DataAccess.AdoWrapper
             using (IDataReader dr = GetDataReader(_strategy.GetStoredProcedureSql(strName)))
             {
                 while (dr.Read())
-                    lst.Add((string)dr[0]);
+                    lst.Add((string) dr[0]);
                 dr.Close();
             }
             return lst;
@@ -444,7 +446,7 @@ namespace DataAccess.AdoWrapper
         public IDatabase Clone()
         {
             var db = new Database();
-            db.Attach((IDatabaseStrategy)_strategy.Clone());
+            db.Attach((IDatabaseStrategy) _strategy.Clone());
             return db;
         }
 
@@ -474,7 +476,7 @@ namespace DataAccess.AdoWrapper
         }
 
         public Exception TryOnEntitiesList(string strQuery, Action<IDataRecord> action, string strMessageOnEmpty,
-                                           bool bHandleConnection)
+            bool bHandleConnection)
         {
             if (bHandleConnection)
                 Connect(false);
@@ -535,7 +537,7 @@ namespace DataAccess.AdoWrapper
         }
 
         public IEnumerable<T> GetEntitiesListWithIndex<T>(string strQuery, Func<long, IDataRecord, T> func,
-                                                          bool bHandleConnection)
+            bool bHandleConnection)
         {
             if (bHandleConnection)
                 Connect(false);
@@ -561,7 +563,7 @@ namespace DataAccess.AdoWrapper
         }
 
         public IDictionary<K, V> GetEntitiesDictionary<K, V>(string strQuery, Func<IDataRecord, KeyValuePair<K, V>> func,
-                                                             bool bHandleConnection, string strExceptionMessage = null)
+            bool bHandleConnection, string strExceptionMessage = null)
         {
             var htRes = new Dictionary<K, V>();
 
@@ -617,7 +619,7 @@ namespace DataAccess.AdoWrapper
         }
 
         public V GetNextPagingStep<V>(string strQuery, Func<IDataRecord, V> func, long iPageSize, V @default,
-                                      bool bHandleConnection, string strExceptionMessage = null)
+            bool bHandleConnection, string strExceptionMessage = null)
         {
             if (bHandleConnection)
                 Connect(false);
@@ -664,8 +666,8 @@ namespace DataAccess.AdoWrapper
         }
 
         public IDictionary<long, V> GetPagedEntitiesDictionary<V>(string strQuery, Func<IDataRecord, V> func,
-                                                                  long iPageSize, bool bHandleConnection,
-                                                                  string strExceptionMessage = null)
+            long iPageSize, bool bHandleConnection,
+            string strExceptionMessage = null)
         {
             var htRes = new Dictionary<long, V>();
 
@@ -892,13 +894,13 @@ namespace DataAccess.AdoWrapper
 
         private static string TypeToString(Type type)
         {
-            if (type == typeof(string))
+            if (type == typeof (string))
                 return "TEXT";
-            if (type == typeof(long) || type == typeof(int))
+            if (type == typeof (long) || type == typeof (int))
                 return "NUMBER";
-            if (type == typeof(double) || type == typeof(float))
+            if (type == typeof (double) || type == typeof (float))
                 return "NUMBER";
-            if (type == typeof(DateTime))
+            if (type == typeof (DateTime))
                 return "DATETIME";
             return "TEXT";
         }

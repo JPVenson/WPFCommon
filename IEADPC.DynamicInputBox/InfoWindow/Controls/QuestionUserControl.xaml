@@ -32,9 +32,7 @@
                             <ItemsControl Height="125" ItemsSource="{Binding Output}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="wrapper2:ListBoxItemWrapper">
-                                        <DataGrid ItemsSource="{Binding Question}">
-
-                                        </DataGrid>
+                                        <DataGrid ItemsSource="{Binding Question}" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -155,8 +153,7 @@
                         <Setter.Value>
                             <TextBox Margin="5"
                                      Text="{Binding Input, ValidatesOnDataErrors=True, NotifyOnValidationError=True , UpdateSourceTrigger=PropertyChanged}"
-                                     TextWrapping="{Binding IsTextWrappingActive}">
-                            </TextBox>
+                                     TextWrapping="{Binding IsTextWrappingActive}" />
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>

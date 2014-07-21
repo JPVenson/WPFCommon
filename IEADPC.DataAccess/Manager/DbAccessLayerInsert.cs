@@ -30,7 +30,7 @@ namespace DataAccess.Manager
 
         public static IDbCommand CreateInsert<T>(T entry, IDatabase batchRemotingDb)
         {
-            Type type = typeof(T);
+            Type type = typeof (T);
             string[] ignore =
                 type.GetProperties()
                     .Where(s => s.CheckForPK() || s.GetCustomAttributes(false).Any(e => e is InsertIgnore))
@@ -46,7 +46,7 @@ namespace DataAccess.Manager
             values = values.Remove(values.Length - 1);
             string query = "INSERT INTO " + type.GetTableName() + " ( " + csvprops + " ) VALUES ( " + values + " )";
 
-            var orignialProps = type.GetPropertysViaRefection(ignore).ToArray();
+            string[] orignialProps = type.GetPropertysViaRefection(ignore).ToArray();
 
             return CreateCommandWithParameterValues(query, orignialProps, entry, batchRemotingDb);
         }
@@ -60,9 +60,9 @@ namespace DataAccess.Manager
         {
             return db.Run(s =>
             {
-                var dbCommand = CreateInsert(entry, s);
+                IDbCommand dbCommand = CreateInsert(entry, s);
                 dbCommand.ExecuteNonQuery();
-                var getlastInsertedId = s.GetlastInsertedID();
+                object getlastInsertedId = s.GetlastInsertedID();
                 return Select<T>(Convert.ToInt64(getlastInsertedId), s);
             });
         }
