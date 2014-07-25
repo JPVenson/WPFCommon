@@ -57,15 +57,12 @@
     <Compile Include="program.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTest2.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IEADPC.DataAccess\DataAccess.csproj">
       <Project>{A5412B57-DC13-476A-B77B-9C7960DBB052}</Project>
       <Name>DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JPB.DataAccess.MySQL\JPB.DataAccess.MySQL.csproj">
-      <Project>{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}</Project>
-      <Name>JPB.DataAccess.MySQL</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

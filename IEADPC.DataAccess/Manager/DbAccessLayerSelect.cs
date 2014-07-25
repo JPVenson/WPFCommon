@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using DataAccess.AdoWrapper;
 using DataAccess.Helper;
+using DataAccess.QueryProvider;
+using Microsoft.Build.Tasks;
 
 namespace DataAccess.Manager
 {
@@ -18,7 +22,7 @@ namespace DataAccess.Manager
 
         public T Select<T>(long pk) where T : new()
         {
-            return (T) Select(typeof (T), pk);
+            return (T)Select(typeof(T), pk);
         }
 
         protected static object Select(Type type, long pk, IDatabase batchRemotingDb)
@@ -38,7 +42,7 @@ namespace DataAccess.Manager
 
         public List<T> Select<T>() where T : new()
         {
-            return Select(typeof (T)).Cast<T>().ToList();
+            return Select(typeof(T)).Cast<T>().ToList();
         }
 
         protected static List<object> Select(Type type, IDatabase batchRemotingDb)
@@ -48,7 +52,7 @@ namespace DataAccess.Manager
 
         protected static List<T> Select<T>(IDatabase batchRemotingDb) where T : new()
         {
-            return Select(typeof (T), batchRemotingDb).Cast<T>().ToList();
+            return Select(typeof(T), batchRemotingDb).Cast<T>().ToList();
         }
 
         protected static List<object> Select(Type type, IDatabase batchRemotingDb, IDbCommand command)
@@ -58,7 +62,7 @@ namespace DataAccess.Manager
 
         protected static List<T> Select<T>(IDatabase batchRemotingDb, IDbCommand command) where T : new()
         {
-            return Select(typeof (T), batchRemotingDb, command).Cast<T>().ToList();
+            return Select(typeof(T), batchRemotingDb, command).Cast<T>().ToList();
         }
 
         #endregion
@@ -72,7 +76,7 @@ namespace DataAccess.Manager
 
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb, string query)
         {
-            return CreateSelect(typeof (T), batchRemotingDb, query);
+            return CreateSelect(typeof(T), batchRemotingDb, query);
         }
 
         public static IDbCommand CreateSelect(Type type, IDatabase batchRemotingDb, string query,
@@ -88,7 +92,7 @@ namespace DataAccess.Manager
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb, string query,
             IEnumerable<IQueryParameter> paramenter)
         {
-            return CreateSelect(typeof (T), batchRemotingDb, query, paramenter);
+            return CreateSelect(typeof(T), batchRemotingDb, query, paramenter);
         }
 
         public static string[] CreateIgnoreList(Type type)
@@ -112,12 +116,12 @@ namespace DataAccess.Manager
 
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb, long pk) where T : new()
         {
-            return CreateSelect(typeof (T), batchRemotingDb, pk);
+            return CreateSelect(typeof(T), batchRemotingDb, pk);
         }
 
         public static string CreateSelect<T>()
         {
-            return CreateSelect(typeof (T));
+            return CreateSelect(typeof(T));
         }
 
         public static string CreateSelect(Type type)
@@ -133,7 +137,7 @@ namespace DataAccess.Manager
 
         public static IDbCommand CreateSelect<T>(IDatabase batchRemotingDb)
         {
-            return CreateSelect(typeof (T), batchRemotingDb);
+            return CreateSelect(typeof(T), batchRemotingDb);
         }
 
         #endregion
@@ -161,7 +165,7 @@ namespace DataAccess.Manager
 
         public static List<T> RunSelect<T>(IDatabase database, IDbCommand query) where T : new()
         {
-            return RunSelect(typeof (T), database, query).Cast<T>().ToList();
+            return RunSelect(typeof(T), database, query).Cast<T>().ToList();
         }
 
         public static List<object> RunSelect(Type type, IDatabase database, string query,
@@ -183,7 +187,7 @@ namespace DataAccess.Manager
         public static List<T> RunSelect<T>(IDatabase database, string query, IEnumerable<IQueryParameter> paramenter)
             where T : new()
         {
-            return RunSelect(typeof (T), database, query, paramenter).Cast<T>().ToList();
+            return RunSelect(typeof(T), database, query, paramenter).Cast<T>().ToList();
         }
 
         private List<object> RunSelect(Type type, IDbCommand command)
@@ -193,7 +197,7 @@ namespace DataAccess.Manager
 
         private List<T> RunSelect<T>(IDbCommand command) where T : new()
         {
-            return RunSelect(typeof (T), Database, command).Cast<T>().ToList();
+            return RunSelect(typeof(T), Database, command).Cast<T>().ToList();
         }
 
         #endregion
@@ -208,7 +212,7 @@ namespace DataAccess.Manager
 
         public List<T> SelectWhere<T>(String @where) where T : new()
         {
-            return SelectWhere(typeof (T), @where).Cast<T>().ToList();
+            return SelectWhere(typeof(T), @where).Cast<T>().ToList();
         }
 
         public List<object> SelectWhere(Type type, String @where, IEnumerable<IQueryParameter> paramenter)
@@ -219,7 +223,7 @@ namespace DataAccess.Manager
 
         public List<T> SelectWhere<T>(String @where, IEnumerable<IQueryParameter> paramenter) where T : new()
         {
-            return SelectWhere(typeof (T), where, paramenter).Cast<T>().ToList();
+            return SelectWhere(typeof(T), where, paramenter).Cast<T>().ToList();
         }
 
         public List<object> SelectWhere(Type type, String @where, dynamic paramenter)
@@ -230,7 +234,7 @@ namespace DataAccess.Manager
 
         public List<T> SelectWhere<T>(String @where, dynamic paramenter) where T : new()
         {
-            List<object> selectWhere = SelectWhere(typeof (T), @where, paramenter);
+            List<object> selectWhere = SelectWhere(typeof(T), @where, paramenter);
             return selectWhere.Cast<T>().ToList();
         }
 
@@ -249,7 +253,7 @@ namespace DataAccess.Manager
 
         private List<T> RunPrimetivSelect<T>(string query) where T : class
         {
-            return RunPrimetivSelect(typeof (T), query).Cast<T>().ToList();
+            return RunPrimetivSelect(typeof(T), query).Cast<T>().ToList();
         }
 
         public List<object> SelectNative(Type type, string query)
@@ -259,7 +263,7 @@ namespace DataAccess.Manager
 
         public List<T> SelectNative<T>(string query) where T : class
         {
-            return SelectNative(typeof (T), query).Cast<T>().ToList();
+            return SelectNative(typeof(T), query).Cast<T>().ToList();
         }
 
         public static List<object> SelectNative(Type type, IDatabase database, IDbCommand command)
@@ -296,50 +300,135 @@ namespace DataAccess.Manager
 
         public List<T> SelectNative<T>(string query, dynamic paramenter) where T : new()
         {
-            var objects = ((List<object>) SelectNative(typeof (T), query, paramenter));
+            var objects = ((List<object>)SelectNative(typeof(T), query, paramenter));
             return objects.Cast<T>().ToList();
         }
 
         #endregion
+
+
+        #region experimental
+
+        private TestQueryProvider _testQueryProvider;
+
+        public DbAccessLayer()
+        {
+            _testQueryProvider = new TestQueryProvider(this);
+        }
+
+        public IQueryable<T> SelectWhereEx<T>()
+        {
+            return _testQueryProvider.CreateQuery<T>();
+        }
+
+        #endregion
+    }
+
+    public static class QueryExtentions
+    {
+
+        static IQueryable<T> SqlQuery<T>(this IQueryable<T> query, Expression predicate, MethodInfo info)
+        {
+            var expressions = new List<Expression>
+            {
+                Expression.Quote(predicate)
+            };
+
+
+            if (query.Expression != null)
+            {
+                expressions.Insert(0, query.Expression);
+            }
+            else
+            {
+                expressions.Insert(0, Expression.Variable(typeof(IQueryable<T>)));
+            }
+
+            var methodCallExpression = Expression.Call(null, info, expressions);
+
+            return
+                query.Provider.CreateQuery<T>(methodCallExpression);
+        }
+
+
+        public static IQueryable<T> WhereSql<T>(this IQueryable<T> query, Expression<Func<T, bool>> predicate)
+        {
+            return SqlQuery(query, predicate, ((MethodInfo)MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof(T)));
+        }
+
+        public static IQueryable<T> AndSql<T>(this IQueryable<T> query, Expression<Func<T, bool>> predicate)
+        {
+            return SqlQuery(query, predicate, ((MethodInfo)MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof(T)));
+        }
+
+        public static IQueryable<T> OrSql<T>(this IQueryable<T> query, Expression<Func<T, bool>> predicate)
+        {
+            return SqlQuery(query, predicate, ((MethodInfo)MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof(T)));
+        }
+
+        private static void WorkOnExp(MethodCallExpression exp)
+        {
+            var readOnlyCollection = exp.Arguments;
+            Expression expess = null;
+
+            expess = readOnlyCollection[1];
+
+            if (expess is UnaryExpression)
+            {
+                var unaryExpression = expess as UnaryExpression;
+                var expression = unaryExpression.Operand as LambdaExpression;
+                var operation = (BinaryExpression)expression.Body;
+                var left = (MemberExpression)operation.Left;
+
+                var rightExp = operation.Right;
+                if (rightExp is ConstantExpression)
+                {
+                    var right = (ConstantExpression)rightExp;
+                }
+                if (rightExp is UnaryExpression)
+                {
+                    var right = (UnaryExpression)rightExp;
+                }
+            }
+        }
+
+        private static void WorkOnExp(UnaryExpression exp)
+        {
+            var expression = exp.Operand as LambdaExpression;
+            var operation = (BinaryExpression)expression.Body;
+            var left = (MemberExpression)operation.Left;
+
+            var rightExp = operation.Right;
+            if (rightExp is ConstantExpression)
+            {
+                var right = (ConstantExpression)rightExp;
+            }
+            if (rightExp is UnaryExpression)
+            {
+                var right = (UnaryExpression)rightExp;
+            }
+        }
+
+        public static IEnumerable<T> Execute<T>(this IQueryable<T> query)
+        {
+            MethodCallExpression expessions = null;
+            expessions = query.Expression as MethodCallExpression;
+            var s = expessions.ToString();
+
+            //http://referencesource.microsoft.com/#System.Core/System/Linq/IQueryable.cs
+            //http://referencesource.microsoft.com/#System.Core/Microsoft/Scripting/Ast/ConstantExpression.cs
+            //http://msdn.microsoft.com/en-us/library/bb397951.aspx
+
+            foreach (var exp in expessions.Arguments)
+            {
+                if(exp is MethodCallExpression)
+                    WorkOnExp(exp as MethodCallExpression);
+
+                if (exp is UnaryExpression)
+                    WorkOnExp(exp as UnaryExpression);
+            }
+
+            return new List<T>();
+        }
     }
 }
-
-//public List<T> SelectWhere<T>(String @where, long top) where T : new()
-//{
-//    string query = CreateSelect<T>(Database).CommandText.Insert(6, " TOP " + top + " ") + " " + @where;
-//    return RunSelect<T>(query);
-//}
-
-//#region PrimetivSelects
-
-//#endregion
-
-//private IEnumerable<object> RunPrimetivSelect(Type type, string query)
-//{
-//    return
-//        Database.Run(
-//        s =>
-//        s.GetEntitiesList(CreateCommand(s, query), e => e[0])
-//    ).ToList();
-//}
-
-//private List<T> RunPrimetivSelect<T>(string query) where T : class
-//{
-//    return RunPrimetivSelect(typeof(T), query).CastToEnumerable<T>().ToList();
-//}
-
-//public List<T> SelectNative<T>(string query) where T : class
-//{
-//    return RunPrimetivSelect<T>(query);
-//}
-
-//public List<T> SelectNative<T>(string query, IEnumerable<IQueryParameter> paramenter) where T : new()
-//{
-//    return RunSelect<T>(Database, query, paramenter);
-//}
-
-//public List<T> SelectNative<T>(string query, dynamic paramenter) where T : new()
-//{
-//    IEnumerable<IQueryParameter> enumarateFromDynamics = EnumarateFromDynamics(paramenter);
-//    return SelectNative<T>(query, enumarateFromDynamics);
-//}

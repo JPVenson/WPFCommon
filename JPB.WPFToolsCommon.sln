@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "IEADPC.DataAccess\DataAccess.csproj", "{A5412B57-DC13-476A-B77B-9C7960DBB052}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "IEADPC.DataAccess\DataAccess.csproj", "{377060C0-C99C-4CAC-BC48-35CE4D8080EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicInputBox", "IEADPC.DynamicInputBox\DynamicInputBox.csproj", "{535181FB-8192-44CB-9859-4D5A2484B971}"
 EndProject
@@ -26,12 +26,12 @@ Global
 		Server|Any CPU = Server|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A5412B57-DC13-476A-B77B-9C7960DBB052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5412B57-DC13-476A-B77B-9C7960DBB052}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5412B57-DC13-476A-B77B-9C7960DBB052}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5412B57-DC13-476A-B77B-9C7960DBB052}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5412B57-DC13-476A-B77B-9C7960DBB052}.Server|Any CPU.ActiveCfg = Server|Any CPU
-		{A5412B57-DC13-476A-B77B-9C7960DBB052}.Server|Any CPU.Build.0 = Server|Any CPU
+		{377060C0-C99C-4CAC-BC48-35CE4D8080EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{377060C0-C99C-4CAC-BC48-35CE4D8080EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{377060C0-C99C-4CAC-BC48-35CE4D8080EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{377060C0-C99C-4CAC-BC48-35CE4D8080EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{377060C0-C99C-4CAC-BC48-35CE4D8080EB}.Server|Any CPU.ActiveCfg = Server|Any CPU
+		{377060C0-C99C-4CAC-BC48-35CE4D8080EB}.Server|Any CPU.Build.0 = Server|Any CPU
 		{535181FB-8192-44CB-9859-4D5A2484B971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{535181FB-8192-44CB-9859-4D5A2484B971}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{535181FB-8192-44CB-9859-4D5A2484B971}.Release|Any CPU.ActiveCfg = Release|Any CPU
