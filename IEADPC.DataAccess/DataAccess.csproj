@@ -68,7 +68,6 @@
     <Compile Include="AdoWrapper\IDatabase.cs" />
     <Compile Include="AdoWrapper\IDatabaseStrategy.cs" />
     <Compile Include="DataConverterExtensions.cs" />
-    <Compile Include="DbAccessParameter.cs" />
     <Compile Include="Manager\DbAccessLayer.cs" />
     <Compile Include="Manager\DbAccessLayerDelete.cs" />
     <Compile Include="Manager\DbAccessLayerInsert.cs" />
@@ -76,6 +75,7 @@
     <Compile Include="Helper\IQueryParameter.cs" />
     <Compile Include="Helper\QueryParameter.cs" />
     <Compile Include="Manager\DbAccessLayerUpdate.cs" />
+    <Compile Include="Manager\QueryExtentions.cs" />
     <Compile Include="ModelsAnotations\ModelAnotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryProvider\Query.cs" />

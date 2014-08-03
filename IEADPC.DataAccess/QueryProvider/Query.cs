@@ -30,7 +30,7 @@ namespace DataAccess.QueryProvider
             }
             if (expression != null)
             {
-                if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
+                if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type) && !(expression is ParameterExpression))
                 {
                     throw new ArgumentOutOfRangeException("expression");
                 }

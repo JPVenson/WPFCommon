@@ -15,8 +15,14 @@ namespace testing
         public void TestMethod1()
         {
             var manager = new DbAccessLayer();
-
-            var res = manager.SelectWhereEx<User>().WhereSql(s => s.Name == "").AndSql(s => s.Name == "").Execute();
+            manager.Database =
+                Database.CreateMSSQL(
+                    "Data Source=(localdb)\\Projects;Initial Catalog=TestDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False");
+            var res = manager.SelectQuery<User>()
+                .WhereSql(s => s.Name == "123")
+                .AndSql(s => s.Name == "456")
+                .AndSql(s => s.Name == "789")
+                .AndSql(s => s.Name == "111").ToArray();
         }
 
 

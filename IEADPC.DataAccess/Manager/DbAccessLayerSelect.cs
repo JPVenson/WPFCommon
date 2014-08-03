@@ -316,119 +316,13 @@ namespace DataAccess.Manager
             _testQueryProvider = new TestQueryProvider(this);
         }
 
-        public IQueryable<T> SelectWhereEx<T>()
+        public IQueryable<T> SelectQuery<T>()
         {
-            return _testQueryProvider.CreateQuery<T>();
+            var makeGenericMethod = ((MethodInfo) MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof (T));
+            var methodCallExpression = Expression.Call(Expression.Constant(this), makeGenericMethod);
+            return _testQueryProvider.CreateQuery<T>(methodCallExpression);
         }
 
         #endregion
-    }
-
-    public static class QueryExtentions
-    {
-
-        static IQueryable<T> SqlQuery<T>(this IQueryable<T> query, Expression predicate, MethodInfo info)
-        {
-            var expressions = new List<Expression>
-            {
-                Expression.Quote(predicate)
-            };
-
-
-            if (query.Expression != null)
-            {
-                expressions.Insert(0, query.Expression);
-            }
-            else
-            {
-                expressions.Insert(0, Expression.Variable(typeof(IQueryable<T>)));
-            }
-
-            var methodCallExpression = Expression.Call(null, info, expressions);
-
-            return
-                query.Provider.CreateQuery<T>(methodCallExpression);
-        }
-
-
-        public static IQueryable<T> WhereSql<T>(this IQueryable<T> query, Expression<Func<T, bool>> predicate)
-        {
-            return SqlQuery(query, predicate, ((MethodInfo)MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof(T)));
-        }
-
-        public static IQueryable<T> AndSql<T>(this IQueryable<T> query, Expression<Func<T, bool>> predicate)
-        {
-            return SqlQuery(query, predicate, ((MethodInfo)MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof(T)));
-        }
-
-        public static IQueryable<T> OrSql<T>(this IQueryable<T> query, Expression<Func<T, bool>> predicate)
-        {
-            return SqlQuery(query, predicate, ((MethodInfo)MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof(T)));
-        }
-
-        private static void WorkOnExp(MethodCallExpression exp)
-        {
-            var readOnlyCollection = exp.Arguments;
-            Expression expess = null;
-
-            expess = readOnlyCollection[1];
-
-            if (expess is UnaryExpression)
-            {
-                var unaryExpression = expess as UnaryExpression;
-                var expression = unaryExpression.Operand as LambdaExpression;
-                var operation = (BinaryExpression)expression.Body;
-                var left = (MemberExpression)operation.Left;
-
-                var rightExp = operation.Right;
-                if (rightExp is ConstantExpression)
-                {
-                    var right = (ConstantExpression)rightExp;
-                }
-                if (rightExp is UnaryExpression)
-                {
-                    var right = (UnaryExpression)rightExp;
-                }
-            }
-        }
-
-        private static void WorkOnExp(UnaryExpression exp)
-        {
-            var expression = exp.Operand as LambdaExpression;
-            var operation = (BinaryExpression)expression.Body;
-            var left = (MemberExpression)operation.Left;
-
-            var rightExp = operation.Right;
-            if (rightExp is ConstantExpression)
-            {
-                var right = (ConstantExpression)rightExp;
-            }
-            if (rightExp is UnaryExpression)
-            {
-                var right = (UnaryExpression)rightExp;
-            }
-        }
-
-        public static IEnumerable<T> Execute<T>(this IQueryable<T> query)
-        {
-            MethodCallExpression expessions = null;
-            expessions = query.Expression as MethodCallExpression;
-            var s = expessions.ToString();
-
-            //http://referencesource.microsoft.com/#System.Core/System/Linq/IQueryable.cs
-            //http://referencesource.microsoft.com/#System.Core/Microsoft/Scripting/Ast/ConstantExpression.cs
-            //http://msdn.microsoft.com/en-us/library/bb397951.aspx
-
-            foreach (var exp in expessions.Arguments)
-            {
-                if(exp is MethodCallExpression)
-                    WorkOnExp(exp as MethodCallExpression);
-
-                if (exp is UnaryExpression)
-                    WorkOnExp(exp as UnaryExpression);
-            }
-
-            return new List<T>();
-        }
     }
 }
