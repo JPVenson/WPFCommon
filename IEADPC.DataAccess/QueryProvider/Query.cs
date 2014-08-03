@@ -49,7 +49,8 @@ namespace DataAccess.QueryProvider
         /// </returns>
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<T>)this.provider.Execute(this.Expression)).GetEnumerator();
+            var execute = ((IEnumerable)this.provider.Execute(this.Expression)).Cast<T>();
+            return execute.GetEnumerator();
         }
 
         /// <summary>

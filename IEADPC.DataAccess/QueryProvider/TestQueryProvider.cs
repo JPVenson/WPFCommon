@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccess.Helper;
 using DataAccess.Manager;
 using Microsoft.Win32;
 
@@ -28,24 +29,27 @@ namespace DataAccess.QueryProvider
 
         private Type type;
 
-        private List<Tuple<MethodInfo, Expression>> expressionTree = new List<Tuple<MethodInfo, Expression>>();
+        private List<Tuple<MethodInfo, Expression>> _expressionTree = new List<Tuple<MethodInfo, Expression>>();
+
+        private List<IQueryParameter> _parameters = new List<IQueryParameter>();
 
         private void SplitArguments(MethodCallExpression parent)
         {
             if (!parent.Arguments.Any())
             {
-                expressionTree.Add(new Tuple<MethodInfo, Expression>(parent.Method, parent));
+                _expressionTree.Add(new Tuple<MethodInfo, Expression>(parent.Method, parent));
                 return;
             }
 
             var expression = parent.Arguments.Last();
-            expressionTree.Add(new Tuple<MethodInfo, Expression>(parent.Method, expression));
+            _expressionTree.Add(new Tuple<MethodInfo, Expression>(parent.Method, expression));
             SplitArguments(parent.Arguments.FirstOrDefault() as MethodCallExpression);
         }
 
         public override object Execute(Expression expression)
         {
-            expressionTree.Clear();
+            _expressionTree.Clear();
+            _parameters.Clear();
 
             MethodCallExpression expessions = null;
             expessions = expression as MethodCallExpression;
@@ -57,16 +61,16 @@ namespace DataAccess.QueryProvider
             var queryBuilder = new StringBuilder();
             SplitArguments(expression as MethodCallExpression);
 
-            expressionTree.Reverse();
+            _expressionTree.Reverse();
 
             type = expessions.Method.GetGenericArguments().FirstOrDefault();
 
-            foreach (var exp in expressionTree)
+            foreach (var exp in _expressionTree)
             {
                 queryBuilder.Append(processParameter(exp.Item1, exp.Item2));
             }
 
-            return DbAccessLayer.SelectNative(type, queryBuilder.ToString());
+            return DbAccessLayer.RunSelect(type, DbAccessLayer.Database, queryBuilder.ToString(), _parameters);
         }
 
 
@@ -84,13 +88,57 @@ namespace DataAccess.QueryProvider
             var expression = getLeftHandExp.Expression;
             var expressionAsString = exp.ToString();
             var leftHandExp = expression.ToString();
-            var indexOf = expressionAsString.IndexOf(".");
-            var indexOfExpression = expressionAsString.IndexOf(leftHandExp, 0, indexOf);
-            expressionAsString = expressionAsString.Remove(indexOfExpression, indexOf);
+            //replace alias with Table name
+            var indexOfDot = expressionAsString.IndexOf(".");
+            var indexOfExpression = expressionAsString.IndexOf(leftHandExp, 0, indexOfDot);
+            expressionAsString = expressionAsString.Remove(indexOfExpression, indexOfDot);
             expressionAsString = expressionAsString.Insert(indexOfExpression, type.GetTableName() + ".");
+            //replace column name with mapped name
+            indexOfDot = expressionAsString.IndexOf(".") + 1;
+            var indexOfOperator = expressionAsString.IndexOf(' ', indexOfDot);
+
+
+            var maybeNotRealColumnName = expressionAsString.Substring(indexOfDot, indexOfOperator - indexOfDot);
+            expressionAsString = expressionAsString.Remove(indexOfDot, indexOfOperator - indexOfDot);
+            expressionAsString = expressionAsString.Insert(indexOfDot,
+                type.MapEntiysPropToSchema(maybeNotRealColumnName));
             expressionAsString = expressionAsString.Replace('(', ' ');
             expressionAsString = expressionAsString.Replace(')', ' ');
+
+            var parama = new QueryParameter();
+            parama.Name = "@" + _parameters.Count;
+            parama.Value = getValueFromExp(exp.Right);
+            _parameters.Add(parama);
+
+            //TODO remove everything from the right 
+            expressionAsString = expressionAsString.Replace(exp.Right.ToString(), parama.Name);
             return expressionAsString;
+        }
+
+        private object getValueFromExp(Expression exp)
+        {
+            if ((exp is ConstantExpression))
+            {
+                var constantExpression = (exp as ConstantExpression);
+                return constantExpression.Value;
+            }
+            if (exp is MemberExpression)
+            {
+                return GetValue(exp as MemberExpression);
+            }
+
+            throw new NotSupportedException("This expression is not suported") { Data = { { "Expression", exp.GetType() } } };
+        }
+
+        private object GetValue(MemberExpression member)
+        {
+            var objectMember = Expression.Convert(member, typeof(object));
+
+            var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+
+            var getter = getterLambda.Compile();
+
+            return getter();
         }
 
         private string processParameter(MethodInfo item1, Expression argument)
