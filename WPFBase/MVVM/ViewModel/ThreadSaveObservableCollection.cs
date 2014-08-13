@@ -12,11 +12,16 @@ using System.Runtime.InteropServices;
 namespace WPFBase.MVVM.ViewModel
 {
     [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
-    public class ThreadSaveObservableCollection<T> : Collection<T>, INotifyCollectionChanged, IList<T>, IList,
+    public class ThreadSaveObservableCollection<T> : Collection<T>, INotifyCollectionChanged,
         INotifyPropertyChanged
     {
         private readonly object LockObject = new object();
         private readonly ThreadSaveViewModelActor actorHelper;
+        
+        public static ThreadSaveObservableCollection<T> Wrap<T>(ObservableCollection<T> batchServers)
+        {
+            return new ThreadSaveObservableCollection<T>(batchServers, true);
+        }
 
         #region INotifyPropertyChanged
 
@@ -45,7 +50,7 @@ namespace WPFBase.MVVM.ViewModel
 
         public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
         {
-            var lambda = (LambdaExpression) property;
+            var lambda = (LambdaExpression)property;
 
             MemberExpression memberExpression;
             var body = lambda.Body as UnaryExpression;
@@ -53,21 +58,29 @@ namespace WPFBase.MVVM.ViewModel
             if (body != null)
             {
                 UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression) unaryExpression.Operand;
+                memberExpression = (MemberExpression)unaryExpression.Operand;
             }
             else
-                memberExpression = (MemberExpression) lambda.Body;
+                memberExpression = (MemberExpression)lambda.Body;
             SendPropertyChanged(memberExpression.Member.Name);
         }
 
         #endregion
 
-        public ThreadSaveObservableCollection(IEnumerable<T> collection)
+        private ThreadSaveObservableCollection(IEnumerable<T> collection, bool copy)
         {
             if (collection == null)
                 throw new ArgumentNullException("collection");
+
             CopyFrom(collection);
+
             actorHelper = new ThreadSaveViewModelBase();
+        }
+
+        public ThreadSaveObservableCollection(IEnumerable<T> collection)
+            : this(collection, false)
+        {
+
         }
 
         public ThreadSaveObservableCollection(List<T> list)
@@ -160,19 +173,27 @@ namespace WPFBase.MVVM.ViewModel
                         newIndex, oldIndex)));
         }
 
-        private void CopyFrom(IEnumerable<T> collection)
+        private void CopyFrom(IEnumerable<T> collection, bool copyRef = false)
         {
             lock (LockObject)
             {
-                IList<T> items = base.Items;
-                if ((collection != null) && (items != null))
+                if (copyRef)
                 {
-                    using (IEnumerator<T> enumerator = collection.GetEnumerator())
+
+                }
+                else
+                {
+                    IList<T> items = base.Items;
+                    if ((collection != null) && (items != null))
                     {
-                        while (enumerator.MoveNext())
-                            items.Add(enumerator.Current);
+                        using (IEnumerator<T> enumerator = collection.GetEnumerator())
+                        {
+                            while (enumerator.MoveNext())
+                                items.Add(enumerator.Current);
+                        }
                     }
                 }
+
             }
         }
 

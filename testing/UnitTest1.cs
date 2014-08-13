@@ -32,6 +32,9 @@ namespace testing
         [TestMethod]
         public void CheckLinq()
         {
+            IQueryable<User> selectQuery = dbaccess.SelectQuery<User>();
+            User[] array = selectQuery.WhereSql(s => s.Name == "Test").OrSql(s => s.UserId == 0).AndSql(s => s.Name == "!").ToArray();
+
             var res = dbaccess.SelectQuery<User>()
                 .WhereSql(s => s.Name == testName).ToArray();
             Assert.AreEqual(res.Length, 1);

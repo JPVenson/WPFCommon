@@ -5,17 +5,18 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace WPFBase.MVVM.ViewModel
 {
-    public class ThreadSaveCollectionModel<T, E> : ThreadSaveViewModelBase
-        where T : IEnumerable<E>, new()
+    public class ThreadSaveCollectionModel<T, TE> : ThreadSaveViewModelBase, IEnumerable<TE> where T : IEnumerable<TE>, new()
     {
         public ThreadSaveCollectionModel()
         {
             Collection = new T();
-            CreateFromSingelItem = s => new[] {s};
+            CreateFromSingelItem = s => new[] { s };
         }
 
         public ThreadSaveCollectionModel(Action sendPropChanged)
@@ -24,19 +25,19 @@ namespace WPFBase.MVVM.ViewModel
             SendPropChanged = sendPropChanged;
         }
 
-        public ThreadSaveCollectionModel(Action sendPropChanged, Func<E, IEnumerable<E>> createFromSingelItem)
+        public ThreadSaveCollectionModel(Action sendPropChanged, Func<TE, IEnumerable<TE>> createFromSingelItem)
             : this(sendPropChanged)
         {
             CreateFromSingelItem = createFromSingelItem;
         }
 
-        public ThreadSaveCollectionModel(Func<E, IEnumerable<E>> createFromSingelItem)
+        public ThreadSaveCollectionModel(Func<TE, IEnumerable<TE>> createFromSingelItem)
             : this(null, createFromSingelItem)
         {
         }
 
         public Action SendPropChanged { get; set; }
-        public Func<E, IEnumerable<E>> CreateFromSingelItem { get; set; }
+        public Func<TE, IEnumerable<TE>> CreateFromSingelItem { get; set; }
 
         #region Collection property
 
@@ -56,9 +57,9 @@ namespace WPFBase.MVVM.ViewModel
 
         #region SelectedItems property
 
-        private IEnumerable<E> _selectedItems = default(IEnumerable<E>);
+        private IEnumerable<TE> _selectedItems = default(IEnumerable<TE>);
 
-        public IEnumerable<E> SelectedItems
+        public IEnumerable<TE> SelectedItems
         {
             get { return _selectedItems; }
             set
@@ -72,9 +73,9 @@ namespace WPFBase.MVVM.ViewModel
 
         #region SelectedItem property
 
-        private E _selectedItem;
+        private TE _selectedItem;
 
-        public E SelectedItem
+        public TE SelectedItem
         {
             get { return _selectedItem; }
             set
@@ -104,6 +105,28 @@ namespace WPFBase.MVVM.ViewModel
             base.BeginThreadSaveAction(() => SendPropertyChanged(() => SelectedItem));
             if (SendPropChanged != null)
                 base.BeginThreadSaveAction(SendPropChanged);
+        }
+
+        public IEnumerator<TE> GetEnumerator()
+        {
+            return this.Collection.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        //public static explicit operator ThreadSaveCollectionModel<T,TE> (T source)
+        //{
+        //    //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
+        //    return new ThreadSaveCollectionModel<T, TE>() { Collection = source };
+        //}
+
+        public static implicit operator ThreadSaveCollectionModel<T, TE>(T source)
+        {
+            //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
+            return new ThreadSaveCollectionModel<T, TE>() { Collection = source };
         }
     }
 }
