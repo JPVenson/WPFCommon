@@ -10,12 +10,13 @@ using System.Collections.Generic;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    public class ThreadSaveCollectionModel<T, TE> : ThreadSaveViewModelBase, IEnumerable<TE> where T : IEnumerable<TE>, new()
+    public class ThreadSaveCollectionModel<T, TE> : ThreadSaveViewModelBase, IEnumerable<TE>
+        where T : IEnumerable<TE>, new()
     {
         public ThreadSaveCollectionModel()
         {
             Collection = new T();
-            CreateFromSingelItem = s => new[] { s };
+            CreateFromSingelItem = s => new[] {s};
         }
 
         public ThreadSaveCollectionModel(Action sendPropChanged)
@@ -87,6 +88,16 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #endregion
 
+        public IEnumerator<TE> GetEnumerator()
+        {
+            return Collection.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
         public void SendCollectionChanged()
         {
             base.BeginThreadSaveAction(() => SendPropertyChanged(() => Collection));
@@ -106,16 +117,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 base.BeginThreadSaveAction(SendPropChanged);
         }
 
-        public IEnumerator<TE> GetEnumerator()
-        {
-            return this.Collection.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
         //public static explicit operator ThreadSaveCollectionModel<T,TE> (T source)
         //{
         //    //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
@@ -125,7 +126,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public static implicit operator ThreadSaveCollectionModel<T, TE>(T source)
         {
             //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
-            return new ThreadSaveCollectionModel<T, TE>() { Collection = source };
+            return new ThreadSaveCollectionModel<T, TE> {Collection = source};
         }
     }
 }

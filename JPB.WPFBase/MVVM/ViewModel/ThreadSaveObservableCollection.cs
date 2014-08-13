@@ -16,55 +16,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
     {
         private readonly object LockObject = new object();
         private readonly ThreadSaveViewModelActor actorHelper;
-        
-        public static ThreadSaveObservableCollection<T> Wrap<T>(ObservableCollection<T> batchServers)
-        {
-            return new ThreadSaveObservableCollection<T>(batchServers, true);
-        }
-
-        #region INotifyPropertyChanged
-
-        /// <summary>
-        ///     Raised when a property on this object has a new value
-        /// </summary>
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanged event
-        /// </summary>
-        /// <param name="propertyName">Name of the property that has a new value</param>
-        public void SendPropertyChanged(string propertyName)
-        {
-            SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
-
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanged event
-        /// </summary>
-        /// <param name="e">Arguments detailing the change</param>
-        protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
-        {
-            var lambda = (LambdaExpression)property;
-
-            MemberExpression memberExpression;
-            var body = lambda.Body as UnaryExpression;
-
-            if (body != null)
-            {
-                UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression)unaryExpression.Operand;
-            }
-            else
-                memberExpression = (MemberExpression)lambda.Body;
-            SendPropertyChanged(memberExpression.Member.Name);
-        }
-
-        #endregion
 
         private ThreadSaveObservableCollection(IEnumerable<T> collection, bool copy)
         {
@@ -79,7 +30,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public ThreadSaveObservableCollection(IEnumerable<T> collection)
             : this(collection, false)
         {
-
         }
 
         public ThreadSaveObservableCollection(List<T> list)
@@ -106,6 +56,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
+
+        public static ThreadSaveObservableCollection<T> Wrap<T>(ObservableCollection<T> batchServers)
+        {
+            return new ThreadSaveObservableCollection<T>(batchServers, true);
+        }
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
@@ -178,7 +133,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
             {
                 if (copyRef)
                 {
-
                 }
                 else
                 {
@@ -192,7 +146,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
                         }
                     }
                 }
-
             }
         }
 
@@ -226,5 +179,49 @@ namespace JPB.WPFBase.MVVM.ViewModel
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
                         oldItem, item, index)));
         }
+
+        #region INotifyPropertyChanged
+
+        /// <summary>
+        ///     Raised when a property on this object has a new value
+        /// </summary>
+        /// <summary>
+        ///     Raises this ViewModels PropertyChanged event
+        /// </summary>
+        /// <param name="propertyName">Name of the property that has a new value</param>
+        public void SendPropertyChanged(string propertyName)
+        {
+            SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        ///     Raises this ViewModels PropertyChanged event
+        /// </summary>
+        /// <param name="e">Arguments detailing the change</param>
+        protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
+        {
+            var lambda = (LambdaExpression) property;
+
+            MemberExpression memberExpression;
+            var body = lambda.Body as UnaryExpression;
+
+            if (body != null)
+            {
+                UnaryExpression unaryExpression = body;
+                memberExpression = (MemberExpression) unaryExpression.Operand;
+            }
+            else
+                memberExpression = (MemberExpression) lambda.Body;
+            SendPropertyChanged(memberExpression.Member.Name);
+        }
+
+        #endregion
     }
 }
