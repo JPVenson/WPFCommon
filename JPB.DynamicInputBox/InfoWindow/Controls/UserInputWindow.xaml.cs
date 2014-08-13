@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows;
 
 namespace JPB.DynamicInputBox.InfoWindow.Controls
 {

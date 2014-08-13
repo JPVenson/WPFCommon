@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using JPB.DynamicInputBox.InfoWindow.Wrapper;
+using JPB.ErrorValidation.ValidationTyps;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {

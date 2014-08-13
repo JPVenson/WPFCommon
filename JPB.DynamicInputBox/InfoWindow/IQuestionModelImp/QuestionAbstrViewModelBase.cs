@@ -5,6 +5,9 @@
 #endregion
 
 using JPB.DynamicInputBox.InfoWindow.Interfaces;
+using JPB.ErrorValidation;
+using JPB.ErrorValidation.ValidationRules;
+using JPB.ErrorValidation.ValidationTyps;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {

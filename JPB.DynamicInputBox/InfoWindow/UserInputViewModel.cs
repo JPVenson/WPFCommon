@@ -11,6 +11,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using JPB.DynamicInputBox.InfoWindow.Controls;
 using JPB.DynamicInputBox.InfoWindow.IQuestionModelImp;
+using JPB.ErrorValidation;
+using JPB.ErrorValidation.ValidationRules;
+using JPB.WPFBase.MVVM.DelegateCommand;
 
 namespace JPB.DynamicInputBox.InfoWindow
 {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {

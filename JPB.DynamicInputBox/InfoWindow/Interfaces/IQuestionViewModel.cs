@@ -5,6 +5,7 @@
 #endregion
 
 using System;
+using JPB.ErrorValidation;
 
 namespace JPB.DynamicInputBox.InfoWindow.Interfaces
 {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using JPB.DataAccess.AdoWrapper;
+using MySql.Data.MySqlClient;
 
 namespace DataAccess.MySQL
 {

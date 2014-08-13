@@ -1,4 +1,6 @@
-﻿namespace JPB.DynamicInputBox.InfoWindow.Wrapper
+﻿using JPB.WPFBase.MVVM.ViewModel;
+
+namespace JPB.DynamicInputBox.InfoWindow.Wrapper
 {
     public interface IListBoxItemWrapper
     {

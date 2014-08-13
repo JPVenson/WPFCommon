@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DataAccess.AdoWrapper;
-using DataAccess.Manager;
-using DataAccess.ModelsAnotations;
+using JPB.DataAccess.AdoWrapper;
+using JPB.DataAccess.Manager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace testing

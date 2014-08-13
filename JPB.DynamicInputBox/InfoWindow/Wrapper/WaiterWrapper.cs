@@ -5,6 +5,7 @@
 #endregion
 
 using System;
+using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.DynamicInputBox.InfoWindow.Wrapper
 {

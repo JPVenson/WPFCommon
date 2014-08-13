@@ -4,6 +4,8 @@
 
 #endregion
 
+using JPB.ErrorValidation.ValidationRules;
+
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionViewModel : QuestionAbstrViewModelBase<QuestionViewModel, QuestionViewModelValidation>

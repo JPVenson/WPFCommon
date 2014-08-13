@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using DataAccess.AdoWrapper;
-using DataAccess.Manager;
-using DataAccess.ModelsAnotations;
+﻿using JPB.DataAccess.AdoWrapper;
+using JPB.DataAccess.Manager;
+using JPB.DataAccess.ModelsAnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace testing

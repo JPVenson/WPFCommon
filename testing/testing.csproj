@@ -64,6 +64,10 @@
       <Project>{A5412B57-DC13-476A-B77B-9C7960DBB052}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\JPB.DataAccess\JPB.DataAccess.csproj">
+      <Project>{46E06D7F-F55A-4B10-978D-13607BE17CB9}</Project>
+      <Name>JPB.DataAccess</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
