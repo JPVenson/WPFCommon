@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using DataAccess.AdoWrapper;
-using MySql.Data.MySqlClient;
+using JPB.DataAccess.AdoWrapper;
 
 namespace DataAccess.MySQL
 {

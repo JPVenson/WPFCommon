@@ -29,22 +29,45 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ExternalRelease|AnyCPU'">
+    <OutputPath>..\..\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorObserver.cs" />
+    <Compile Include="ErrorProviderBase.cs" />
+    <Compile Include="IErrorProvider.cs" />
+    <Compile Include="IErrorProviderBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ValidationRules\ValidationRuleBase.cs" />
     <Compile Include="ValidationTyps\Error.cs" />
     <Compile Include="ValidationTyps\IValidation.cs" />
     <Compile Include="ValidationTyps\NoError.cs" />
     <Compile Include="ValidationTyps\Warning.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
+      <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
+      <Name>JPB.WPFBase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
