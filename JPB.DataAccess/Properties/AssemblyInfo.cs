@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("testing")]
+[assembly: AssemblyTitle("JPB.DataAccess")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("testing")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCompany("Firma")]
+[assembly: AssemblyProduct("JPB.DataAccess")]
+[assembly: AssemblyCopyright("Copyright © Firma 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6ee02124-80f2-4fbe-a991-7e8e2c9beb91")]
+[assembly: Guid("bae27d49-4abf-4e73-a21e-dbe03dc0e806")]
 
 // Version information for an assembly consists of the following four values:
 //
