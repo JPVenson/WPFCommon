@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JPB.WPFBase.MVVM.ViewModel
@@ -34,6 +36,17 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #endregion
 
+        protected Task CurrentTask;
+
+        public TaskAwaiter GetAwaiter()
+        {
+            if (IsWorking)
+            {
+                return CurrentTask.GetAwaiter();
+            }
+            return new TaskAwaiter();
+        }
+
         private void StartWork()
         {
             IsWorking = true;
@@ -48,7 +61,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             return false;
         }
-
 
         protected void SimpleWorkWithSyncContinue<T>(Func<T> delegatetask, Action<T> continueWith, bool setWorking)
         {
@@ -71,6 +83,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
             {
                 var task = new Task(delegatetask.Invoke);
                 SimpleWork(task, false);
+            }
+        }
+
+        public void BackgroundSimpleWork<T>(Func<T> delegatetask, Action<T> continueWith)
+        {
+            if (delegatetask != null)
+            {
+                var task = new Task<T>(delegatetask.Invoke);
+                SimpleWork(task, continueWith, false);
             }
         }
 
@@ -113,6 +134,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 if (setWOrking)
                     StartWork();
                 task.ContinueWith(s => CreateContinue(s, continueWith, setWOrking)());
+                if (setWOrking)
+                    CurrentTask = task;
                 task.Start();
             }
         }
@@ -161,23 +184,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void SimpleWork(Task task)
         {
-            if (task != null)
-            {
-                StartWork();
-                task.ContinueWith(s => CreateContinue(s)());
-                task.Start();
-            }
+            SimpleWork(task, true);
         }
 
         public void SimpleWork(Task task, bool setWorking)
         {
-            if (task != null)
-            {
-                if (setWorking)
-                    StartWork();
-                task.ContinueWith(s => CreateContinue(s, setWorking)());
-                task.Start();
-            }
+            SimpleWork(task, null, setWorking);
         }
     }
 }
