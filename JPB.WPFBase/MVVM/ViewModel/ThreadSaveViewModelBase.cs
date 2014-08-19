@@ -30,9 +30,17 @@ namespace JPB.WPFBase.MVVM.ViewModel
         /// <param name="e">Arguments detailing the change</param>
         protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-                handler(this, e);
+            var checkAccess = Dispatcher.CheckAccess();
+            if (checkAccess)
+            {
+                PropertyChangedEventHandler handler = PropertyChanged;
+                if (handler != null)
+                    handler(this, e);
+            }
+            else
+            {
+                base.ThreadSaveAction(() => SendPropertyChanged(e));
+            }
         }
 
         public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)

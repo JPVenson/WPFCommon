@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
@@ -7,31 +10,82 @@ namespace JPB.Extentions.Extensions
 {
     public static class SaveExtensions
     {
-        //public static T LoadGeneric<T>([In, Out] this T Class, string Filename) where T : ITypContainer, new()
-        //{
-        //    if (File.Exists(Filename))
-        //    {
-        //        var ts = new TypeStore();
-        //        ts = LoadFromBinary<TypeStore>("TypeStore.bin");
-        //        T newc = LoadFromXML(Filename, ts.Typen.ToArray());
-        //        return newc;
-        //    }
-        //    return new T();
-        //}
+        public static T LoadGenericEx<T>([In, Out] this string Filename) where T : ITypContainer, new()
+        {
+            if (File.Exists(Filename))
+            {
+                var ts = new TypeStore();
+                ts = LoadFromBinary<TypeStore>(Filename + ".typestore");
+                T newc = LoadFromXML<T>(Filename, ts.Typen.ToArray());
+                return newc;
+            }
+            return new T();
+        }
 
-        //public static void SaveGeneric<T>(this T Class, string Filename) where T : ITypContainer
-        //{
-        //    var ts = new TypeStore();
-        //    ts.Typen = Class.GetTyps();
-        //    ts.SaveAsBinary("TypeStore.bin");
-        //    Class.SaveAsXML(Filename, ts.Typen.ToArray());
-        //}
+        public static void SaveGenericEx<T>(this T Class, string Filename) where T : ITypContainer
+        {
+            var ts = new TypeStore();
+            ts.Typen = Class.GetTyps().ToArray();
+            ts.SaveAsBinary(Filename + ".typestoren");
+            Class.SaveAsXML(Filename, ts.Typen.ToArray());
+        }
+
+        public static T LoadGeneric<T>([In, Out] this string Filename) where T : new()
+        {
+            if (File.Exists(Filename))
+            {
+                var ts = new TypeStore();
+                ts = LoadFromBinary<TypeStore>(Filename + ".typestore");
+                T newc = LoadFromXML<T>(Filename, ts.Typen.ToArray());
+                return newc;
+            }
+            return new T();
+        }
+
+        public static void SaveGeneric<T>(this T Class, string Filename)
+        {
+            var ts = new TypeStore();
+            var types = new List<Type>();
+            foreach (var propType in Class.GetType().GetProperties().Select(s => s.DeclaringType).ToArray())
+            {
+                types.AddHelper(propType);
+            }
+
+            foreach (var enumerable in types.Where(s => s.GetInterface("IEnumerable") != null))
+            {
+                var interfaces = enumerable.GetInterfaces();
+                foreach (var @interface in interfaces)
+                {
+                    types.AddHelper(@interface);
+                }
+
+                if (enumerable.ContainsGenericParameters)
+                {
+                    foreach (var @generic in enumerable.GetGenericArguments())
+                    {
+                        types.AddHelper(@generic);
+                    }
+                }
+            }
+
+            ts.Typen = types.ToArray();
+            ts.SaveAsBinary(Filename + ".typestoren");
+            Class.SaveAsXML(Filename, ts.Typen.ToArray());
+        }
+
+        private static void AddHelper(this List<Type> source, Type type)
+        {
+            if (!source.Contains(type))
+            {
+                source.Add(type);
+            }
+        }
 
         public static T LoadFromXMLString<T>(this string source, params Type[] typs) where T : class
         {
             using (var textReader = new StringReader(source))
             {
-                var deserializer = new XmlSerializer(typeof (T), typs);
+                var deserializer = new XmlSerializer(typeof(T), typs);
                 return (deserializer.Deserialize(textReader)) as T;
             }
         }
@@ -42,8 +96,8 @@ namespace JPB.Extentions.Extensions
             {
                 using (var textReader = new StreamReader(FileName))
                 {
-                    var deserializer = new XmlSerializer(typeof (T));
-                    return (T) (deserializer.Deserialize(textReader));
+                    var deserializer = new XmlSerializer(typeof(T));
+                    return (T)(deserializer.Deserialize(textReader));
                 }
             }
             return new T();
@@ -67,8 +121,8 @@ namespace JPB.Extentions.Extensions
             {
                 using (var textReader = new StreamReader(FileName))
                 {
-                    var deserializer = new XmlSerializer(typeof (T), typs);
-                    return (T) (deserializer.Deserialize(textReader));
+                    var deserializer = new XmlSerializer(typeof(T), typs);
+                    return (T)(deserializer.Deserialize(textReader));
                 }
             }
             return new T();
@@ -141,7 +195,7 @@ namespace JPB.Extentions.Extensions
             {
                 var fs = new FileStream(FileName, FileMode.Open);
                 var formatter = new BinaryFormatter();
-                return (A) formatter.Deserialize(fs);
+                return (A)formatter.Deserialize(fs);
             }
             return new A();
         }

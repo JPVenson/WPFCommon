@@ -6,9 +6,9 @@ namespace JPB.Extentions.Extensions
     [Serializable]
     public class TypeStore
     {
-        private List<Type> _typen = new List<Type>();
+        private Type[] _typen;
 
-        public List<Type> Typen
+        public Type[] Typen
         {
             get { return _typen; }
             set { _typen = value; }
