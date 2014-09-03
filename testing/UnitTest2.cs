@@ -1,4 +1,5 @@
-﻿using JPB.DataAccess.AdoWrapper;
+﻿using System;
+using JPB.DataAccess.AdoWrapper;
 using JPB.DataAccess.Manager;
 using JPB.DataAccess.ModelsAnotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,6 +23,7 @@ namespace testing
      
     }
 
+    [Serializable]
     [ForModel("Users")]
     public class User
     {
@@ -38,6 +40,7 @@ namespace testing
         public virtual Image Img { get; set; }
     }
 
+    [Serializable]
     [ForModel("Images")]
     public class Image
     {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
+using JPB.Communication.ComBase.Messages;
 
 namespace JPB.Communication.ComBase
 {

@@ -59,6 +59,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComBase\Messages\MessageBase.cs" />
     <Compile Include="ComBase\Networkbase.cs" />
     <Compile Include="ComBase\TCPNetworkReceiver.cs" />
     <Compile Include="ComBase\TCPNetworkSender.cs" />
@@ -67,7 +68,6 @@
     <Compile Include="Interface\IMessageSerialize.cs" />
     <Compile Include="ComBase\TcpConnection.cs" />
     <Compile Include="ComBase\InfoState.cs" />
-    <Compile Include="ComBase\MessageBase.cs" />
     <Compile Include="ComBase\NetworkInfoBase.cs" />
     <Compile Include="ComBase\TcpMessage.cs" />
     <Compile Include="NetworkFactory.cs" />

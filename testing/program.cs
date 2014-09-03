@@ -10,8 +10,8 @@ namespace testing
     {
         public static int Main()
         {
-            var test = new UnitTest2();
-            test.TestMethod1();
+            var test = new NetworkTest();
+            test.TestSender();
             return 0;
         }
     }

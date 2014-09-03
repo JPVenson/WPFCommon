@@ -58,11 +58,16 @@
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTest2.cs" />
+    <Compile Include="NetworkTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IEADPC.DataAccess\DataAccess.csproj">
       <Project>{A5412B57-DC13-476A-B77B-9C7960DBB052}</Project>
       <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JPB.Communication\JPB.Communication.csproj">
+      <Project>{50077C76-3ADF-4E5C-A230-B1474674BDD7}</Project>
+      <Name>JPB.Communication</Name>
     </ProjectReference>
     <ProjectReference Include="..\JPB.DataAccess\JPB.DataAccess.csproj">
       <Project>{46E06D7F-F55A-4B10-978D-13607BE17CB9}</Project>

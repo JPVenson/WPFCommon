@@ -7,13 +7,44 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using JPB.Communication.ComBase.Messages;
 
 namespace JPB.Communication.ComBase
 {
     public sealed class TCPNetworkReceiver : Networkbase, IDisposable
     {
-        private readonly List<Tuple<Action<MessageBase>, Guid>> _onetimeupdated =
-            new List<Tuple<Action<MessageBase>, Guid>>();
+        internal TCPNetworkReceiver(short port)
+        {
+            Port = port;
+            //_server = new TcpListener(NetworkInfoBase.IpAddress, NetworkInfoBase.Port);
+            //_server.Start();
+            //var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            //var activeTcpListeners = ipGlobalProperties.GetActiveTcpListeners();
+            //var any = activeTcpListeners.Any(s => s.Port == port);
+
+            //if(any)
+            //    throw new NotSupportedException("The port is in use");
+
+            _sock = new Socket(IPAddress.Any.AddressFamily,
+                               SocketType.Stream,
+                               ProtocolType.Tcp);
+            _sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _sock.Bind(new IPEndPoint(NetworkInfoBase.IpAddress, Port));
+
+            // Bind the socket to the address and port.
+
+            // Start listening.
+            _sock.Listen(5000);
+            // Set up the callback to be notified when somebody requests
+            // a new connection.
+            _sock.BeginAccept(OnConnectRequest, _sock);
+        }
+
+        private readonly List<Tuple<Action<MessageBase>, Guid>> _onetimeupdated = new List<Tuple<Action<MessageBase>, Guid>>();
+
+        private readonly List<Tuple<Action<RequstMessage>, Guid>> _pendingrequests = new List<Tuple<Action<RequstMessage>, Guid>>();
+
+        private readonly List<Tuple<Func<RequstMessage, object>, object>> _requestHandler = new List<Tuple<Func<RequstMessage, object>, object>>();
 
         private readonly Socket _sock;
 
@@ -37,36 +68,9 @@ namespace JPB.Communication.ComBase
 
         #endregion
 
-        internal TCPNetworkReceiver(short port)
-        {
-            Port = port;
-            //_server = new TcpListener(NetworkInfoBase.IpAddress, NetworkInfoBase.Port);
-            //_server.Start();
-            //var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            //var activeTcpListeners = ipGlobalProperties.GetActiveTcpListeners();
-            //var any = activeTcpListeners.Any(s => s.Port == port);
-
-            //if(any)
-            //    throw new NotSupportedException("The port is in use");
-
-            _sock = new Socket(IPAddress.Any.AddressFamily,
-                               SocketType.Stream,
-                               ProtocolType.Tcp);
-            _sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _sock.Bind(new IPEndPoint(NetworkInfoBase.IpAddress, Port));
-
-            // Bind the socket to the address and port.
-            
-            // Start listening.
-            _sock.Listen(5000);
-            // Set up the callback to be notified when somebody requests
-            // a new connection.
-            _sock.BeginAccept(OnConnectRequest, _sock);
-        }
-
         public short Port { get; private set; }
 
-        public bool IsDisposing { get; set; }
+        public bool IsDisposing { get; private set; }
 
         public void RegisterChanged(Action<MessageBase> action, object state)
         {
@@ -78,12 +82,22 @@ namespace JPB.Communication.ComBase
             _onetimeupdated.Add(new Tuple<Action<MessageBase>, Guid>(action, guid));
         }
 
+        public void RegisterRequstHandler(Func<RequstMessage, object> action, object state)
+        {
+            _requestHandler.Add(new Tuple<Func<RequstMessage, object>, object>(action, state));
+        }
+
+        internal void RegisterRequst(Action<RequstMessage> action, Guid guid)
+        {
+            _pendingrequests.Add(new Tuple<Action<RequstMessage>, Guid>(action, guid));
+        }
+
         public void UnRegisterCallback(Guid guid)
         {
             _onetimeupdated.Remove(_onetimeupdated.FirstOrDefault(s => s.Item2 == guid));
         }
 
-        private void MessagesOnCollectionChanged(object sender,
+        private void MessagesOnCollectionChanged(object o,
                                                  NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             if (notifyCollectionChangedEventArgs.Action != NotifyCollectionChangedAction.Add)
@@ -94,22 +108,48 @@ namespace JPB.Communication.ComBase
             _workeritems.Enqueue(() =>
             {
                 var item = items.First();
-                var updateCallbacks = _updated.Where(action => action.Item2 == null || action.Item2.Equals(item.InfoState)).ToArray();
-                foreach (
-                    var action in updateCallbacks)
-                    action.Item1.BeginInvoke(item, e => { }, null);
 
-                var useditems = new List<Tuple<Action<MessageBase>, Guid>>();
-
-                foreach (
-                    var action in _onetimeupdated.Where(s => item.Id == s.Item2).ToArray())
+                if (item is RequstMessage)
                 {
-                    action.Item1.BeginInvoke(item, e => { }, null);
-                    useditems.Add(action);
-                }
+                    //message with return value inbound
+                    var requstInbound = item as RequstMessage;
+                    var firstOrDefault = _requestHandler.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.InfoState));
+                    if (firstOrDefault != null)
+                    {
+                        //Found a handler for that message and executed it
+                        var result = firstOrDefault.Item1(requstInbound);
 
-                foreach (var useditem in useditems)
-                    _onetimeupdated.Remove(useditem);
+                        var sender = NetworkFactory.Instance.GetSender(Port);
+                        sender.SendMessageAsync(new RequstMessage() {Message = result, ResponseFor = requstInbound.Id}, item.Sender);
+
+                        _requestHandler.Remove(firstOrDefault);
+                    }
+                    else
+                    {
+                        //This is an awnser
+                        var awnser = _pendingrequests.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.ResponseFor));
+                        if (awnser != null)
+                            awnser.Item1(requstInbound);
+                    }
+                }
+                else
+                {
+                    var updateCallbacks = _updated.Where(action => action.Item2 == null || action.Item2.Equals(item.InfoState)).ToArray();
+                    foreach (
+                        var action in updateCallbacks)
+                        action.Item1.BeginInvoke(item, e => { }, null);
+
+                    //Go through all one time items and check for ID
+                    var oneTimeImtes = _onetimeupdated.Where(s => item.Id == s.Item2).ToArray();
+
+                    foreach (var action in oneTimeImtes)
+                    {
+                        action.Item1.BeginInvoke(item, e => { }, null);
+                    }
+
+                    foreach (var useditem in oneTimeImtes)
+                        _onetimeupdated.Remove(useditem);
+                }
             });
             if (_isWorking)
                 return;

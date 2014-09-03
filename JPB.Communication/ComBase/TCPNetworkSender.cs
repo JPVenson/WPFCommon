@@ -9,8 +9,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
+using JPB.Communication.ComBase.Messages;
 using JPB.Communication.Interface;
 
 namespace JPB.Communication.ComBase
@@ -20,11 +23,13 @@ namespace JPB.Communication.ComBase
         internal TCPNetworkSender(short port)
         {
             Port = port;
+            Timeout = TimeSpan.FromSeconds(15);
         }
 
         public short Port { get; private set; }
+        public TimeSpan Timeout { get; set; }
 
-        //private TcpClient Client { get; set; }
+        #region Message Methods
 
         public static async Task SendMessage(MessageBase message, string ip, short port)
         {
@@ -40,7 +45,6 @@ namespace JPB.Communication.ComBase
 
         /// <summary>
         /// Sends a message to multible Hosts
-        /// 
         /// </summary>
         /// <returns>all non reached hosts</returns>
         public IEnumerable<string> SendMultiMessage(MessageBase message, params string[] ips)
@@ -95,8 +99,37 @@ namespace JPB.Communication.ComBase
             return task;
         }
 
-        public async void SendFile(Stream stream, string ip)
+        #endregion
+
+        /// <summary>
+        /// Sends a message an awaits a response on the same port from the other side
+        /// </summary>
+        /// <param name="mess"></param>
+        /// <param name="ip"></param>
+        /// <returns>Result from other side or default(T)</returns>
+        /// <exception cref="TimeoutException"></exception>
+        public async Task<T> SendRequstMessage<T>(RequstMessage mess, string ip)
         {
+            var result = default(T);
+            var waitForResponsive = new AutoResetEvent(false);
+            var reciever = NetworkFactory.Instance.GetReceiver(Port);
+            reciever.RegisterRequst(s =>
+            {
+                result = (T)s.Message;
+                waitForResponsive.Set();
+            }, mess.Id);
+            var isSend = SendMessage(mess, ip);
+            if (isSend)
+            {
+                waitForResponsive.WaitOne(Timeout);
+            }
+            return result;
+        }
+
+        public async void SendFile(FileStream stream, MessageBase mess, string ip)
+        {
+            throw new NotImplementedException();
+
             var client = await CreateClientSockAsync(ip, Port);
             if (client == null)
                 return;
@@ -113,34 +146,14 @@ namespace JPB.Communication.ComBase
             return Wrap(message, provider);
         }
 
-        private async Task<TcpClient> CreateClientSockAsync(string ip, int port)
+        private static async Task<TcpClient> CreateClientSockAsync(string ip, int port)
         {
             try
             {
-                var Client = new TcpClient();
-                await Client.ConnectAsync(ip, port);
-                Client.NoDelay = true;
-                return Client;
-
-                //if (Client == null)
-                //{
-                //    Client = new TcpClient();
-                //    await Client.ConnectAsync(ip, port);
-                //    Client.NoDelay = true;
-                //    return Client;
-                //}
-                //else
-                //{
-                //    if (Client.Connected)
-                //    {
-                //        return Client;
-                //    }
-                //    else
-                //    {
-                //        await Client.ConnectAsync(ip, port);
-                //        return Client;
-                //    }
-                //}
+                var client = new TcpClient();
+                await client.ConnectAsync(ip, port);
+                client.NoDelay = true;
+                return client;
             }
             catch (Exception e)
             {
@@ -150,26 +163,31 @@ namespace JPB.Communication.ComBase
 
         private void SendBaseAsync(TcpMessage message, TcpClient client)
         {
-            byte[] stream = Serialize(message);
-            using (var memstream = new MemoryStream(stream))
+            using (var memstream = new MemoryStream(Serialize(message)))
             {
-                SendBase(memstream, client);
+                using (SendBase(memstream, client))
+                {
+
+                }
             }
         }
 
-        private void SendBase(Stream stream, TcpClient client)
+        private NetworkStream SendBase(Stream stream, TcpClient client)
         {
-            using (var networkStream = client.GetStream())
-            {
-                int bufSize = client.ReceiveBufferSize;
-                var buf = new byte[bufSize];
+            NetworkStream networkStream = client.GetStream();
 
-                int bytesRead;
-                while ((bytesRead = stream.Read(buf, 0, bufSize)) > 0)
-                {
-                    networkStream.Write(buf, 0, bytesRead);
-                }
+            int bufSize = client.ReceiveBufferSize;
+            var buf = new byte[bufSize];
+
+            int bytesRead;
+            while ((bytesRead = stream.Read(buf, 0, bufSize)) > 0)
+            {
+                networkStream.Write(buf, 0, bytesRead);
             }
+
+            networkStream.Write(new byte[0], 0, 0);
+
+            return networkStream;
         }
 
         #endregion
