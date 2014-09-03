@@ -6,6 +6,17 @@ using JPB.Communication.Interface;
 
 namespace JPB.Communication.Security
 {
+    public static class SecurityManagerLinker
+    {
+        public static void AddLink<T>() where T: ISecureMessage, new()
+        {
+            if (SecurityManager.Provider.All(s => !(s is T)))
+            {
+                SecurityManager.Provider.Add(new T());
+            }
+        }
+    }
+
     internal class SecurityManager
     {
         static SecurityManager()
@@ -34,7 +45,8 @@ namespace JPB.Communication.Security
                     if(secureMessage == null)
                         continue;
 
-                    if (Provider.Any(s => s.GetType() == type))
+                    Type type1 = type;
+                    if (Provider.Any(s => s.GetType() == type1))
                     {
                         Provider.Add(secureMessage);
                     }
@@ -44,6 +56,8 @@ namespace JPB.Communication.Security
                         resolvedProvide = secureMessage;
                     }
                 }
+
+
             }
 
             if (resolvedProvide == null)

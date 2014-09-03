@@ -16,7 +16,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public ThreadSaveCollectionModel()
         {
             Collection = new T();
-            CreateFromSingelItem = s => new[] {s};
+            CreateFromSingelItem = s => new[] { s };
         }
 
         public ThreadSaveCollectionModel(Action sendPropChanged)
@@ -77,7 +77,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public TE SelectedItem
         {
-            get { return _selectedItem; }
+            get
+            {
+                return _selectedItem;
+            }
             set
             {
                 _selectedItem = value;
@@ -126,7 +129,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public static implicit operator ThreadSaveCollectionModel<T, TE>(T source)
         {
             //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
-            return new ThreadSaveCollectionModel<T, TE> {Collection = source};
+            return new ThreadSaveCollectionModel<T, TE> { Collection = source };
         }
     }
 }

@@ -5,7 +5,10 @@
 #endregion
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using JPB.Communication.Interface;
@@ -21,15 +24,57 @@ namespace JPB.Communication.ComBase
 
         public short Port { get; private set; }
 
+        //private TcpClient Client { get; set; }
+
         public static async Task SendMessage(MessageBase message, string ip, short port)
         {
             var sender = NetworkFactory.Instance.GetSender(port);
             await sender.SendMessageAsync(message, ip);
         }
 
-        public async void SendMessage(MessageBase message, string ip)
+        public static async Task SendMessageAsync(MessageBase message, string ip, short port)
         {
-            await SendMessageAsync(message, ip);
+            var sender = NetworkFactory.Instance.GetSender(port);
+            sender.SendMessageAsync(message, ip);
+        }
+
+        /// <summary>
+        /// Sends a message to multible Hosts
+        /// 
+        /// </summary>
+        /// <returns>all non reached hosts</returns>
+        public IEnumerable<string> SendMultiMessage(MessageBase message, params string[] ips)
+        {
+            var failedMessages = new List<string>();
+
+            var runningMessages = ips.Select(ip => SendMessageAsync(message, ip)).ToArray();
+
+            for (var i = 0; i < runningMessages.Length; i++)
+            {
+                try
+                {
+                    var task = runningMessages[i];
+                    task.Wait();
+                    if (!task.Result)
+                    {
+                        failedMessages.Add(ips[i]);
+                    }
+                }
+                catch (Exception)
+                {
+                    failedMessages.Add(ips[i]);
+                }
+            }
+
+            return failedMessages;
+        }
+
+        public bool SendMessage(MessageBase message, string ip)
+        {
+            var sendMessageAsync = SendMessageAsync(message, ip);
+            sendMessageAsync.Wait();
+            var b = sendMessageAsync.Result;
+            return b;
         }
 
         public Task<bool> SendMessageAsync(MessageBase message, string ip)
@@ -42,8 +87,8 @@ namespace JPB.Communication.ComBase
                 var result = client.Result;
                 if (result == null)
                     return false;
-                var sendBaseAsync = SendBaseAsync(tcpMessage, result);
-                sendBaseAsync.Wait();
+                SendBaseAsync(tcpMessage, result);
+
                 return true;
             });
             task.Start();
@@ -55,7 +100,7 @@ namespace JPB.Communication.ComBase
             var client = await CreateClientSockAsync(ip, Port);
             if (client == null)
                 return;
-            await SendBaseAsync(stream, client);
+            SendBase(stream, client);
         }
 
         #region Base Methods
@@ -72,10 +117,30 @@ namespace JPB.Communication.ComBase
         {
             try
             {
-                var client = new TcpClient();
-                await client.ConnectAsync(ip, port);
-                client.NoDelay = true;
-                return client;
+                var Client = new TcpClient();
+                await Client.ConnectAsync(ip, port);
+                Client.NoDelay = true;
+                return Client;
+
+                //if (Client == null)
+                //{
+                //    Client = new TcpClient();
+                //    await Client.ConnectAsync(ip, port);
+                //    Client.NoDelay = true;
+                //    return Client;
+                //}
+                //else
+                //{
+                //    if (Client.Connected)
+                //    {
+                //        return Client;
+                //    }
+                //    else
+                //    {
+                //        await Client.ConnectAsync(ip, port);
+                //        return Client;
+                //    }
+                //}
             }
             catch (Exception e)
             {
@@ -83,37 +148,27 @@ namespace JPB.Communication.ComBase
             }
         }
 
-        private Task SendBaseAsync(TcpMessage message, TcpClient client)
+        private void SendBaseAsync(TcpMessage message, TcpClient client)
         {
-            if (client == null)
-                return null;
             byte[] stream = Serialize(message);
             using (var memstream = new MemoryStream(stream))
             {
-                return SendBaseAsync(memstream, client);
+                SendBase(memstream, client);
             }
         }
 
-        private Task SendBaseAsync(Stream stream, TcpClient client)
+        private void SendBase(Stream stream, TcpClient client)
         {
-            if (client == null)
-                return null;
-
             using (var networkStream = client.GetStream())
             {
                 int bufSize = client.ReceiveBufferSize;
                 var buf = new byte[bufSize];
 
-                long totalBytes = 0;
-                int bytesRead = 0;
-                Task writeAsync = null;
-
+                int bytesRead;
                 while ((bytesRead = stream.Read(buf, 0, bufSize)) > 0)
                 {
-                    writeAsync = networkStream.WriteAsync(buf, 0, bytesRead);
-                    totalBytes += bytesRead;
+                    networkStream.Write(buf, 0, bytesRead);
                 }
-                return writeAsync;
             }
         }
 

@@ -102,10 +102,9 @@ namespace JPB.Communication.ComBase
                 var useditems = new List<Tuple<Action<MessageBase>, Guid>>();
 
                 foreach (
-                    var action in
-                        _onetimeupdated.Where(s => item.Id == s.Item2))
+                    var action in _onetimeupdated.Where(s => item.Id == s.Item2).ToArray())
                 {
-                    action.Item1.Invoke(item);
+                    action.Item1.BeginInvoke(item, e => { }, null);
                     useditems.Add(action);
                 }
 
