@@ -4,16 +4,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using JPB.ErrorValidation.ValidationTyps;
+using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ValidationRules
 {
     public abstract class ValidationRuleBase<T> : IErrorProvider<T>
     {
-        private readonly ICollection<IValidation<T>> _vallidationErrors = new ObservableCollection<IValidation<T>>();
+        private readonly ICollection<IValidation<T>> _vallidationErrors = new ThreadSaveObservableCollection<IValidation<T>>();
 
         protected ValidationRuleBase()
         {
-            Errors = new ObservableCollection<IValidation<T>>();
+            Errors = new ThreadSaveObservableCollection<IValidation<T>>();
         }
 
         #region IErrorProvider<T> Members
@@ -30,7 +31,7 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public bool WarningAsFailure { get; set; }
 
-        public ObservableCollection<IValidation<T>> Errors { get; set; }
+        public ThreadSaveObservableCollection<IValidation<T>> Errors { get; set; }
 
         public NoError<T> DefaultNoError { get; set; }
 
@@ -49,9 +50,9 @@ namespace JPB.ErrorValidation.ValidationRules
             return typeof (T);
         }
 
-        public IValidation<T> RetrunError(string columnName)
+        public IEnumerable<IValidation<T>> RetrunErrors(string columnName)
         {
-            return _vallidationErrors.FirstOrDefault(s => s.ErrorIndicator == columnName);
+            return _vallidationErrors.Where(s => s.ErrorIndicator.Contains(columnName));
         }
 
         public void Add(IValidation<T> item)

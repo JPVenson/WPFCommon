@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using JPB.DataAccess.AdoWrapper;
@@ -8,9 +10,78 @@ using JPB.DataAccess.Helper;
 
 namespace JPB.DataAccess.Manager
 {
+    [DebuggerDisplay("DB={Database}")]
+#if !DEBUG
+        [DebuggerStepThrough]
+#endif
     public partial class DbAccessLayer
     {
-        public IDatabase Database { get; set; }
+        private IDatabase _database;
+
+        public enum DbTypes
+        {
+            MsSql,
+            MySql,
+            Unknown
+        }
+
+        /// <summary>
+        /// Must set the Database Property immeditly
+        /// Just for Intigration
+        /// </summary>
+        [Obsolete("Will be removed in future", false)]
+        public DbAccessLayer()
+        {
+
+        }
+
+        public DbAccessLayer(DbTypes dbType, string connection)
+        {
+            DbType = dbType;
+            Database = new Database();
+
+            if (dbType == DbTypes.Unknown)
+            {
+                throw new InvalidEnumArgumentException("dbType", (int)DbTypes.Unknown, typeof(DbTypes));
+            }
+
+            switch (dbType)
+            {
+                case DbTypes.MsSql:
+                    Database.Attach(new DsMSSQL(connection));
+                    break;
+                case DbTypes.MySql:
+                    Database.Attach(new Mysql(connection));
+                    break;
+            }
+        }
+
+        public DbAccessLayer(IDatabase database)
+        {
+            if (database == null)
+                throw new ArgumentNullException("database");
+            SelectDbAccessLayer();
+            UpdateDbAccessLayer();
+
+            DbType = DbTypes.Unknown;
+            Database = database;
+        }
+
+        public DbTypes DbType { get; private set; }
+
+        public IDatabase Database
+        {
+            get { return _database; }
+            set
+            {
+                if(_database == null)
+                _database = value;
+                else
+                {
+                    throw new NotSupportedException("Runtime change of Database is not allowed. Create a new DbAccessLayer object");
+                }
+            }
+        }
 
         public bool CheckDatabase()
         {
@@ -33,7 +104,7 @@ namespace JPB.DataAccess.Manager
 
         public int ExecuteGenericCommand(string query, dynamic paramenter)
         {
-            return ExecuteGenericCommand(query, (IEnumerable<IQueryParameter>) EnumarateFromDynamics(paramenter));
+            return ExecuteGenericCommand(query, (IEnumerable<IQueryParameter>)EnumarateFromDynamics(paramenter));
         }
 
         public int ExecuteGenericCommand(IDbCommand command)
@@ -47,11 +118,11 @@ namespace JPB.DataAccess.Manager
         }
 
         public static List<T> ExecuteGenericCreateModelsCommand<T>(IDbCommand command, IDatabase batchRemotingDb)
-            where T : new()
+            where T : class, new()
         {
             return batchRemotingDb.Run(
                 s =>
-                    s.GetEntitiesList(command, e => new T().SetPropertysViaRefection(e))
+                    s.GetEntitiesList(command, DataConverterExtensions.SetPropertysViaRefection<T>)
                         .ToList());
         }
 
@@ -68,7 +139,7 @@ namespace JPB.DataAccess.Manager
         public static IDbCommand CreateCommandWithParameterValues<T>(string query, string[] propertyInfos, T entry,
             IDatabase batchRemotingDb)
         {
-            Type type = typeof (T);
+            Type type = typeof(T);
             object[] propertyvalues =
                 propertyInfos.Select(
                     propertyInfo =>
@@ -86,7 +157,7 @@ namespace JPB.DataAccess.Manager
         {
             var listofQueryParamter = new List<IQueryParameter>();
             for (int i = 0; i < values.Count(); i++)
-                listofQueryParamter.Add(new QueryParameter {Name = i.ToString(), Value = values[i]});
+                listofQueryParamter.Add(new QueryParameter { Name = i.ToString(), Value = values[i] });
             return CreateCommandWithParameterValues(query, batchRemotingDb, listofQueryParamter);
         }
 
@@ -110,13 +181,13 @@ namespace JPB.DataAccess.Manager
         {
             var list = new List<IQueryParameter>();
 
-            PropertyInfo[] propertys = ((Type) parameter.GetType()).GetProperties();
+            PropertyInfo[] propertys = ((Type)parameter.GetType()).GetProperties();
 
             for (int i = 0; i < propertys.Length; i++)
             {
                 PropertyInfo element = propertys[i];
                 dynamic value = DataConverterExtensions.GetParamaterValue(parameter, element.Name);
-                list.Add(new QueryParameter {Name = "@" + element.Name, Value = value});
+                list.Add(new QueryParameter { Name = "@" + element.Name, Value = value });
             }
 
             return list;
@@ -129,7 +200,7 @@ namespace JPB.DataAccess.Manager
 
         protected static string CreatePropertyCSV<T>(bool ignorePK = false)
         {
-            return CreatePropertyCSV(typeof (T), ignorePK);
+            return CreatePropertyCSV(typeof(T), ignorePK);
         }
 
         protected static string CreatePropertyCSV(Type type, params string[] ignore)
@@ -140,7 +211,7 @@ namespace JPB.DataAccess.Manager
 
         protected static string CreatePropertyCSV<T>(params string[] ignore)
         {
-            return CreatePropertyCSV(typeof (T), ignore);
+            return CreatePropertyCSV(typeof(T), ignore);
         }
 
         protected static IEnumerable<string> CreatePropertyNames(Type type, params string[] ignore)
@@ -150,7 +221,7 @@ namespace JPB.DataAccess.Manager
 
         protected static IEnumerable<string> CreatePropertyNames<T>(params string[] ignore)
         {
-            return CreatePropertyNames(typeof (T), ignore);
+            return CreatePropertyNames(typeof(T), ignore);
         }
 
         protected static IEnumerable<string> CreatePropertyNames(Type type, bool ignorePK = false)
@@ -160,7 +231,7 @@ namespace JPB.DataAccess.Manager
 
         protected static IEnumerable<string> CreatePropertyNames<T>(bool ignorePK = false)
         {
-            return ignorePK ? CreatePropertyNames<T>(typeof (T).GetPK()) : CreatePropertyNames<T>(new string[0]);
+            return ignorePK ? CreatePropertyNames<T>(typeof(T).GetPK()) : CreatePropertyNames<T>(new string[0]);
         }
     }
 }

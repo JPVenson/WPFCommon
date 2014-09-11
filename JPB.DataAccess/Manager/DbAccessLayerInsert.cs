@@ -14,7 +14,7 @@ namespace JPB.DataAccess.Manager
             Insert(entry, Database);
         }
 
-        public T InsertWithSelect<T>(T entry) where T : new()
+        public T InsertWithSelect<T>(T entry)
         {
             return InsertWithSelect(entry, Database);
         }
@@ -56,7 +56,7 @@ namespace JPB.DataAccess.Manager
             db.Run(s => { s.ExecuteNonQuery(CreateInsert(entry, s)); });
         }
 
-        public static T InsertWithSelect<T>(T entry, IDatabase db) where T : new()
+        public static T InsertWithSelect<T>(T entry, IDatabase db) 
         {
             return db.Run(s =>
             {

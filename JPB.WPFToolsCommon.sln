@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testing", "testing\testing.csproj", "{B3D1161A-3C53-4459-865F-D586D1100E76}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DataAccess.MySQL", "JPB.DataAccess.MySQL\JPB.DataAccess.MySQL.csproj", "{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DataAccess", "JPB.DataAccess\JPB.DataAccess.csproj", "{46E06D7F-F55A-4B10-978D-13607BE17CB9}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFBase", "JPB.WPFBase\JPB.WPFBase.csproj", "{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.Communication", "JPB.Communication\JPB.Communication.csproj", "{50077C76-3ADF-4E5C-A230-B1474674BDD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApplication1", "WpfApplication1\WpfApplication1.csproj", "{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,13 +37,6 @@ Global
 		{B3D1161A-3C53-4459-865F-D586D1100E76}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B3D1161A-3C53-4459-865F-D586D1100E76}.Server|Any CPU.ActiveCfg = Release|Any CPU
 		{B3D1161A-3C53-4459-865F-D586D1100E76}.Server|Any CPU.Build.0 = Release|Any CPU
-		{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
-		{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}.Server|Any CPU.ActiveCfg = Release|Any CPU
-		{8EEFFE5E-CF17-4119-86FA-A7905BFBED25}.Server|Any CPU.Build.0 = Release|Any CPU
 		{46E06D7F-F55A-4B10-978D-13607BE17CB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{46E06D7F-F55A-4B10-978D-13607BE17CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46E06D7F-F55A-4B10-978D-13607BE17CB9}.ExternalRelease|Any CPU.ActiveCfg = ExternalRelease|Any CPU
@@ -98,6 +93,14 @@ Global
 		{50077C76-3ADF-4E5C-A230-B1474674BDD7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{50077C76-3ADF-4E5C-A230-B1474674BDD7}.Server|Any CPU.ActiveCfg = Server|Any CPU
 		{50077C76-3ADF-4E5C-A230-B1474674BDD7}.Server|Any CPU.Build.0 = Server|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.ExternalRelease|Any CPU.Build.0 = Release|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Server|Any CPU.ActiveCfg = Release|Any CPU
+		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Server|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -26,7 +26,7 @@ namespace JPB.DynamicInputBox.InfoWindow
             {"GoTo", "Go to page:"},
             {"Close", "OK"},
             {"Back", "Back"},
-            {"Quit", "Quit"},
+            {"Quit", "OK"},
         };
 
         public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort,

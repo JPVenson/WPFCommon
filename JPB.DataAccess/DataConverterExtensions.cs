@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -22,18 +23,18 @@ using JPB.DataAccess.ModelsAnotations;
 
 namespace JPB.DataAccess
 {
-    public static class DataHelperExtensions
+    internal static class DataHelperExtensions
     {
-        public static void AddWithValue(this IDataParameterCollection source, string name, object parameter,
+        internal static void AddWithValue(this IDataParameterCollection source, string name, object parameter,
             IDatabase db)
         {
             source.Add(db.CreateParameter(name, parameter));
         }
     }
 
-    public class StaticHelper
+    internal class StaticHelper
     {
-        public static IEnumerable<T> CastToEnumerable<T>(object o) where T : class
+        internal static IEnumerable<T> CastToEnumerable<T>(object o) where T : class
         {
             var foo = (o as IEnumerable<T>);
             if (foo != null)
@@ -45,16 +46,18 @@ namespace JPB.DataAccess
             if (basicEnumerable != null)
             {
                 foreach (object VARIABLE in basicEnumerable)
-                    castedEmumerable.Add((T) VARIABLE);
+                    castedEmumerable.Add((T)VARIABLE);
             }
 
             return castedEmumerable.AsReadOnly();
         }
     }
-
-    public static class DataConverterExtensions
+#if !DEBUG
+        [DebuggerStepThrough]
+#endif
+    internal static class DataConverterExtensions
     {
-        public static string GetTableName<T>()
+        internal static string GetTableName<T>()
         {
             var forModel = typeof (T).GetCustomAttributes(false).FirstOrDefault(s => s is ForModel) as ForModel;
             if (forModel != null)
@@ -62,7 +65,7 @@ namespace JPB.DataAccess
             return typeof (T).Name;
         }
 
-        public static string GetTableName(this Type type)
+        internal static string GetTableName(this Type type)
         {
             var forModel = type.GetCustomAttributes(false).FirstOrDefault(s => s is ForModel) as ForModel;
             if (forModel != null)
@@ -70,86 +73,83 @@ namespace JPB.DataAccess
             return type.Name;
         }
 
-        public static object GetParamaterValue(this object source, string name)
+        internal static object GetParamaterValue(this object source, string name)
         {
             return GetParamater(source, name).GetValue(source, null);
         }
 
-        //public static string GetParamaterName(this object source)
-        //{
-        //    return GetParamater(source).Name;
-        //}
-
-        public static PropertyInfo GetParamater(this object source, string name)
+        internal static PropertyInfo GetParamater(this object source, string name)
         {
             return source.GetType().GetProperties().FirstOrDefault(s => s.Name == name);
         }
 
-
-        public static bool CheckForPK(this PropertyInfo info)
+        internal static bool CheckForPK(this PropertyInfo info)
         {
             return info.GetCustomAttributes(false).Any(s => s is PrimaryKeyAttribute) || (info.Name.EndsWith("_ID"));
         }
 
-        public static bool CheckForFK(this PropertyInfo info, string name)
+        internal static bool CheckForFK(this PropertyInfo info, string name)
         {
             if (info.Name != name)
                 return false;
             return info.GetCustomAttributes(false).Any(s => s is PrimaryKeyAttribute);
         }
 
-        public static string GetPKPropertyName(this Type type)
+        internal static string GetPKPropertyName(this Type type)
         {
             PropertyInfo name = type.GetProperties().FirstOrDefault(CheckForPK);
             return name == null ? null : name.Name;
         }
 
-        public static string GetPK(this Type type)
+        /// <summary>
+        /// Get and Convert the found PK into Database name
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        internal static string GetPK(this Type type)
         {
             PropertyInfo name = type.GetProperties().FirstOrDefault(CheckForPK);
             return MapEntiysPropToSchema(type, name == null ? null : name.Name);
         }
 
-        public static string GetFK(this Type type, string name)
+        internal static string GetFK(this Type type, string name)
         {
             name = type.ReMapSchemaToEntiysProp(name);
             PropertyInfo prop = type.GetProperties().FirstOrDefault(info => CheckForFK(info, name));
             return prop == null ? null : prop.Name;
         }
 
-        public static long GetPK<T>(this T source)
+        /// <summary>
+        /// Gets the PK value of the Object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        internal static long GetPK<T>(this T source)
         {
             return GetPK<T, long>(source);
         }
 
-        public static E GetPK<T, E>(this T source)
+        internal static E GetPK<T, E>(this T source)
         {
             string pk = source.GetType().GetPKPropertyName();
             return (E) source.GetType().GetProperty(pk).GetValue(source, null);
         }
 
-        public static E GetFK<E>(this object source, string name)
+        internal static E GetFK<E>(this object source, string name)
         {
             Type type = source.GetType();
             string pk = type.GetFK(name);
             return (E) type.GetProperty(pk).GetValue(source, null);
         }
 
-        public static E GetFK<T, E>(this T source, string name)
+        internal static E GetFK<T, E>(this T source, string name)
         {
             string pk = typeof (T).GetFK(name);
             return (E) typeof (T).GetProperty(pk).GetValue(source, null);
         }
 
-        //public static E GetFK<E>(this Type targetType, string name)
-        //{
-        //    string pk = targetType.GetFK(name);
-        //    var propertyInfo = targetType.GetProperty(pk);
-        //    var value = propertyInfo.GetValue(source, null);
-        //    return (E)value;
-        //}
-
-        public static IEnumerable<string> MapEntiyToSchema(Type type, string[] ignore)
+        internal static IEnumerable<string> MapEntiyToSchema(Type type, string[] ignore)
         {
             return from propertyInfo in type.GetProperties().Where(s => !s.GetGetMethod().IsVirtual)
                 where !ignore.Contains(propertyInfo.Name)
@@ -157,12 +157,12 @@ namespace JPB.DataAccess
                 select formodle != null ? formodle.AlternatingName : propertyInfo.Name;
         }
 
-        public static IEnumerable<string> MapEntiyToSchema<T>(string[] ignore)
+        internal static IEnumerable<string> MapEntiyToSchema<T>(string[] ignore)
         {
             return MapEntiyToSchema(typeof (T), ignore);
         }
 
-        public static string MapEntiysPropToSchema(this Type source, string prop)
+        internal static string MapEntiysPropToSchema(this Type source, string prop)
         {
             PropertyInfo[] propertys = source.GetProperties();
             return (from propertyInfo in propertys
@@ -172,17 +172,17 @@ namespace JPB.DataAccess
                 select formodle != null ? formodle.AlternatingName : propertyInfo.Name).FirstOrDefault();
         }
 
-        public static string MapEntiysPropToSchema<T>(string prop)
+        internal static string MapEntiysPropToSchema<T>(string prop)
         {
             return MapEntiysPropToSchema(typeof (T), prop);
         }
 
-        public static string ReMapSchemaToEntiysProp<T>(string prop)
+        internal static string ReMapSchemaToEntiysProp<T>(string prop)
         {
             return ReMapSchemaToEntiysProp(typeof (T), prop);
         }
 
-        public static string ReMapSchemaToEntiysProp(this Type source, string prop)
+        internal static string ReMapSchemaToEntiysProp(this Type source, string prop)
         {
             foreach (PropertyInfo propertyInfo in from propertyInfo in source.GetProperties()
                 let customAttributes =
@@ -196,7 +196,7 @@ namespace JPB.DataAccess
             return prop;
         }
 
-        public static bool CheckForListInterface(this PropertyInfo info)
+        internal static bool CheckForListInterface(this PropertyInfo info)
         {
             if (info.PropertyType == typeof (string))
                 return false;
@@ -207,19 +207,19 @@ namespace JPB.DataAccess
             return false;
         }
 
-        public static bool CheckForListInterface(this object info)
+        internal static bool CheckForListInterface(this object info)
         {
             return !(info is string) &&
                    info.GetType().GetInterface(typeof (IEnumerable).Name) != null &&
                    info.GetType().GetInterface(typeof (IEnumerable<>).Name) != null;
         }
 
-        public static T LoadNavigationProps<T>(this T source, IDatabase accessLayer)
+        internal static T LoadNavigationProps<T>(this T source, IDatabase accessLayer)
         {
             return (T) LoadNavigationProps(source as object, accessLayer);
         }
 
-        public static object LoadNavigationProps(this object source, IDatabase accessLayer)
+        internal static object LoadNavigationProps(this object source, IDatabase accessLayer)
         {
             Type type = source.GetType();
             PropertyInfo[] props = source.GetType().GetProperties().ToArray();
@@ -284,17 +284,77 @@ namespace JPB.DataAccess
             return source;
         }
 
-        public static T SetPropertysViaRefection<T>(this T source, IDataRecord reader)
-            where T : new()
+        internal static T SetPropertysViaRefection<T>(IDataRecord reader)
+            where T : class
         {
+            return (T)SetPropertysViaRefection(typeof (T), reader);
+        }
+
+        public static EgarDataRecord CreateEgarRecord(this IDataRecord rec)
+        {
+            return new EgarDataRecord(rec);
+        }
+
+        internal static dynamic SetPropertysViaRefection(Type type, IDataRecord reader)
+        {
+            var constructorInfos = type.GetConstructors();
+            dynamic source = null;
+
+            var constructor =
+                constructorInfos
+                    .FirstOrDefault(s => s.GetCustomAttributes().Any(e => e is ObjectFactoryMehtodAttribute)) ??
+                constructorInfos.FirstOrDefault(s =>
+                {
+                    var parameterInfos = s.GetParameters();
+                    return parameterInfos.Length == 1 && parameterInfos.First().ParameterType == typeof (IDataRecord);
+                });
+
+            //maybe single ctor with param
+
+            if (constructor != null)
+            {
+                var parameterInfos = constructor.GetParameters();
+                if (parameterInfos.Length == 1 && parameterInfos.First().ParameterType == typeof (IDataRecord))
+                {
+                    return Activator.CreateInstance(type, reader);
+                }
+            }
+            else
+            {
+                //check for a Factory mehtod
+                var factory =
+                    type.GetMethods()
+                        .FirstOrDefault(s => s.GetCustomAttributes().Any(f => f is ObjectFactoryMehtodAttribute));
+
+                if (factory != null)
+                {
+                    if (factory.IsStatic)
+                    {
+                        var returnParameter = factory.GetParameters();
+                        var returnType = factory.ReturnParameter;
+
+                        if (returnType != null && returnType.ParameterType == type)
+                        {
+                            if (returnParameter.Length == 1 &&
+                                returnParameter.First().ParameterType == typeof (IDataRecord))
+                            {
+                                return factory.Invoke(null, new object[] {reader});
+                            }
+                        }
+                    }
+                }
+            }
+
+            source = Activator.CreateInstance(type);
+
             var listofpropertys = new Dictionary<string, object>();
 
-            for (int i = 0; i < reader.FieldCount; i++)
-                listofpropertys.Add(ReMapSchemaToEntiysProp(typeof (T), reader.GetName(i)), reader.GetValue(i));
+            for (var i = 0; i < reader.FieldCount; i++)
+                listofpropertys.Add(ReMapSchemaToEntiysProp(type, reader.GetName(i)), reader.GetValue(i));
 
             foreach (var item in listofpropertys)
             {
-                PropertyInfo property = typeof (T).GetProperty(item.Key);
+                PropertyInfo property = type.GetProperty(item.Key);
                 if (property != null)
                 {
                     if (item.Value is DBNull)
@@ -318,52 +378,7 @@ namespace JPB.DataAccess
             return source;
         }
 
-        public static Func<object, object> GetGetter(FieldInfo fieldInfo)
-        {
-            // create a method without a name, object as result type and one parameter of type object
-            // the last parameter is very import for accessing private fields
-            var method = new DynamicMethod(string.Empty, typeof (object), new[] {typeof (object)}, fieldInfo.Module,
-                true);
-            ILGenerator il = method.GetILGenerator();
-
-            il.Emit(OpCodes.Ldarg_0); // load the first argument onto the stack (source of type object)
-            il.Emit(OpCodes.Castclass, fieldInfo.DeclaringType);
-            // cast the parameter of type object to the type containing the field
-            il.Emit(OpCodes.Ldfld, fieldInfo);
-            // store the value of the given field on the stack. The casted version of source is used as instance
-
-            if (fieldInfo.FieldType.IsValueType)
-                il.Emit(OpCodes.Box, fieldInfo.FieldType);
-            // box the value type, so you will have an object on the stack
-
-            il.Emit(OpCodes.Ret); // return the value on the stack
-
-            return (Func<object, object>) method.CreateDelegate(typeof (Func<object, object>));
-        }
-
-        public static Action<object, object> GetSetter(FieldInfo fieldInfo)
-        {
-            var method = new DynamicMethod(string.Empty, null, new[] {typeof (object), typeof (object)},
-                fieldInfo.Module, true);
-            ILGenerator il = method.GetILGenerator();
-
-            il.Emit(OpCodes.Ldarg_0); // load the first argument onto the stack (source of type object)
-            il.Emit(OpCodes.Castclass, fieldInfo.DeclaringType);
-            // cast the parameter of type object to the type containing the field
-            il.Emit(OpCodes.Ldarg_1); // push the second argument onto the stack (this is the value)
-
-            if (fieldInfo.FieldType.IsValueType)
-                il.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType); // unbox the value parameter to the value-type
-            else
-                il.Emit(OpCodes.Castclass, fieldInfo.FieldType); // cast the value on the stack to the field type
-
-            il.Emit(OpCodes.Stfld, fieldInfo); // store the value on stack in the field
-            il.Emit(OpCodes.Ret); // return
-
-            return (Action<object, object>) method.CreateDelegate(typeof (Action<object, object>));
-        }
-
-        public static IEnumerable<string> GetPropertysViaRefection(this Type t, params string[] ignore)
+        internal static IEnumerable<string> GetPropertysViaRefection(this Type t, params string[] ignore)
         {
             return t.GetProperties().Select(s => s.Name).Except(ignore);
         }

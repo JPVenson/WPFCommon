@@ -118,11 +118,11 @@ namespace JPB.Communication.ComBase
                     {
                         //Found a handler for that message and executed it
                         var result = firstOrDefault.Item1(requstInbound);
+                        if(result == null)
+                            return;
 
                         var sender = NetworkFactory.Instance.GetSender(Port);
-                        sender.SendMessageAsync(new RequstMessage() {Message = result, ResponseFor = requstInbound.Id}, item.Sender);
-
-                        _requestHandler.Remove(firstOrDefault);
+                        sender.SendMessageAsync(new RequstMessage() { Message = result, ResponseFor = requstInbound.Id }, item.Sender);
                     }
                     else
                     {
@@ -130,6 +130,7 @@ namespace JPB.Communication.ComBase
                         var awnser = _pendingrequests.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.ResponseFor));
                         if (awnser != null)
                             awnser.Item1(requstInbound);
+                        _pendingrequests.Remove(awnser);
                     }
                 }
                 else

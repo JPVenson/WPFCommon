@@ -9,7 +9,7 @@ namespace JPB.ErrorValidation.ValidationTyps
     {
         #region IValidation<T> Members
 
-        public string ErrorIndicator { get; set; }
+        public string[] ErrorIndicator { get; set; }
 
         public string ErrorText { get; set; }
 

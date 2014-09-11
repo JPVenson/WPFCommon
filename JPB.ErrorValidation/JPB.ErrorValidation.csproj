@@ -64,6 +64,10 @@
     <Compile Include="ValidationTyps\Warning.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JPB.Tasking\JPB.Tasking.csproj">
+      <Project>{0F6C25A5-DAF2-4BCE-8C4D-F6D6542A172E}</Project>
+      <Name>JPB.Tasking</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
       <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
       <Name>JPB.WPFBase</Name>

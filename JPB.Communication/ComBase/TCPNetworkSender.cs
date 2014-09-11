@@ -106,6 +106,7 @@ namespace JPB.Communication.ComBase
         /// </summary>
         /// <param name="mess"></param>
         /// <param name="ip"></param>
+        /// <param name="reciverPort"></param>
         /// <returns>Result from other side or default(T)</returns>
         /// <exception cref="TimeoutException"></exception>
         public async Task<T> SendRequstMessage<T>(RequstMessage mess, string ip)
@@ -115,7 +116,8 @@ namespace JPB.Communication.ComBase
             var reciever = NetworkFactory.Instance.GetReceiver(Port);
             reciever.RegisterRequst(s =>
             {
-                result = (T)s.Message;
+                if (s.Message is T)
+                    result = (T)s.Message;
                 waitForResponsive.Set();
             }, mess.Id);
             var isSend = SendMessage(mess, ip);

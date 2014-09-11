@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B3D1161A-3C53-4459-865F-D586D1100E76}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>testing</RootNamespace>
     <AssemblyName>testing</AssemblyName>
@@ -14,8 +14,12 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
-    <IsCodedUITest>False</IsCodedUITest>
+    <IsCodedUITest>True</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>12.0</OldToolsVersion>
+    <UpgradeBackupLocation />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,9 +41,22 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '10.0' Or '$(VisualStudioVersion)' == '11.0'">
+      <ItemGroup>
+        <Reference Include="UIAutomationTypes" />
+      </ItemGroup>
+    </When>
+  </Choose>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -54,17 +71,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Image.cs" />
     <Compile Include="program.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTest2.cs" />
     <Compile Include="NetworkTest.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IEADPC.DataAccess\DataAccess.csproj">
-      <Project>{A5412B57-DC13-476A-B77B-9C7960DBB052}</Project>
-      <Name>DataAccess</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JPB.Communication\JPB.Communication.csproj">
       <Project>{50077C76-3ADF-4E5C-A230-B1474674BDD7}</Project>
       <Name>JPB.Communication</Name>
@@ -72,6 +88,14 @@
     <ProjectReference Include="..\JPB.DataAccess\JPB.DataAccess.csproj">
       <Project>{46E06D7F-F55A-4B10-978D-13607BE17CB9}</Project>
       <Name>JPB.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JPB.ErrorValidation\JPB.ErrorValidation.csproj">
+      <Project>{795AE2CF-4B7A-4C3B-8A29-618B727FB252}</Project>
+      <Name>JPB.ErrorValidation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
+      <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
+      <Name>JPB.WPFBase</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

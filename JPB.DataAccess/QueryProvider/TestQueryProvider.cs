@@ -191,11 +191,11 @@ namespace JPB.DataAccess.QueryProvider
                 }
                 //if (upper.Contains("DELETE"))
                 //{
-                //    return DbAccessLayer.CreateSelect(targetType);
+                //    return DbAccessLayer.CreateSelectQueryFactory(targetType);
                 //}
                 //if (upper.Contains("INSERT"))
                 //{
-                //    return DbAccessLayer.CreateSelect(targetType);
+                //    return DbAccessLayer.CreateSelectQueryFactory(targetType);
                 //}
             }
 

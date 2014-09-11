@@ -106,7 +106,7 @@ namespace JPB.Communication.ComBase.Messages
         }
         
         public Guid ResponseFor { get; set; }
-
+        
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("ResponseFor", ResponseFor, ResponseFor.GetType());

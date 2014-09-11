@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using JPB.ErrorValidation.ValidationTyps;
+using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation
 {
@@ -10,10 +11,10 @@ namespace JPB.ErrorValidation
         bool HasError { get; }
         bool WarningAsFailure { get; set; }
         //ICollection<IValidation<T>> VallidationErrors { get; }
-        ObservableCollection<IValidation<T>> Errors { get; set; }
+        ThreadSaveObservableCollection<IValidation<T>> Errors { get; set; }
         NoError<T> DefaultNoError { get; set; }
 
         Type RetrunT();
-        IValidation<T> RetrunError(string columnName);
+        IEnumerable<IValidation<T>> RetrunErrors(string columnName);
     }
 }
