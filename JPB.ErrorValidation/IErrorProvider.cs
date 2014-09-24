@@ -11,7 +11,7 @@ namespace JPB.ErrorValidation
         bool HasError { get; }
         bool WarningAsFailure { get; set; }
         //ICollection<IValidation<T>> VallidationErrors { get; }
-        ThreadSaveObservableCollection<IValidation<T>> Errors { get; set; }
+        ObservableCollection<IValidation<T>> Errors { get; set; }
         NoError<T> DefaultNoError { get; set; }
 
         Type RetrunT();

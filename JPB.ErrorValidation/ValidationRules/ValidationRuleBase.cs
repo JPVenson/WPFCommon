@@ -10,11 +10,11 @@ namespace JPB.ErrorValidation.ValidationRules
 {
     public abstract class ValidationRuleBase<T> : IErrorProvider<T>
     {
-        private readonly ICollection<IValidation<T>> _vallidationErrors = new ThreadSaveObservableCollection<IValidation<T>>();
+        private readonly ICollection<IValidation<T>> _vallidationErrors = new ObservableCollection<IValidation<T>>();
 
         protected ValidationRuleBase()
         {
-            Errors = new ThreadSaveObservableCollection<IValidation<T>>();
+            Errors = new ObservableCollection<IValidation<T>>();
         }
 
         #region IErrorProvider<T> Members
@@ -31,7 +31,7 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public bool WarningAsFailure { get; set; }
 
-        public ThreadSaveObservableCollection<IValidation<T>> Errors { get; set; }
+        public ObservableCollection<IValidation<T>> Errors { get; set; }
 
         public NoError<T> DefaultNoError { get; set; }
 

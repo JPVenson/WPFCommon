@@ -821,21 +821,25 @@ namespace JPB.DataAccess.AdoWrapper
             return db;
         }
 
+        [Obsolete]
         public static Database CreateMySQL(string strServer, string strDatabase)
         {
             return Create(new DsMSSQL(strServer, strDatabase));
         }
 
+        [Obsolete]
         public static Database CreateMSSQL(string strServer, string strDatabase)
         {
             return Create(new DsMSSQL(strServer, strDatabase));
         }
 
+        [Obsolete]
         public static Database CreateMSSQL(string strServer, string strDatabase, string strLogin, string strPassword)
         {
             return Create(new DsMSSQL(strServer, strDatabase, strLogin, strPassword));
         }
 
+        [Obsolete]
         public static Database CreateMSSQL(string strConnStr)
         {
             return Create(new DsMSSQL(strConnStr));

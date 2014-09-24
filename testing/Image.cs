@@ -16,7 +16,7 @@ namespace testing
         [ForModel("Content")]
         public string Text { get; set; }
 
-        [UpdateFactoryMehtod, UsedImplicitly]
+        [UpdateFactoryMethod, UsedImplicitly]
         string OnUpdate()
         {
             return "";

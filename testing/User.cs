@@ -5,11 +5,10 @@ using JPB.DataAccess.QueryFactory;
 
 namespace testing
 {
-    [Serializable]
     [ForModel("Users")]
     public class User
     {
-        [ObjectFactoryMehtod]
+        [ObjectFactoryMethod]
         public User(IDataRecord record)
         {
             UserId = (long)record["User_ID"];
@@ -24,26 +23,27 @@ namespace testing
             
         }
 
-        [PrimaryKey]
-        [ForModel("User_ID")]
-        public long UserId { get; set; }
 
         [ForModel("UserName")]
         public string Name { get; set; }
 
         public long? ID_Image { get; set; }
 
+        [PrimaryKey]
+        [ForModel("User_ID")]
+        public long UserId { get; set; }
+
         [RowVersion]
         [ForModel("RowState")]
         public byte[] RowBla { get; set; }
         
-        [SelectFactoryMehtod()]
-        public static QueryFactoryResult CreateQuery()
+        [SelectFactoryMethod()]
+        public static IQueryFactoryResult CreateQuery()
         {
             return new QueryFactoryResult("SELECT * FROM Users");
         }
 
-        [UpdateFactoryMehtod()]
+        [UpdateFactoryMethod()]
         public string UpdateQuery()
         {
             return string.Empty;

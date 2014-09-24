@@ -146,7 +146,7 @@ namespace JPB.DataAccess.Manager
             var methods =
                 type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic |
                               BindingFlags.Static)
-                    .FirstOrDefault(s => s.GetCustomAttributes(false).Any(e => e is SelectFactoryMehtodAttribute));
+                    .FirstOrDefault(s => s.GetCustomAttributes(false).Any(e => e is SelectFactoryMethodAttribute));
             if (methods != null)
             {
                 //must be public static

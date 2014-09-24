@@ -22,8 +22,7 @@ namespace testing
         [TestInitialize()]
         public void CheckDbdbaccess()
         {
-            dbaccess = new DbAccessLayer();
-            dbaccess.Database = Database.CreateMSSQL("Data Source=(localdb)\\Projects;Initial Catalog=TestDB;Integrated Security=True;");
+            dbaccess = new DbAccessLayer(DbTypes.MsSql, "Data Source=(localdb)\\Projects;Initial Catalog=TestDB;Integrated Security=True;");
         }
 
         [TestMethod]

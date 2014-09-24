@@ -25,7 +25,7 @@ namespace WpfApplication2
         {
             base.OnStartup(e);
 
-            IEnumerable<string> manifests = Directory.EnumerateFiles(@"\\s-cl-gen01\x.staff\jean.bachmann\BatchRemoteUpdate\", "*.xml");
+            IEnumerable<string> manifests = Directory.EnumerateFiles(@"C:\");
             string question = manifests.Aggregate("Choosefile", (current, item) => current + ("#q" + item));
             string showInput = InputWindow.ReparseList(manifests, InputWindow.ShowInput(question, EingabeModus.RadioBox));
         }

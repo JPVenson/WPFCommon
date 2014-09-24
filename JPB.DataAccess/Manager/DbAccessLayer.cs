@@ -18,12 +18,7 @@ namespace JPB.DataAccess.Manager
     {
         private IDatabase _database;
 
-        public enum DbTypes
-        {
-            MsSql,
-            MySql,
-            Unknown
-        }
+
 
         /// <summary>
         /// Must set the Database Property immeditly

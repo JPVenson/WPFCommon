@@ -59,7 +59,7 @@ namespace JPB.DataAccess.ModelsAnotations
     /// The Method must be static
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, Inherited = false, AllowMultiple = false)]
-    public sealed class ObjectFactoryMehtodAttribute : Attribute
+    public sealed class ObjectFactoryMethodAttribute : Attribute
     {
 
     }
@@ -69,7 +69,7 @@ namespace JPB.DataAccess.ModelsAnotations
     /// The method must return a <code>string</code> or <code>IQueryFactoryResult</code>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    public sealed class SelectFactoryMehtodAttribute : Attribute
+    public sealed class SelectFactoryMethodAttribute : Attribute
     {
 
     }
@@ -79,7 +79,7 @@ namespace JPB.DataAccess.ModelsAnotations
     /// The method must return a <code>string</code> or <code>IQueryFactoryResult</code>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    public sealed class UpdateFactoryMehtodAttribute : Attribute
+    public sealed class UpdateFactoryMethodAttribute : Attribute
     {
 
     }
