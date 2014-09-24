@@ -2,18 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
     public abstract class AsyncViewModelBase : ThreadSaveViewModelBase
     {
-        protected AsyncViewModelBase()
-        {
-            Factory = Task.Factory;
-            Scheduler = Factory.Scheduler;
-            CancellationToken = new CancellationToken(false);
-        }
-
         #region IsWorking property
 
         private bool _isWorking = default(bool);
@@ -28,6 +22,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 {
                     SendPropertyChanged(() => IsWorking);
                     SendPropertyChanged(() => IsNotWorking);
+                    CommandManager.InvalidateRequerySuggested();
                 });
             }
         }
@@ -43,42 +38,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #endregion
 
-        public CancellationToken CancellationToken
-        {
-            get { return _cancellationToken; }
-            set
-            {
-                _cancellationToken = value;
-            }
-        }
-
-        protected TaskScheduler Scheduler
-        {
-            get { return _scheduler; }
-            set
-            {
-                if (value != null)
-                {
-                    _scheduler = value;
-                    this.Factory = new TaskFactory(CancellationToken,TaskCreationOptions.PreferFairness,TaskContinuationOptions.None, value);
-                }
-            }
-        }
-
-        protected TaskFactory Factory
-        {
-            get { return _factory; }
-            set
-            {
-                if (value != null) 
-                    _factory = value;
-            }
-        }
-
         protected Task CurrentTask;
-        private TaskScheduler _scheduler;
-        private TaskFactory _factory;
-        private CancellationToken _cancellationToken;
 
         public TaskAwaiter GetAwaiter()
         {
@@ -108,7 +68,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (delegatetask != null)
             {
-                SimpleWork(delegatetask, s => base.ThreadSaveAction(() => continueWith(s)), setWorking);
+                var task = new Task<T>(delegatetask.Invoke);
+                SimpleWork(task, new Action<Task<T>>(s =>
+                    base.ThreadSaveAction(() => continueWith(s.Result))), setWorking);
             }
         }
 
@@ -121,7 +83,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (delegatetask != null)
             {
-                SimpleWork(delegatetask.Invoke, null, false);
+                var task = new Task(delegatetask.Invoke);
+                SimpleWork(task, false);
             }
         }
 
@@ -129,7 +92,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (delegatetask != null)
             {
-                SimpleWork(delegatetask.Invoke, continueWith, false);
+                var task = new Task<T>(delegatetask.Invoke);
+                SimpleWork(task, continueWith, false);
             }
         }
 
@@ -137,7 +101,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (delegatetask != null)
             {
-                SimpleWork(delegatetask.Invoke);
+                var task = new Task(delegatetask.Invoke);
+                SimpleWork(task);
             }
         }
 
@@ -145,48 +110,37 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (delegatetask != null)
             {
-                SimpleWork(delegatetask.Invoke, continueWith);
+                var task = new Task<T>(delegatetask.Invoke);
+                SimpleWork(task, new Action<Task<T>>(s => continueWith(s.Result)));
             }
         }
 
-        public void SimpleWork<T>(Func<T> task, Action<T> continueWith = null, bool setWOrking = true)
+        public void SimpleWork(Delegate delegatetask, Delegate continueWith)
+        {
+            if (delegatetask != null)
+            {
+                var task = new Task(() => delegatetask.DynamicInvoke());
+                SimpleWork(task, continueWith);
+            }
+        }
+
+        public void SimpleWork(Delegate delegatetask)
+        {
+            SimpleWork(new Task(() => delegatetask.DynamicInvoke()));
+        }
+
+        public void SimpleWork(Task task, Delegate continueWith, bool setWOrking = true)
         {
             if (task != null)
             {
                 if (setWOrking)
                     StartWork();
-                var startNew = Factory.StartNew(task, TaskCreationOptions.PreferFairness);
-                startNew.ContinueWith(s => CreateContinue(s, continueWith, setWOrking)());
+                task.ContinueWith(s => CreateContinue(s, continueWith, setWOrking)());
                 if (setWOrking)
-                    CurrentTask = startNew;
+                    CurrentTask = task;
+                task.Start();
             }
         }
-
-        public void SimpleWork(Action task, Delegate continueWith = null, bool setWOrking = true)
-        {
-            if (task != null)
-            {
-                if (setWOrking)
-                    StartWork();
-                var startNew = Factory.StartNew(task, TaskCreationOptions.PreferFairness);
-                startNew.ContinueWith(s => CreateContinue(s, continueWith, setWOrking)());
-                if (setWOrking)
-                    CurrentTask = startNew;
-            }
-        }
-
-        //public void SimpleWork(Task task, Delegate continueWith, bool setWOrking = true)
-        //{
-        //    if (task != null)
-        //    {
-        //        if (setWOrking)
-        //            StartWork();
-        //        task.ContinueWith(s => CreateContinue(s, continueWith, setWOrking)());
-        //        if (setWOrking)
-        //            CurrentTask = task;
-        //        task.Start();
-        //    }
-        //}
 
         private Action CreateContinue(Task s)
         {
@@ -228,6 +182,16 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (task != null)
                 task.Start();
+        }
+
+        public void SimpleWork(Task task)
+        {
+            SimpleWork(task, true);
+        }
+
+        public void SimpleWork(Task task, bool setWorking)
+        {
+            SimpleWork(task, null, setWorking);
         }
     }
 }

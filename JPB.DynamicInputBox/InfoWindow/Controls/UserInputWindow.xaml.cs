@@ -10,12 +10,12 @@ namespace JPB.DynamicInputBox.InfoWindow.Controls
         internal UserInputWindow(List<object> inputQuestions, Func<List<object>> returnlist,
             IEnumerable<EingabeModus> eingabeModi)
         {
+            InitializeComponent();
             DataContext = new UserInputViewModel(inputQuestions, returnlist, () =>
             {
                 DialogResult = true;
                 Close();
             }, eingabeModi);
-            InitializeComponent();
         }
 
         private void UserInputWindow_OnClosing(object sender, CancelEventArgs e)

@@ -74,13 +74,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
             T tempitem = item;
             lock (LockObject)
             {
+                base.InsertItem(index, tempitem);
+                SendPropertyChanged("Count");
+                SendPropertyChanged("Item[]");
+                actorHelper.ThreadSaveAction(
+                    () => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem)));
             }
-            base.InsertItem(index, tempitem);
-            SendPropertyChanged("Count");
-            SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(
-                () =>
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem)));
         }
 
         public void AddRange(IEnumerable<T> item)
@@ -116,6 +115,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
             T item;
             lock (LockObject)
             {
+                if (oldIndex + 1 > this.Count)
+                    return;
                 item = base[oldIndex];
                 base.RemoveItem(oldIndex);
                 base.InsertItem(newIndex, item);
@@ -154,6 +155,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
             T item;
             lock (LockObject)
             {
+                if (index + 1 > this.Count)
+                    return;
+
                 item = base[index];
                 base.RemoveItem(index);
             }
@@ -170,6 +174,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
             T oldItem;
             lock (LockObject)
             {
+                //count is not Null based
+                if (index + 1 > base.Count)
+                    return;
+
                 oldItem = base[index];
                 base.SetItem(index, item);
             }
@@ -207,7 +215,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
         {
-            var lambda = (LambdaExpression) property;
+            var lambda = (LambdaExpression)property;
 
             MemberExpression memberExpression;
             var body = lambda.Body as UnaryExpression;
@@ -215,10 +223,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
             if (body != null)
             {
                 UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression) unaryExpression.Operand;
+                memberExpression = (MemberExpression)unaryExpression.Operand;
             }
             else
-                memberExpression = (MemberExpression) lambda.Body;
+                memberExpression = (MemberExpression)lambda.Body;
             SendPropertyChanged(memberExpression.Member.Name);
         }
 

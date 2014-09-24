@@ -11,8 +11,8 @@ using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation
 {
-    public abstract class ErrorProviderBase<T, TE> : 
-        AsyncViewModelBase, 
+    public abstract class ErrorProviderBase<T, TE> :
+        AsyncViewModelBase,
         IErrorProviderBase<T>
         where T : class
         where TE : class, IErrorProvider<T>, new()
@@ -42,10 +42,10 @@ namespace JPB.ErrorValidation
 
             if (ErrorObserver<T>.Instance.GetProviderViaType() == null)
                 ErrorObserver<T>.Instance.RegisterErrorProvider(new TE());
-
-            base.PropertyChanged += OnPropertyChanged;
+            //TODO add async validation
+            //base.PropertyChanged += OnPropertyChanged;
             ErrorProviderSimpleAccessAdapter.Errors.CollectionChanged += ErrorsOnCollectionChanged;
-            base.Scheduler = new LimitedConcurrencyLevelTaskScheduler(MaximumErrorValidationConcurrency);
+            //base.Scheduler = new LimitedConcurrencyLevelTaskScheduler(MaximumErrorValidationConcurrency);
             AddTypeToText = true;
             Validation = ValidationLogic.BreakAtFirstFail;
             Validate = true;
@@ -55,8 +55,8 @@ namespace JPB.ErrorValidation
         private void ErrorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             var items = new List<IValidation<T>>();
- 
-            if(notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Add)
+
+            if (notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Add)
                 items.AddRange(notifyCollectionChangedEventArgs.NewItems.Cast<IValidation<T>>());
             if (notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Remove)
                 items.AddRange(notifyCollectionChangedEventArgs.OldItems.Cast<IValidation<T>>());
@@ -70,17 +70,18 @@ namespace JPB.ErrorValidation
         protected ErrorProviderBase()
             : this(Environment.ProcessorCount)
         {
-        
+
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             //validate Async
 
-            base.BackgroundSimpleWork(() =>
-            {
-                ForceRefresh();
-            });
+            if (Validate)
+                base.BackgroundSimpleWork(() =>
+                {
+                    ForceRefresh();
+                });
         }
 
         #region IErrorProviderBase<T> Members
@@ -93,14 +94,19 @@ namespace JPB.ErrorValidation
 
         public bool HasError
         {
-            get { return ErrorObserver<T>.Instance.GetProviderViaType().HasError; }
+            get { return ErrorProviderSimpleAccessAdapter.HasError; }
         }
 
         public bool AddTypeToText { get; set; }
 
         public string Error
         {
-            get { return _error; }
+            get
+            {
+                if (Validate)
+                    return _error;
+                return string.Empty;
+            }
         }
 
         [XmlIgnore]
@@ -108,7 +114,7 @@ namespace JPB.ErrorValidation
 
         string IDataErrorInfo.Error
         {
-            get { return _error; }
+            get { return Error; }
         }
 
         string IDataErrorInfo.this[string columnName]
@@ -118,8 +124,9 @@ namespace JPB.ErrorValidation
 
         public void ForceRefresh()
         {
-            foreach (var error in ErrorObserver<T>.Instance.GetProviderViaType().SelectMany(s => s.ErrorIndicator).Distinct())
-                ObManage(error, this as T);
+            if (Validate)
+                foreach (var error in ErrorProviderSimpleAccessAdapter.SelectMany(s => s.ErrorIndicator).Distinct())
+                    ObManage(error, this as T);
         }
 
         public string GetError(string columnName, T obj)
@@ -132,7 +139,12 @@ namespace JPB.ErrorValidation
         private string ObManage(string errorIndicator, T obj)
         {
             if (!Validate)
-                return string.Empty;
+            {
+                if (ErrorProviderSimpleAccessAdapter.Errors.Any())
+                    ErrorProviderSimpleAccessAdapter.Errors.Clear();
+                _error = string.Empty;
+                return _error;
+            }
 
             List<IValidation<T>> refference = ErrorObserver<T>.Instance.GetProviderViaType().Errors.ToList();
 
@@ -195,7 +207,6 @@ namespace JPB.ErrorValidation
         private string ManageError(T obj, IValidation<T> item)
         {
             string errortext = string.Empty;
-            IErrorProvider<T> refference = ErrorObserver<T>.Instance.GetProviderViaType();
             bool conditionresult;
             try
             {
@@ -207,22 +218,22 @@ namespace JPB.ErrorValidation
             }
 
             // Bedingung ist wahr und error ist nicht in der liste der angezeigten errors
-            if (conditionresult && !refference.Errors.Contains(item))
+            if (conditionresult && !ErrorProviderSimpleAccessAdapter.Errors.Contains(item))
             {
                 if (AddTypeToText)
                 {
                     if (item.ErrorText.StartsWith(item.ErrorType))
                         item.ErrorText = string.Format("{0} : {1}", item.ErrorType, item.ErrorText);
                 }
-                refference.Errors.Add(item);
+                ErrorProviderSimpleAccessAdapter.Errors.Add(item);
                 errortext = item.ErrorText;
             }
 
             // Bedingung ist flasch und error ist in der liste der angezeigten errors
-            if (!conditionresult && refference.Errors.Contains(item))
-                refference.Errors.Remove(item);
+            if (!conditionresult && ErrorProviderSimpleAccessAdapter.Errors.Contains(item))
+                ErrorProviderSimpleAccessAdapter.Errors.Remove(item);
 
-            else if (refference.Errors.Contains(item))
+            else if (ErrorProviderSimpleAccessAdapter.Errors.Contains(item))
                 errortext = item.ErrorText;
 
             return errortext;

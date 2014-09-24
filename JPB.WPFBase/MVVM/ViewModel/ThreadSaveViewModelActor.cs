@@ -28,9 +28,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
             {
                 IsLocked = true;
                 if (Dispatcher.CheckAccess())
+                {
                     action();
+                }
                 else
+                {
                     Dispatcher.Invoke(action, DispatcherPriority.DataBind);
+                }
             }
             finally
             {
@@ -53,7 +57,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 }
             }
             else
+            {
                 Dispatcher.BeginInvoke(action, DispatcherPriority.DataBind);
+            }
         }
     }
 }
