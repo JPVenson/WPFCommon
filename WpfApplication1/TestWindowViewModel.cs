@@ -6,14 +6,24 @@ namespace WpfApplication1
 {
     public class TestWindowViewModel : ErrorProviderBase<TestWindowViewModel, TestWindowViewModelRules>
     {
-        public TestWindowViewModel() : base(1)
+
+        public TestWindowViewModel()
+            : base(1)
         {
-            
+
         }
 
         private string _toValidationString;
 
-        public string ToValidationString { get; set; }
+        public string ToValidationString
+        {
+            get { return _toValidationString; }
+            set
+            {
+                _toValidationString = value;
+                SendPropertyChanged(() => ToValidationString);
+            }
+        }
     }
 
     public class TestWindowViewModelRules : ValidationRuleBase<TestWindowViewModel>

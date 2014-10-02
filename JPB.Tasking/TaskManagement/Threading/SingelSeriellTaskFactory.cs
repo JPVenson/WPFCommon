@@ -35,6 +35,9 @@ namespace JPB.Tasking.TaskManagement.Threading
 
         public void Add(Action action, object key)
         {
+            if (_thread == Thread.CurrentThread)
+                return;
+
             if (key != null && ConcurrentQueue.Any(s => s.Item2 == key))
             {
                 var task = new Task(() =>

@@ -17,7 +17,7 @@ namespace JPB.DynamicInputBox
 
         public static T ReparseList<T>(IEnumerable<T> input, IEnumerable<IListBoxItemWrapper> selected) where T : class
         {
-            return input.ElementAt(selected.First().Index);
+            return input.ElementAt(selected.FirstOrDefault().Index);
         }
 
         public static IEnumerable<string> ParseMultiItemsList(object elementAt)
@@ -44,7 +44,7 @@ namespace JPB.DynamicInputBox
             var returns = new List<object>();
             if (WindowThread(new List<object> {inputQuestion}, () => returns,
                 new List<EingabeModus> {EingabeModus.ShowProgress}))
-                return returns.First();
+                return returns.FirstOrDefault();
             return null;
         }
 
@@ -53,7 +53,7 @@ namespace JPB.DynamicInputBox
             var returns = new List<object>();
             if (WindowThread(new List<object> {inputQuestion}, () => returns,
                 new List<EingabeModus> {EingabeModus.ShowProgress}))
-                return returns.First();
+                return returns.FirstOrDefault();
             return null;
         }
 
@@ -61,7 +61,7 @@ namespace JPB.DynamicInputBox
         {
             var returns = new List<object>();
             if (WindowThread(new List<object> {inputQuestion}, () => returns, new List<EingabeModus> {EingabeModus.Text}))
-                return returns.First() as string;
+                return returns.FirstOrDefault() as string;
             return null;
         }
 
@@ -69,7 +69,7 @@ namespace JPB.DynamicInputBox
         {
             var returns = new List<object>();
             if (WindowThread(new List<object> {inputQuestion}, () => returns, new List<EingabeModus> {modus}))
-                return returns.First();
+                return returns.FirstOrDefault();
             return null;
         }
 

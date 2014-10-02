@@ -20,6 +20,8 @@ namespace JPB.ErrorValidation
         private string _error;
         private readonly int _maximumErrorValidationConcurrency;
 
+        public SingelSeriellTaskFactory TaskFactory { get; set; }
+
         protected bool Validate { get; set; }
 
         protected ValidationLogic Validation { get; set; }
@@ -39,13 +41,15 @@ namespace JPB.ErrorValidation
         protected ErrorProviderBase(int maxiumConcurrency)
         {
             _maximumErrorValidationConcurrency = maxiumConcurrency;
+            TaskFactory = new SingelSeriellTaskFactory();
 
             if (ErrorObserver<T>.Instance.GetProviderViaType() == null)
                 ErrorObserver<T>.Instance.RegisterErrorProvider(new TE());
             //TODO add async validation
-            //base.PropertyChanged += OnPropertyChanged;
+
+            PropertyChanged += OnPropertyChanged;
             ErrorProviderSimpleAccessAdapter.Errors.CollectionChanged += ErrorsOnCollectionChanged;
-            //base.Scheduler = new LimitedConcurrencyLevelTaskScheduler(MaximumErrorValidationConcurrency);
+
             AddTypeToText = true;
             Validation = ValidationLogic.BreakAtFirstFail;
             Validate = true;
@@ -76,12 +80,12 @@ namespace JPB.ErrorValidation
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             //validate Async
-
-            if (Validate)
-                base.BackgroundSimpleWork(() =>
-                {
-                    ForceRefresh();
-                });
+            if (!Validate)
+                return;
+            TaskFactory.Add(() =>
+            {
+                ObManage(propertyChangedEventArgs.PropertyName, this as T);
+            }, propertyChangedEventArgs.PropertyName);
         }
 
         #region IErrorProviderBase<T> Members
@@ -177,7 +181,6 @@ namespace JPB.ErrorValidation
                     }
                     break;
                 case ValidationLogic.BreakAtFirstFailButRunAllWarnings:
-
                     var ofErrors = listOfErrors as IValidation<T>[] ?? listOfErrors.ToArray();
 
                     foreach (var item in ofErrors.Where(s => s is Warning<T>))
@@ -251,14 +254,14 @@ namespace JPB.ErrorValidation
         {
             var handler = ErrorsChanged;
             if (handler != null)
-                base.BeginThreadSaveAction(() => handler(this, e));
+                base.ThreadSaveAction(() => handler(this, e));
         }
 
         protected virtual void OnErrorsChanged(string propname)
         {
             var handler = ErrorsChanged;
             if (handler != null)
-                base.BeginThreadSaveAction(() => handler(this, new DataErrorsChangedEventArgs(propname)));
+                base.ThreadSaveAction(() => handler(this, new DataErrorsChangedEventArgs(propname)));
         }
     }
 }

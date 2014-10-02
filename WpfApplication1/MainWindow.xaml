@@ -7,7 +7,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
     <DockPanel>
-        <TextBox DockPanel.Dock="Top" Text="{Binding ToValidationString, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox DockPanel.Dock="Top" Text="{Binding ToValidationString, 
+            ValidatesOnNotifyDataErrors=True, 
+            UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox DockPanel.Dock="Top" Text="{Binding ToValidationString, 
+            ValidatesOnNotifyDataErrors=True, 
+            UpdateSourceTrigger=PropertyChanged}"/>
+        
         <Label Content="{Binding Error}"></Label>
     </DockPanel>
 </Window>

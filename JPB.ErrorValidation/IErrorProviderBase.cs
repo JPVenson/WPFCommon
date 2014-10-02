@@ -7,7 +7,7 @@ namespace JPB.ErrorValidation
 {
     public interface IErrorProviderBase<T> : 
         //new
-        //INotifyDataErrorInfo,
+        INotifyDataErrorInfo,
         IDataErrorInfo, 
         INotifyPropertyChanged where T : class
     {
