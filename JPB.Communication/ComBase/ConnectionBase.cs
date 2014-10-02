@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Text;
 using JPB.Communication.ComBase.Messages;
 
@@ -20,15 +21,24 @@ namespace JPB.Communication.ComBase
         public bool Parse(string strReceived)
         {
             //Console.WriteLine("RECIVED: \"" + strReceived + "\"\r\n");
-            TcpMessage item = DeSerialize(strReceived);
-
-            if (item != null)
+            TcpMessage item;
+            try
             {
-                LastMessage = item;
-                Messages.Add(base.LoadMessageBaseFromBinary(item.MessageBase));
-                return true;
+                item = DeSerialize(strReceived);
+
+                if (item != null)
+                {
+                    LastMessage = item;
+                    Messages.Add(base.LoadMessageBaseFromBinary(item.MessageBase));
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
+
         }
     }
 }

@@ -33,6 +33,11 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public ObservableCollection<IValidation<T>> Errors { get; set; }
 
+        public IEnumerable<IValidation<T>> Warnings
+        {
+            get { return Errors.Where(s => s is Warning<T>); }
+        }
+
         public NoError<T> DefaultNoError { get; set; }
 
         public int Count

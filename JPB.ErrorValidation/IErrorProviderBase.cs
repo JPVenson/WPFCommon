@@ -7,13 +7,12 @@ namespace JPB.ErrorValidation
 {
     public interface IErrorProviderBase<T> : 
         //new
-        INotifyDataErrorInfo,
+        //INotifyDataErrorInfo,
         IDataErrorInfo, 
         INotifyPropertyChanged where T : class
     {
         bool HasError { get; }
         bool AddTypeToText { get; set; }
-        string Error { get; }
         NoError<T> DefaultNoError { get; set; }
         IErrorProvider<T> ErrorProviderSimpleAccessAdapter { get; }
 

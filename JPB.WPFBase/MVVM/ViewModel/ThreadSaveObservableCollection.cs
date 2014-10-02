@@ -102,12 +102,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
             lock (LockObject)
             {
                 base.ClearItems();
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    });
             }
-
-            SendPropertyChanged("Count");
-            SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(
-                () => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
         }
 
         protected virtual void MoveItem(int oldIndex, int newIndex)
@@ -120,12 +122,16 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 item = base[oldIndex];
                 base.RemoveItem(oldIndex);
                 base.InsertItem(newIndex, item);
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Move, item,
+                            newIndex, oldIndex));
+                    });
             }
-            SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(
-                () =>
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, item,
-                        newIndex, oldIndex)));
+
         }
 
         private void CopyFrom(IEnumerable<T> collection, bool copyRef = false)
@@ -160,13 +166,18 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
                 item = base[index];
                 base.RemoveItem(index);
+
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(
+                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
+                                index));
+                    });
             }
-            SendPropertyChanged("Count");
-            SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(
-                () =>
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
-                        index)));
+
         }
 
         protected override void SetItem(int index, T item)
@@ -180,12 +191,17 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
                 oldItem = base[index];
                 base.SetItem(index, item);
+
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(
+                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
+                                oldItem, item, index));
+                    });
             }
-            SendPropertyChanged("Item[]");
-            actorHelper.ThreadSaveAction(
-                () =>
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
-                        oldItem, item, index)));
+
         }
 
         #region INotifyPropertyChanged

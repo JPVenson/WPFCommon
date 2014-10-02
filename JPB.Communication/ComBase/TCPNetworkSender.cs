@@ -109,25 +109,65 @@ namespace JPB.Communication.ComBase
         /// <param name="reciverPort"></param>
         /// <returns>Result from other side or default(T)</returns>
         /// <exception cref="TimeoutException"></exception>
-        public async Task<T> SendRequstMessage<T>(RequstMessage mess, string ip)
+        public Task<T> SendRequstMessageAsync<T>(RequstMessage mess, string ip)
         {
-            var result = default(T);
-            var waitForResponsive = new AutoResetEvent(false);
-            var reciever = NetworkFactory.Instance.GetReceiver(Port);
-            reciever.RegisterRequst(s =>
+            var task = new Task<T>(() =>
             {
-                if (s.Message is T)
-                    result = (T)s.Message;
-                waitForResponsive.Set();
-            }, mess.Id);
-            var isSend = SendMessage(mess, ip);
-            if (isSend)
-            {
-                waitForResponsive.WaitOne(Timeout);
-            }
-            return result;
+                var result = default(T);
+                var waitForResponsive = new AutoResetEvent(false);
+                var reciever = NetworkFactory.Instance.GetReceiver(Port);
+                reciever.RegisterRequst(s =>
+                {
+                    if (s.Message is T)
+                        result = (T)s.Message;
+                    waitForResponsive.Set();
+                }, mess.Id);
+                var isSend = SendMessage(mess, ip);
+                if (isSend)
+                {
+                    waitForResponsive.WaitOne(Timeout);
+                }
+                return result;
+            });
+            task.Start();
+            return task;
         }
 
+        /// <summary>
+        /// Sends a message an awaits a response on the same port from the other side
+        /// </summary>
+        /// <param name="mess"></param>
+        /// <param name="ip"></param>
+        /// <param name="reciverPort"></param>
+        /// <returns>Result from other side or default(T)</returns>
+        /// <exception cref="TimeoutException"></exception>
+        public async Task<T> SendRequstMessage<T>(RequstMessage mess, string ip)
+        {
+            return await SendRequstMessageAsync<T>(mess, ip);
+        }
+
+        public Dictionary<string, T> SendMultiRequestMessage<T>(RequstMessage mess, string[] ips)
+        {
+            Task<T>[] pendingRequests = ips.Select(ip => this.SendRequstMessageAsync<T>(mess, ip)).ToArray();
+
+            Task.WaitAll(pendingRequests);
+
+            var results = new Dictionary<string, T>();
+
+            for (int i = 0; i < ips.Length; i++)
+            {
+                results.Add(ips[i], pendingRequests[i].Result);
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// To be Supplied
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="mess"></param>
+        /// <param name="ip"></param>
         public async void SendFile(FileStream stream, MessageBase mess, string ip)
         {
             throw new NotImplementedException();
