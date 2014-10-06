@@ -1,13 +1,38 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace JPB.Extentions.Extensions
 {
     public static class CollectionExtensions
     {
+        public static IEnumerable<T> RemoveWhere<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (predicate == null)
+                throw new ArgumentNullException("predicate");
+
+            var enumerable = source as IList<T> ?? source.ToList();
+            var elements = enumerable.Where(predicate).ToArray();
+
+            foreach (var item in elements)
+            {
+                enumerable.Remove(item);
+            }
+
+            return enumerable;
+        }
+
+        public static string ToPropertyCsv<T, TE>(this IEnumerable<T> source, Func<T, string> getProperty)
+        {
+            return source.Select(getProperty).Aggregate((s, e) => s + "," + e);
+        }
+
         public static IEnumerable<T> CastWhere<T, TE>(this ICollection<TE> source)
         {
             return source.Where(e => e is T).Cast<T>();
@@ -44,7 +69,7 @@ namespace JPB.Extentions.Extensions
             where E : class
             where T : class
         {
-            PropertyInfo _compareProperty = typeof (E).GetProperty(property);
+            PropertyInfo _compareProperty = typeof(E).GetProperty(property);
 
             //var buff = sourcelist
             //    .FirstOrDefault(s => _compareProperty.GetValue(s, null)
@@ -62,7 +87,7 @@ namespace JPB.Extentions.Extensions
             where E : class
             where T : class
         {
-            PropertyInfo _compareProperty = typeof (E).GetProperty(property);
+            PropertyInfo _compareProperty = typeof(E).GetProperty(property);
 
             //var buff = sourcelist
             //    .FirstOrDefault(s => _compareProperty.GetValue(s, null)

@@ -51,7 +51,7 @@ namespace JPB.Communication.ComBase
         {
             var failedMessages = new List<string>();
 
-            var runningMessages = ips.Select(ip => SendMessageAsync(message, ip)).ToArray();
+            var runningMessages = ips.Select(ip => SendMessageAsync(message.Clone() as MessageBase, ip)).ToArray();
 
             for (var i = 0; i < runningMessages.Length; i++)
             {
@@ -148,15 +148,17 @@ namespace JPB.Communication.ComBase
 
         public Dictionary<string, T> SendMultiRequestMessage<T>(RequstMessage mess, string[] ips)
         {
-            Task<T>[] pendingRequests = ips.Select(ip => this.SendRequstMessageAsync<T>(mess, ip)).ToArray();
+            var enumerable = ips.Distinct().ToArray();
+
+            Task<T>[] pendingRequests = enumerable.Select(ip => this.SendRequstMessageAsync<T>(mess.Clone() as RequstMessage, ip)).ToArray();
 
             Task.WaitAll(pendingRequests);
 
             var results = new Dictionary<string, T>();
 
-            for (int i = 0; i < ips.Length; i++)
+            for (int i = 0; i < enumerable.Length; i++)
             {
-                results.Add(ips[i], pendingRequests[i].Result);
+                results.Add(enumerable[i], pendingRequests[i].Result);
             }
 
             return results;

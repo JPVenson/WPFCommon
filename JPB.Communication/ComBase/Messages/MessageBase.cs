@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace JPB.Communication.ComBase.Messages
 {
     [Serializable]
-    public class MessageBase : ISerializable
+    public class MessageBase : ISerializable, ICloneable
     {
         private object _message;
         private object _infoState;
@@ -88,10 +88,17 @@ namespace JPB.Communication.ComBase.Messages
             info.AddValue("ID", Id, Id.GetType());
             info.AddValue("RecievedAt", RecievedAt, RecievedAt.GetType());
         }
+
+        public object Clone()
+        {
+            var obje = this.MemberwiseClone() as RequstMessage;
+            obje.Id = Guid.NewGuid();
+            return obje;
+        }
     }
 
     [Serializable]
-    public class RequstMessage : MessageBase
+    public class RequstMessage : MessageBase, ICloneable
     {
         public RequstMessage()
         {
@@ -112,5 +119,7 @@ namespace JPB.Communication.ComBase.Messages
             info.AddValue("ResponseFor", ResponseFor, ResponseFor.GetType());
             base.GetObjectData(info, context);
         }
+
+
     }
 }
