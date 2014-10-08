@@ -16,15 +16,6 @@ namespace JPB.Communication.ComBase
         internal TCPNetworkReceiver(short port)
         {
             Port = port;
-            //_server = new TcpListener(NetworkInfoBase.IpAddress, NetworkInfoBase.Port);
-            //_server.Start();
-            //var ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            //var activeTcpListeners = ipGlobalProperties.GetActiveTcpListeners();
-            //var any = activeTcpListeners.Any(s => s.Port == port);
-
-            //if(any)
-            //    throw new NotSupportedException("The port is in use");
-
             _sock = new Socket(IPAddress.Any.AddressFamily,
                                SocketType.Stream,
                                ProtocolType.Tcp);
@@ -72,16 +63,31 @@ namespace JPB.Communication.ComBase
 
         public bool IsDisposing { get; private set; }
 
+        /// <summary>
+        /// Register a Callback localy that will be used when a new message is inbound that has state in its InfoState
+        /// </summary>
+        /// <param name="action">Callback</param>
+        /// <param name="state">Maybe an Enum?</param>
         public void RegisterChanged(Action<MessageBase> action, object state)
         {
             _updated.Add(new Tuple<Action<MessageBase>, object>(action, state));
         }
 
+        /// <summary>
+        /// Register a Callback localy that will be used when a message contains a given Guid
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="guid"></param>
         public void RegisterCallback(Action<MessageBase> action, Guid guid)
         {
             _onetimeupdated.Add(new Tuple<Action<MessageBase>, Guid>(action, guid));
         }
 
+        /// <summary>
+        /// Register a Callback localy that will be used when a Requst is inbound that has state in its InfoState
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="state"></param>
         public void RegisterRequstHandler(Func<RequstMessage, object> action, object state)
         {
             _requestHandler.Add(new Tuple<Func<RequstMessage, object>, object>(action, state));
@@ -92,13 +98,21 @@ namespace JPB.Communication.ComBase
             _pendingrequests.Add(new Tuple<Action<RequstMessage>, Guid>(action, guid));
         }
 
-        public void UnRegisterCallback(Guid guid)
+        internal void UnRegisterRequst(Guid guid)
+        {
+            var firstOrDefault = _pendingrequests.FirstOrDefault(s => s.Item2 == guid);
+            if (firstOrDefault != null)
+            {
+                _pendingrequests.Remove(firstOrDefault);
+            }
+        }
+
+        internal void UnRegisterCallback(Guid guid)
         {
             _onetimeupdated.Remove(_onetimeupdated.FirstOrDefault(s => s.Item2 == guid));
         }
 
-        private void MessagesOnCollectionChanged(object o,
-                                                 NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        private void MessagesOnCollectionChanged(object o, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             if (notifyCollectionChangedEventArgs.Action != NotifyCollectionChangedAction.Add)
                 return;
@@ -107,7 +121,7 @@ namespace JPB.Communication.ComBase
 
             _workeritems.Enqueue(() =>
             {
-                var item = items.First();
+                var item = items.FirstOrDefault();
 
                 if (item is RequstMessage)
                 {
@@ -177,9 +191,7 @@ namespace JPB.Communication.ComBase
             _autoResetEvent.Set();
         }
 
-        // This is the method that is called when the socket recives a request
-        // for a new connection.
-        public void OnConnectRequest(IAsyncResult result)
+        internal void OnConnectRequest(IAsyncResult result)
         {
             // Get the socket (which should be this listener's socket) from
             // the argument.

@@ -5,16 +5,13 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using JPB.Communication.ComBase.Messages;
-using JPB.Communication.Interface;
 
 namespace JPB.Communication.ComBase
 {
@@ -31,16 +28,31 @@ namespace JPB.Communication.ComBase
 
         #region Message Methods
 
+        /// <summary>
+        /// Sends a message to a Given IP:Port and wait for Deliver
+        /// </summary>
+        /// <param name="message">Instance of message</param>
+        /// <param name="ip">Ip of client pc</param>
+        /// <param name="port">Port of client pc</param>
+        /// <returns></returns>
+        /// <exception cref="TimeoutException"></exception>
         public static async Task SendMessage(MessageBase message, string ip, short port)
         {
-            var sender = NetworkFactory.Instance.GetSender(port);
-            await sender.SendMessageAsync(message, ip);
+            await SendMessageAsync(message, ip, port);
         }
 
-        public static async Task SendMessageAsync(MessageBase message, string ip, short port)
+        /// <summary>
+        /// Sends a message async to a IP:Port
+        /// </summary>
+        /// <param name="message">Instance of message</param>
+        /// <param name="ip">Ip of client pc</param>
+        /// <param name="port">Port of client pc</param>
+        /// <returns></returns>
+        /// <exception cref="TimeoutException"></exception>
+        public static Task SendMessageAsync(MessageBase message, string ip, short port)
         {
             var sender = NetworkFactory.Instance.GetSender(port);
-            sender.SendMessageAsync(message, ip);
+            return sender.SendMessageAsync(message, ip);
         }
 
         /// <summary>
@@ -73,6 +85,13 @@ namespace JPB.Communication.ComBase
             return failedMessages;
         }
 
+        /// <summary>
+        /// Sends one message to one client and wait for deliver
+        /// </summary>
+        /// <param name="message">Message object or inherted object</param>
+        /// <param name="ip">Ip of client</param>
+        /// <returns>frue if message was successful delivered otherwise false</returns>
+        /// <exception cref="TimeoutException"></exception>
         public bool SendMessage(MessageBase message, string ip)
         {
             var sendMessageAsync = SendMessageAsync(message, ip);
@@ -81,6 +100,12 @@ namespace JPB.Communication.ComBase
             return b;
         }
 
+        /// <summary>
+        /// Sends one message to one client async
+        /// </summary>
+        /// <param name="message">Message object or inherted object</param>
+        /// <param name="ip">Ip of client</param>
+        /// <returns>frue if message was successful delivered otherwise false</returns>
         public Task<bool> SendMessageAsync(MessageBase message, string ip)
         {
             var task = new Task<bool>(() =>
@@ -104,9 +129,8 @@ namespace JPB.Communication.ComBase
         /// <summary>
         /// Sends a message an awaits a response on the same port from the other side
         /// </summary>
-        /// <param name="mess"></param>
-        /// <param name="ip"></param>
-        /// <param name="reciverPort"></param>
+        /// <param name="mess">Message object or inherted object</param>
+        /// <param name="ip">Ip of client</param>
         /// <returns>Result from other side or default(T)</returns>
         /// <exception cref="TimeoutException"></exception>
         public Task<T> SendRequstMessageAsync<T>(RequstMessage mess, string ip)
@@ -115,18 +139,24 @@ namespace JPB.Communication.ComBase
             {
                 var result = default(T);
                 var waitForResponsive = new AutoResetEvent(false);
+                //We await a responce on the same port than we send it
                 var reciever = NetworkFactory.Instance.GetReceiver(Port);
+                //register a callback that is filtered by the Guid we send inside our requst
                 reciever.RegisterRequst(s =>
                 {
                     if (s.Message is T)
                         result = (T)s.Message;
+                    // ReSharper disable AccessToDisposedClosure
                     waitForResponsive.Set();
+                    // ReSharper restore AccessToDisposedClosure
                 }, mess.Id);
                 var isSend = SendMessage(mess, ip);
                 if (isSend)
                 {
                     waitForResponsive.WaitOne(Timeout);
                 }
+                reciever.UnRegisterCallback(mess.Id);
+                waitForResponsive.Dispose();
                 return result;
             });
             task.Start();
@@ -136,9 +166,8 @@ namespace JPB.Communication.ComBase
         /// <summary>
         /// Sends a message an awaits a response on the same port from the other side
         /// </summary>
-        /// <param name="mess"></param>
-        /// <param name="ip"></param>
-        /// <param name="reciverPort"></param>
+        /// <param name="mess">Message object or inherted object</param>
+        /// <param name="ip">Ip of client</param>
         /// <returns>Result from other side or default(T)</returns>
         /// <exception cref="TimeoutException"></exception>
         public async Task<T> SendRequstMessage<T>(RequstMessage mess, string ip)
@@ -146,6 +175,13 @@ namespace JPB.Communication.ComBase
             return await SendRequstMessageAsync<T>(mess, ip);
         }
 
+        /// <summary>
+        /// Sends one message COPY to each ip and awaits from all a result or nothing
+        /// </summary>
+        /// <typeparam name="T">the result we await</typeparam>
+        /// <param name="mess">Message object or inherted object</param>
+        /// <param name="ips">Ips of client</param>
+        /// <returns>A Dictiornary that contains for each key ( IP ) the result we got</returns>
         public Dictionary<string, T> SendMultiRequestMessage<T>(RequstMessage mess, string[] ips)
         {
             var enumerable = ips.Distinct().ToArray();
@@ -182,12 +218,12 @@ namespace JPB.Communication.ComBase
 
         #region Base Methods
 
-        private TcpMessage PrepareMessage(MessageBase message, string ip, ISecureMessage provider = null)
+        private TcpMessage PrepareMessage(MessageBase message, string ip)
         {
             message.SendAt = DateTime.Now;
             message.Sender = NetworkInfoBase.IpAddress.ToString();
             message.Reciver = ip;
-            return Wrap(message, provider);
+            return Wrap(message);
         }
 
         private static async Task<TcpClient> CreateClientSockAsync(string ip, int port)
@@ -235,161 +271,5 @@ namespace JPB.Communication.ComBase
         }
 
         #endregion
-
     }
 }
-
-
-
-
-
-
-
-
-
-
-//private TcpMessage PrepareMessage(MessageBase message, string ip)
-//{
-//    message.Sender = NetworkInfoBase.IpAddress.ToString();
-//    message.Reciver = ip;
-//    return Wrap(message);
-//}
-
-//public async void SendMessage(MessageBase message, string ip)
-//{
-//    this.SendMessage(message, ip, Port);
-//}
-
-//public async void SendMessage(MessageBase message, string ip, short port)
-//{
-//    var client = CreateClientSock(ip, port);
-//    var tcpMessage = PrepareMessage(message, ip);
-//    SendBase(tcpMessage, await client);
-//}
-
-//public Task SendMessageAsync(MessageBase message, string ip)
-//{
-//    return SendMessageAsync(message, ip);
-//}
-
-//public Task SendMessageAsync(MessageBase message, string ip, short port)
-//{
-//    var task = new Task(() =>
-//    {
-//        var client = CreateClientSock(ip, port);
-//        var tcpMessage = PrepareMessage(message, ip);
-//        client.Wait();
-//        SendBase(tcpMessage, client.Result);
-//    });
-//    task.Start();
-//    return task;
-//}
-
-//public async void SendFile(Stream stream, string ip, short port)
-//{
-//    var client = CreateClientSock(ip, port);
-//    if (client == null)
-//        return;
-//    await SendBase(stream, await client);
-//}
-
-//public void SendFile(Stream stream, string ip)
-//{
-//    SendFile(stream, ip, Port);
-//}
-
-//private async Task<TcpClient> CreateClientSock(string ip, int port)
-//{
-//    try
-//    {
-//        var client = new TcpClient();
-//        await client.ConnectAsync(ip, port);
-//        client.NoDelay = true;
-//        return client;
-//    }
-//    catch (Exception e)
-//    {
-//        return null;
-//    }
-//}
-
-//public async void SendMessageBack(MessageBase message, string ip, short port)
-//{
-//    SendMessageBack(message, ip, port);
-//}
-
-//public async void SendMessageBack(MessageBase message, string ip)
-//{
-//    var client = CreateClientSock(ip, Port);
-//    var tcpMessage = PrepareMessage(message, ip);
-//    tcpMessage.TcpInfoState = TcpInfoState.NotifyMessageRecived;
-//    SendBase(tcpMessage, await client);
-//}
-
-//public Task<bool> SendAndReceiveAsync(MessageBase message, string ip)
-//{
-//    return SendAndReceiveAsync(message, ip, Port);
-//}
-
-//public Task<bool> SendAndReceiveAsync(MessageBase message, string ip, short port)
-//{
-//    var task = new Task<bool>(() =>
-//    {
-//        try
-//        {
-//            var sendMessageAsync = SendMessageAsync(message, ip, port);
-//            sendMessageAsync.Wait();
-//            return true;
-//        }
-//        catch (Exception)
-//        {
-//            return false;
-//        }
-//    });
-//    return task;
-//}
-
-//public void SendAndReceive(MessageBase message, string ip, Action<bool> hostReached)
-//{
-//    try
-//    {
-//        SendMessage(message, ip);
-//        hostReached(true);
-//    }
-//    catch (Exception)
-//    {
-//        hostReached(false);
-//    }
-//}
-
-//private async void SendBase(TcpMessage message, TcpClient client)
-//{
-//    if (client == null)
-//        return;
-//    byte[] stream = Serialize(message);
-//    using (var memstream = new MemoryStream(stream))
-//    {
-//        await SendBase(memstream, client);
-//    }
-//}
-
-//private async Task SendBase(Stream stream, TcpClient client)
-//{
-//    if (client == null)
-//        return;
-
-//    using (var networkStream = client.GetStream())
-//    {
-//        int bufSize = client.ReceiveBufferSize;
-//        var buf = new byte[bufSize];
-
-//        long totalBytes = 0;
-//        int bytesRead = 0;
-
-//        while ((bytesRead = stream.Read(buf, 0, bufSize)) > 0)
-//        {
-//            await networkStream.WriteAsync(buf, 0, bytesRead);
-//            totalBytes += bytesRead;
-//        }
-//    }
-//}

@@ -60,18 +60,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComBase\Messages\MessageBase.cs" />
+    <Compile Include="ComBase\Messages\RequstMessage.cs" />
     <Compile Include="ComBase\Networkbase.cs" />
     <Compile Include="ComBase\TCPNetworkReceiver.cs" />
     <Compile Include="ComBase\TCPNetworkSender.cs" />
     <Compile Include="ComBase\ConnectionBase.cs" />
-    <Compile Include="Interface\ExportSecProviderAttribute.cs" />
-    <Compile Include="Interface\IMessageSerialize.cs" />
     <Compile Include="ComBase\TcpConnection.cs" />
     <Compile Include="ComBase\InfoState.cs" />
     <Compile Include="ComBase\NetworkInfoBase.cs" />
     <Compile Include="ComBase\TcpMessage.cs" />
     <Compile Include="NetworkFactory.cs" />
-    <Compile Include="Interface\ISecureMessage.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -86,7 +84,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Security\SecurityManager.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

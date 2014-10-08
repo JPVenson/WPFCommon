@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using JPB.Communication.ComBase;
 
 namespace JPB.Communication
@@ -18,11 +19,13 @@ namespace JPB.Communication
         private Dictionary<short, TCPNetworkSender> _senders;
         private TCPNetworkReceiver _commonReciever;
         private TCPNetworkSender _commonSender;
+        private Object _mutex;
 
         private NetworkFactory()
         {
             _receivers = new Dictionary<short, TCPNetworkReceiver>();
             _senders = new Dictionary<short, TCPNetworkSender>();
+            _mutex = new object();
         }
 
         public static NetworkFactory Instance
@@ -66,16 +69,24 @@ namespace JPB.Communication
             }
         }
 
+        /// <summary>
+        /// Gets or Creates a Network sender for a given port
+        /// </summary>
+        /// <param name="port"></param>
+        /// <returns></returns>
         public TCPNetworkSender GetSender(short port)
         {
-            var element = _senders.FirstOrDefault(s => s.Key == port);
-
-            if (!element.Equals(null) && element.Value != null)
+            lock (_mutex)
             {
-                return element.Value;
-            }
+                var element = _senders.FirstOrDefault(s => s.Key == port);
 
-            return CreateSender(port);
+                if (!element.Equals(null) && element.Value != null)
+                {
+                    return element.Value;
+                }
+
+                return CreateSender(port);
+            }
         }
 
         private TCPNetworkSender CreateSender(short port)
@@ -85,16 +96,24 @@ namespace JPB.Communication
             return sender;
         }
 
+        /// <summary>
+        /// Gets or Creats a network Reciever for a given port
+        /// </summary>
+        /// <param name="port"></param>
+        /// <returns></returns>
         public TCPNetworkReceiver GetReceiver(short port)
         {
-            var element = _receivers.FirstOrDefault(s => s.Key == port);
-
-            if (!element.Equals(null) && element.Value != null)
+            lock (_mutex)
             {
-                return element.Value;
-            }
+                var element = _receivers.FirstOrDefault(s => s.Key == port);
 
-            return CreateReceiver(port);
+                if (!element.Equals(null) && element.Value != null)
+                {
+                    return element.Value;
+                }
+
+                return CreateReceiver(port);
+            }
         }
 
         private TCPNetworkReceiver CreateReceiver(short port)

@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 
 namespace JPB.Communication.ComBase
 {
-    public class InternalMemoryHolder : IDisposable
+    internal class InternalMemoryHolder : IDisposable
     {
         private List<byte[]> _datarec = new List<byte[]>();
 
-        public byte[] Last { get; set; }
-        
-        public bool IsSharedMem { get; set; }
+        internal byte[] Last { get; set; }
+
+        internal bool IsSharedMem { get; set; }
 
         private FileStream _fileStream;
 
         private Task _writeAsync;
 
-        public async void Add(byte[] bytes)
+        internal async void Add(byte[] bytes)
         {
             Last = bytes;
 
@@ -48,7 +48,7 @@ namespace JPB.Communication.ComBase
             return !IsSharedMem ? _datarec.SelectMany(s => s).ToArray() : Last;
         }
 
-        public byte[] Get()
+        internal byte[] Get()
         {
             return privateGet();
         }
@@ -66,21 +66,24 @@ namespace JPB.Communication.ComBase
                 {
                     throw;
                 }
-                _fileStream.Dispose();
+                finally
+                {
+                    _fileStream.Dispose();
+                }
             }
             _datarec = null;
         }
     }
 
 
-    public class TcpConnection : ConnectionBase, IDisposable
+    internal class TcpConnection : ConnectionBase, IDisposable
     {
         private readonly Socket sock;
         private InternalMemoryHolder datarec;
         // Pick whatever encoding works best for you.  Just make sure the remote 
         // host is using the same encoding.
 
-        public TcpConnection(Socket s)
+        internal TcpConnection(Socket s)
         {
             datarec = new InternalMemoryHolder();
             sock = s;

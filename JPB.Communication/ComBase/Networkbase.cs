@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security;
 using System.Xml.Serialization;
 using JPB.Communication.ComBase.Messages;
-using JPB.Communication.Interface;
-using JPB.Communication.Security;
 
 namespace JPB.Communication.ComBase
 {
@@ -18,11 +17,6 @@ namespace JPB.Communication.ComBase
                 {
                     var deserializer = new XmlSerializer(typeof(TcpMessage));
                     var tcpMessage = (TcpMessage)deserializer.Deserialize(textReader);
-
-                    if (string.IsNullOrEmpty(tcpMessage.MessageSecType))
-                    {
-                        tcpMessage.MessageBase = SecurityManager.DecryptMessage(tcpMessage.MessageBase, tcpMessage.MessageSecType);
-                    }
                     return tcpMessage;
                 }
             }
@@ -42,24 +36,15 @@ namespace JPB.Communication.ComBase
             }
         }
 
-        public byte[] SaveMessageBaseAsBinary(MessageBase A, ISecureMessage provider)
+        public byte[] SaveMessageBaseAsBinary(MessageBase A)
         {
             using (var fs = new MemoryStream())
             {
                 var formatter = new BinaryFormatter();
                 formatter.Serialize(fs, A);
                 var array = fs.ToArray();
-                if (provider != null)
-                {
-                    return provider.EncryptMessage(array);
-                }
                 return array;
             }
-        }
-
-        public byte[] SaveMessageBaseAsBinary(MessageBase A)
-        {
-            return SaveMessageBaseAsBinary(A, null);
         }
 
         public MessageBase LoadMessageBaseFromBinary(Byte[] source)
@@ -72,21 +57,13 @@ namespace JPB.Communication.ComBase
             }
         }
 
-        protected TcpMessage Wrap(MessageBase message, ISecureMessage provider)
+        protected TcpMessage Wrap(MessageBase message)
         {
             var mess = new TcpMessage();
-            if (provider != null)
-                mess.MessageSecType = provider.GeneratePublicId();
-
             mess.MessageBase = SaveMessageBaseAsBinary(message);
             mess.Reciver = message.Reciver;
             mess.Sender = message.Sender;
             return mess;
-        }
-
-        protected TcpMessage Wrap(MessageBase message)
-        {
-            return Wrap(message, null);
         }
     }
 }
