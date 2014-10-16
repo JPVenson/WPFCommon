@@ -26,6 +26,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             try
             {
+                if (Dispatcher.HasShutdownStarted)
+                    return;
+
                 IsLocked = true;
                 if (Dispatcher.CheckAccess())
                 {
@@ -44,6 +47,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void BeginThreadSaveAction(Action action)
         {
+            if (Dispatcher.HasShutdownStarted)
+                return;
+
             if (Dispatcher.CheckAccess())
             {
                 try

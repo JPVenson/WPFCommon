@@ -23,7 +23,6 @@ namespace JPB.Communication.ComBase
             Timeout = TimeSpan.FromSeconds(15);
         }
 
-        public short Port { get; private set; }
         public TimeSpan Timeout { get; set; }
 
         #region Message Methods
@@ -117,7 +116,7 @@ namespace JPB.Communication.ComBase
                 if (result == null)
                     return false;
                 SendBaseAsync(tcpMessage, result);
-
+                RaiseMessageSended(message);
                 return true;
             });
             task.Start();

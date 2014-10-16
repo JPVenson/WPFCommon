@@ -21,6 +21,31 @@ namespace JPB.Communication
         private TCPNetworkSender _commonSender;
         private Object _mutex;
 
+        public bool ShouldRaiseEvents { get; set; }
+
+        public event EventHandler OnSenderCreate;
+        public event EventHandler OnReceiverCreate;
+
+        protected virtual void RaiseSenderCreate()
+        {
+            if(!ShouldRaiseEvents)
+                return;
+
+            var handler = OnSenderCreate;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        protected virtual void RaiseReceiverCreate()
+        {
+            if (!ShouldRaiseEvents)
+                return;
+
+            var handler = OnReceiverCreate;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
         private NetworkFactory()
         {
             _receivers = new Dictionary<short, TCPNetworkReceiver>();
@@ -31,7 +56,16 @@ namespace JPB.Communication
         public static NetworkFactory Instance
         {
             get { return _instance; }
-            private set { _instance = value; }
+        }
+
+        public Dictionary<short, TCPNetworkReceiver>.Enumerator GetReceivers()
+        {
+            return _receivers.GetEnumerator();
+        }
+
+        public Dictionary<short, TCPNetworkSender>.Enumerator GetSenders()
+        {
+            return _senders.GetEnumerator();
         }
 
         public TCPNetworkReceiver Reciever
@@ -42,7 +76,7 @@ namespace JPB.Communication
                     throw new ArgumentException("There is no port supplied. call InitCommonSenderAndReciver first");
                 return _commonReciever;
             }
-            set { _commonReciever = value; }
+            private set { _commonReciever = value; }
         }
 
         public TCPNetworkSender Sender
@@ -53,7 +87,7 @@ namespace JPB.Communication
                     throw new ArgumentException("There is no port supplied. call InitCommonSenderAndReciver first");
                 return _commonSender;
             }
-            set { _commonSender = value; }
+            private set { _commonSender = value; }
         }
 
         public void InitCommonSenderAndReciver(short listeningPort = -1, short sendingPort = -1)
@@ -71,6 +105,7 @@ namespace JPB.Communication
 
         /// <summary>
         /// Gets or Creates a Network sender for a given port
+        /// Thread-Save
         /// </summary>
         /// <param name="port"></param>
         /// <returns></returns>
@@ -93,11 +128,13 @@ namespace JPB.Communication
         {
             var sender = new TCPNetworkSender(port);
             _senders.Add(port, sender);
+            RaiseSenderCreate();
             return sender;
         }
 
         /// <summary>
         /// Gets or Creats a network Reciever for a given port
+        /// Thread-Save
         /// </summary>
         /// <param name="port"></param>
         /// <returns></returns>
@@ -120,6 +157,7 @@ namespace JPB.Communication
         {
             var receiver = new TCPNetworkReceiver(port);
             _receivers.Add(port, receiver);
+            RaiseReceiverCreate();
             return receiver;
         }
     }

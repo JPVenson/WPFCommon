@@ -15,6 +15,7 @@ namespace JPB.Communication.ComBase
     {
         internal TCPNetworkReceiver(short port)
         {
+            OnNewItemLoadedSuccess += TcpConnectionOnOnNewItemLoadedSuccess;
             Port = port;
             _sock = new Socket(IPAddress.Any.AddressFamily,
                                SocketType.Stream,
@@ -31,6 +32,66 @@ namespace JPB.Communication.ComBase
             _sock.BeginAccept(OnConnectRequest, _sock);
         }
 
+        private void TcpConnectionOnOnNewItemLoadedSuccess(MessageBase mess, short port)
+        {
+            if (port == Port)
+            {
+                var messCopy = mess;
+                _workeritems.Enqueue(() =>
+                {
+                    if (messCopy is RequstMessage)
+                    {
+                        //message with return value inbound
+                        var requstInbound = messCopy as RequstMessage;
+                        var firstOrDefault = _requestHandler.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.InfoState));
+                        if (firstOrDefault != null)
+                        {
+                            //Found a handler for that message and executed it
+                            var result = firstOrDefault.Item1(requstInbound);
+                            if (result == null)
+                                return;
+
+                            var sender = NetworkFactory.Instance.GetSender(Port);
+                            sender.SendMessageAsync(new RequstMessage() { Message = result, ResponseFor = requstInbound.Id }, messCopy.Sender);
+                        }
+                        else
+                        {
+                            //This is an awnser
+                            var awnser = _pendingrequests.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.ResponseFor));
+                            if (awnser != null)
+                                awnser.Item1(requstInbound);
+                            _pendingrequests.Remove(awnser);
+                        }
+                    }
+                    else
+                    {
+                        var updateCallbacks = _updated.Where(action => action.Item2 == null || action.Item2.Equals(messCopy.InfoState)).ToArray();
+                        foreach (
+                            var action in updateCallbacks)
+                            action.Item1.BeginInvoke(messCopy, e => { }, null);
+
+                        //Go through all one time items and check for ID
+                        var oneTimeImtes = _onetimeupdated.Where(s => messCopy.Id == s.Item2).ToArray();
+
+                        foreach (var action in oneTimeImtes)
+                        {
+                            action.Item1.BeginInvoke(messCopy, e => { }, null);
+                        }
+
+                        foreach (var useditem in oneTimeImtes)
+                            _onetimeupdated.Remove(useditem);
+                    }
+                });
+                if (_isWorking)
+                    return;
+
+                _isWorking = true;
+                var task = new Task(WorkOnItems);
+                task.Start();
+                task.ContinueWith(s => { _isWorking = false; });
+            }
+        }
+
         private readonly List<Tuple<Action<MessageBase>, Guid>> _onetimeupdated = new List<Tuple<Action<MessageBase>, Guid>>();
 
         private readonly List<Tuple<Action<RequstMessage>, Guid>> _pendingrequests = new List<Tuple<Action<RequstMessage>, Guid>>();
@@ -43,6 +104,7 @@ namespace JPB.Communication.ComBase
             new List<Tuple<Action<MessageBase>, object>>();
 
         private readonly ConcurrentQueue<Action> _workeritems = new ConcurrentQueue<Action>();
+
         private AutoResetEvent _autoResetEvent;
 
         private bool _isWorking;
@@ -58,8 +120,6 @@ namespace JPB.Communication.ComBase
         }
 
         #endregion
-
-        public short Port { get; private set; }
 
         public bool IsDisposing { get; private set; }
 
@@ -112,69 +172,6 @@ namespace JPB.Communication.ComBase
             _onetimeupdated.Remove(_onetimeupdated.FirstOrDefault(s => s.Item2 == guid));
         }
 
-        private void MessagesOnCollectionChanged(object o, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
-        {
-            if (notifyCollectionChangedEventArgs.Action != NotifyCollectionChangedAction.Add)
-                return;
-
-            var items = notifyCollectionChangedEventArgs.NewItems.OfType<MessageBase>().ToArray();
-
-            _workeritems.Enqueue(() =>
-            {
-                var item = items.FirstOrDefault();
-
-                if (item is RequstMessage)
-                {
-                    //message with return value inbound
-                    var requstInbound = item as RequstMessage;
-                    var firstOrDefault = _requestHandler.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.InfoState));
-                    if (firstOrDefault != null)
-                    {
-                        //Found a handler for that message and executed it
-                        var result = firstOrDefault.Item1(requstInbound);
-                        if(result == null)
-                            return;
-
-                        var sender = NetworkFactory.Instance.GetSender(Port);
-                        sender.SendMessageAsync(new RequstMessage() { Message = result, ResponseFor = requstInbound.Id }, item.Sender);
-                    }
-                    else
-                    {
-                        //This is an awnser
-                        var awnser = _pendingrequests.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.ResponseFor));
-                        if (awnser != null)
-                            awnser.Item1(requstInbound);
-                        _pendingrequests.Remove(awnser);
-                    }
-                }
-                else
-                {
-                    var updateCallbacks = _updated.Where(action => action.Item2 == null || action.Item2.Equals(item.InfoState)).ToArray();
-                    foreach (
-                        var action in updateCallbacks)
-                        action.Item1.BeginInvoke(item, e => { }, null);
-
-                    //Go through all one time items and check for ID
-                    var oneTimeImtes = _onetimeupdated.Where(s => item.Id == s.Item2).ToArray();
-
-                    foreach (var action in oneTimeImtes)
-                    {
-                        action.Item1.BeginInvoke(item, e => { }, null);
-                    }
-
-                    foreach (var useditem in oneTimeImtes)
-                        _onetimeupdated.Remove(useditem);
-                }
-            });
-            if (_isWorking)
-                return;
-
-            _isWorking = true;
-            var task = new Task(WorkOnItems);
-            task.Start();
-            task.ContinueWith(s => { _isWorking = false; });
-        }
-
         private void WorkOnItems()
         {
             _autoResetEvent = new AutoResetEvent(false);
@@ -199,9 +196,7 @@ namespace JPB.Communication.ComBase
 
             // Create a new client connection, using the primary socket to
             // spawn a new socket.
-            var newConn = new TcpConnection(sock.EndAccept(result));
-            newConn.Messages.CollectionChanged -= MessagesOnCollectionChanged;
-            newConn.Messages.CollectionChanged += MessagesOnCollectionChanged;
+            new TcpConnection(sock.EndAccept(result));
             // Tell the listener socket to start listening again.
             _sock.BeginAccept(OnConnectRequest, sock);
         }

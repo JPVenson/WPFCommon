@@ -2,13 +2,53 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security;
+using System.Text;
 using System.Xml.Serialization;
 using JPB.Communication.ComBase.Messages;
 
 namespace JPB.Communication.ComBase
 {
+    public delegate void MessageDelegate(MessageBase mess, short port);
+
     public class Networkbase
     {
+        public short Port { get; internal set; }
+
+        public static event MessageDelegate OnNewItemLoadedSuccess;
+        public static event EventHandler<string> OnNewItemLoadedFail;
+        public static event EventHandler<string> OnIncommingMessage;
+        public static event MessageDelegate OnMessageSend;
+
+        protected virtual void RaiseMessageSended(MessageBase message)
+        {
+            var handler = OnMessageSend;
+            if (handler != null)
+                handler(message, Port);
+        }
+
+        protected virtual void RaiseIncommingMessage(string strReceived)
+        {
+            var handler = OnIncommingMessage;
+            if (handler != null)
+                handler(this, strReceived);
+        }
+
+        protected virtual void RaiseNewItemLoadedFail(string strReceived)
+        {
+            var handler = OnNewItemLoadedFail;
+            if (handler != null)
+                handler(this, strReceived);
+        }
+
+        protected virtual void RaiseNewItemLoadedSuccess(MessageBase loadMessageBaseFromBinary)
+        {
+            var handler = OnNewItemLoadedSuccess;
+            if (handler != null)
+                handler(loadMessageBaseFromBinary, Port);
+        }
+
+        internal static Encoding Encoding = Encoding.UTF8;
+
         public static TcpMessage DeSerialize(string source)
         {
             try

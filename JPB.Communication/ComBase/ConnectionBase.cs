@@ -7,38 +7,33 @@ namespace JPB.Communication.ComBase
 {
     internal abstract class ConnectionBase : Networkbase
     {
-        internal static Encoding Encoding = Encoding.UTF8;
-
         protected ConnectionBase()
         {
-            Messages = new ObservableCollection<MessageBase>();
+
         }
-
-        internal TcpMessage LastMessage { get; set; }
-
-        internal ObservableCollection<MessageBase> Messages { get; set; }
-
+        
         internal bool Parse(string strReceived)
         {
             //Console.WriteLine("RECIVED: \"" + strReceived + "\"\r\n");
             TcpMessage item;
             try
             {
+                RaiseIncommingMessage(strReceived);
                 item = DeSerialize(strReceived);
 
                 if (item != null)
                 {
-                    LastMessage = item;
-                    Messages.Add(base.LoadMessageBaseFromBinary(item.MessageBase));
+                    var loadMessageBaseFromBinary = base.LoadMessageBaseFromBinary(item.MessageBase);
+                    RaiseNewItemLoadedSuccess(loadMessageBaseFromBinary);
                     return true;
                 }
                 return false;
             }
             catch (Exception)
             {
+                RaiseNewItemLoadedFail(strReceived);
                 return false;
             }
-
         }
     }
 }

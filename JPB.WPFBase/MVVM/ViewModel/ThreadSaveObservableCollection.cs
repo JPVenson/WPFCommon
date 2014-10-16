@@ -11,7 +11,9 @@ using System.Runtime.InteropServices;
 namespace JPB.WPFBase.MVVM.ViewModel
 {
     [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
-    public class ThreadSaveObservableCollection<T> : Collection<T>, INotifyCollectionChanged,
+    public class ThreadSaveObservableCollection<T> : 
+        Collection<T>, 
+        INotifyCollectionChanged,
         INotifyPropertyChanged
     {
         private readonly object LockObject = new object();
