@@ -169,5 +169,7 @@ namespace JPB.Communication.ComBase
         }
 
         #endregion
+
+        public override short Port { get; internal set; }
     }
 }

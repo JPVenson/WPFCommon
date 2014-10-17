@@ -92,8 +92,15 @@ namespace JPB.Communication.ComBase.Messages
         public object Clone()
         {
             var obje = this.MemberwiseClone() as MessageBase;
-            obje.Id = Guid.NewGuid();
-            return obje;
+            if (obje != null)
+            {
+                obje.Id = Guid.NewGuid();
+                return obje;
+            }
+            return new MessageBase(Message)
+            {
+                InfoState = InfoState
+            };
         }
     }
 }

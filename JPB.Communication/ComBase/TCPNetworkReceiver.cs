@@ -200,5 +200,7 @@ namespace JPB.Communication.ComBase
             // Tell the listener socket to start listening again.
             _sock.BeginAccept(OnConnectRequest, sock);
         }
+
+        public override short Port { get; internal set; }
     }
 }

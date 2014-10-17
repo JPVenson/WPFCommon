@@ -48,7 +48,7 @@ namespace JPB.ErrorValidation
             //TODO add async validation
 
             PropertyChanged += OnPropertyChanged;
-            ErrorProviderSimpleAccessAdapter.Errors.CollectionChanged += ErrorsOnCollectionChanged;
+            //ErrorProviderSimpleAccessAdapter.Errors.CollectionChanged += ErrorsOnCollectionChanged;
 
             AddTypeToText = true;
             Validation = ValidationLogic.BreakAtFirstFail;
@@ -65,10 +65,13 @@ namespace JPB.ErrorValidation
             if (notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Remove)
                 items.AddRange(notifyCollectionChangedEventArgs.OldItems.Cast<IValidation<T>>());
 
-            foreach (var validation in items.SelectMany(s => s.ErrorIndicator).Distinct())
+            TaskFactory.Add(() =>
             {
-                this.OnErrorsChanged(validation);
-            }
+                foreach (var validation in items.SelectMany(s => s.ErrorIndicator).Distinct())
+                {
+                    this.OnErrorsChanged(validation);
+                }
+            }, sender);
         }
 
         protected ErrorProviderBase()
@@ -202,8 +205,11 @@ namespace JPB.ErrorValidation
             if (!refference.Any(s => s is Error<T> || s is Warning<T>))
                 refference.Add(DefaultNoError);
 
-            _error = errortext;
-            SendPropertyChanged("Error");
+            if (errortext != null && !errortext.Equals(_error))
+            {
+                _error = errortext;
+                SendPropertyChanged("Error");
+            }
             return errortext;
         }
 

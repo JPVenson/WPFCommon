@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -58,30 +59,52 @@ namespace JPB.Communication.ComBase
         /// Sends a message to multible Hosts
         /// </summary>
         /// <returns>all non reached hosts</returns>
-        public IEnumerable<string> SendMultiMessage(MessageBase message, params string[] ips)
+        public Task<IEnumerable<string>> SendMultiMessageAsync(MessageBase message, params string[] ips)
         {
-            var failedMessages = new List<string>();
-
-            var runningMessages = ips.Select(ip => SendMessageAsync(message.Clone() as MessageBase, ip)).ToArray();
-
-            for (var i = 0; i < runningMessages.Length; i++)
+            var gentask = new Task<IEnumerable<string>>(() =>
             {
-                try
+                if (message == null)
+                    throw new ArgumentNullException("message");
+                if (ips == null)
+                    throw new ArgumentNullException("ips");
+
+
+                var failedMessages = new List<string>();
+
+                var runningMessages = ips.Select(ip => SendMessageAsync(message.Clone() as MessageBase, ip)).ToArray();
+
+                for (var i = 0; i < runningMessages.Length; i++)
                 {
-                    var task = runningMessages[i];
-                    task.Wait();
-                    if (!task.Result)
+                    try
+                    {
+                        var task = runningMessages[i];
+                        task.Wait();
+                        if (!task.Result)
+                        {
+                            failedMessages.Add(ips[i]);
+                        }
+                    }
+                    catch (Exception)
                     {
                         failedMessages.Add(ips[i]);
                     }
                 }
-                catch (Exception)
-                {
-                    failedMessages.Add(ips[i]);
-                }
-            }
 
-            return failedMessages;
+                return failedMessages;
+            });
+            gentask.Start();
+            return gentask;
+        }
+
+        /// <summary>
+        /// Sends a message to multible Hosts
+        /// </summary>
+        /// <returns>all non reached hosts</returns>
+        public IEnumerable<string> SendMultiMessage(MessageBase message, params string[] ips)
+        {
+            var send = SendMultiMessageAsync(message, ips);
+            send.Wait();
+            return send.Result;
         }
 
         /// <summary>
@@ -185,7 +208,8 @@ namespace JPB.Communication.ComBase
         {
             var enumerable = ips.Distinct().ToArray();
 
-            Task<T>[] pendingRequests = enumerable.Select(ip => this.SendRequstMessageAsync<T>(mess.Clone() as RequstMessage, ip)).ToArray();
+            Task<T>[] pendingRequests =
+                enumerable.Select(ip => this.SendRequstMessageAsync<T>(mess.Clone() as RequstMessage, ip)).ToArray();
 
             Task.WaitAll(pendingRequests);
 
@@ -270,5 +294,7 @@ namespace JPB.Communication.ComBase
         }
 
         #endregion
+
+        public override short Port { get; internal set; }
     }
 }

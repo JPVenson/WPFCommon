@@ -10,9 +10,9 @@ namespace JPB.Communication.ComBase
 {
     public delegate void MessageDelegate(MessageBase mess, short port);
 
-    public class Networkbase
+    public abstract class Networkbase
     {
-        public short Port { get; internal set; }
+        public abstract short Port { get; internal set; }
 
         public static event MessageDelegate OnNewItemLoadedSuccess;
         public static event EventHandler<string> OnNewItemLoadedFail;

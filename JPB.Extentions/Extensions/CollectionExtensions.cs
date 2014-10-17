@@ -28,7 +28,7 @@ namespace JPB.Extentions.Extensions
             return enumerable;
         }
 
-        public static string ToPropertyCsv<T, TE>(this IEnumerable<T> source, Func<T, string> getProperty)
+        public static string ToPropertyCsv<T>(this IEnumerable<T> source, Func<T, string> getProperty)
         {
             return source.Select(getProperty).Aggregate((s, e) => s + "," + e);
         }
