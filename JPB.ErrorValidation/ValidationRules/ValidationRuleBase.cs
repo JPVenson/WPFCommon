@@ -8,16 +8,16 @@ using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ValidationRules
 {
-    public abstract class ValidationRuleBase<T> : IErrorProvider<T>
+    public abstract class ValidationRuleBase<T> : IErrorInfoProvider<T>
     {
         private readonly ICollection<IValidation<T>> _vallidationErrors = new ObservableCollection<IValidation<T>>();
 
         protected ValidationRuleBase()
         {
-            Errors = new ObservableCollection<IValidation<T>>();
+            Errors = new ThreadSaveObservableCollection<IValidation<T>>();
         }
 
-        #region IErrorProvider<T> Members
+        #region IErrorInfoProvider<T> Members
 
         public virtual bool HasError
         {
@@ -31,7 +31,7 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public bool WarningAsFailure { get; set; }
 
-        public ObservableCollection<IValidation<T>> Errors { get; set; }
+        public ThreadSaveObservableCollection<IValidation<T>> Errors { get; set; }
 
         public IEnumerable<IValidation<T>> Warnings
         {

@@ -12,7 +12,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         public QuestionMutliOrSingelInputViewModel(object question, EingabeModus eingabeModus)
             : base(question, eingabeModus)
         {
-            base.ErrorProviderSimpleAccessAdapter.Add(new Error<QuestionViewModel>(
+            base.ErrorInfoProviderSimpleAccessAdapter.Add(new Error<QuestionViewModel>(
                 "Bitte wähle mindestens ein Item aus", "Input", s =>
                 {
                     if (s.Input == null)

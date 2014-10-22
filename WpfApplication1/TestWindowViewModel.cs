@@ -4,11 +4,9 @@ using JPB.ErrorValidation.ValidationTyps;
 
 namespace WpfApplication1
 {
-    public class TestWindowViewModel : ErrorProviderBase<TestWindowViewModel, TestWindowViewModelRules>
+    public class TestWindowViewModel : AsyncErrorProviderBase<TestWindowViewModel, TestWindowViewModelRules>
     {
-
         public TestWindowViewModel()
-            : base(1)
         {
 
         }
@@ -30,9 +28,10 @@ namespace WpfApplication1
     {
         public TestWindowViewModelRules()
         {
+            var vc_attributes = 0;
             Add(new Error<TestWindowViewModel>("Is null or empty", "ToValidationString", s => string.IsNullOrEmpty(s.ToValidationString)));
+            Add(new Error<TestWindowViewModel>("Must be Int", "ToValidationString", s => !int.TryParse(s.ToValidationString, out vc_attributes)));
             Add(new Error<TestWindowViewModel>("Is too big", "ToValidationString", s => s.ToValidationString != null && s.ToValidationString.Length > 10));
-            Add(new Warning<TestWindowViewModel>("Is OK", "ToValidationString", s => s.ToValidationString != null && s.ToValidationString.Length < 10));
         }
     }
 }

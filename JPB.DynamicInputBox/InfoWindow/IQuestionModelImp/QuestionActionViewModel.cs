@@ -19,7 +19,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         public QuestionActionViewModel(object question, EingabeModus eingabeModus)
             : base(question, eingabeModus)
         {
-            base.ErrorProviderSimpleAccessAdapter.Add(
+            base.ErrorInfoProviderSimpleAccessAdapter.Add(
                 new Error<QuestionViewModel>("Bitte warten bis die Action abgelaufen ist", "Input", s => IsRuning));
             RunActionCommand = new DelegateCommand(RunAction, CanRunAction);
 

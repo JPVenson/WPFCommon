@@ -7,18 +7,18 @@ namespace JPB.ErrorValidation.ValidationTyps
     /// </summary>
     public class Error<T> : IValidation<T>
     {
-        public Error(string ErrorText,string ErrorIndicator, Func<T, bool> Condition)
+        public Error(string errorText, string errorIndicator, Func<T, bool> condition)
         {
-            this.Condition = Condition;
-            this.ErrorIndicator = new[] { ErrorIndicator };
-            this.ErrorText = ErrorText;
+            this.Condition = condition;
+            this.ErrorIndicator = new[] { errorIndicator };
+            this.ErrorText = errorText;
         }
 
-        public Error(string ErrorText, Func<T, bool> Condition, params string[] ErrorIndicator)
+        public Error(string errorText, Func<T, bool> condition, params string[] errorIndicator)
         {
-            this.Condition = Condition;
-            this.ErrorIndicator = ErrorIndicator;
-            this.ErrorText = ErrorText;
+            this.Condition = condition;
+            this.ErrorIndicator = errorIndicator;
+            this.ErrorText = errorText;
         }
 
         #region IValidation<T> Members

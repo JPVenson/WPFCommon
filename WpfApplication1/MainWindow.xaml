@@ -4,16 +4,92 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wpfApplication1="clr-namespace:WpfApplication1"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
+
+    <Window.Resources>
+        <Style x:Key="targetStyle" TargetType="TextBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ContentControl 
+                                Grid.Row="0"
+                                Grid.Column="0">
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding }"></DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+
+                            <TextBox x:Name="PlaceholderTextContentPresenter"
+                                  Grid.Row="0"
+                                  Grid.Column="1"
+                                  Margin="{TemplateBinding BorderThickness}"
+                                  Padding="{TemplateBinding Padding}"
+                                  IsTabStop="False"
+                                  Text="{Binding Text,RelativeSource={RelativeSource TemplatedParent}}" 
+                                  IsHitTestVisible="False"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <DockPanel>
-        <TextBox DockPanel.Dock="Top" Text="{Binding ToValidationString, 
-            ValidatesOnNotifyDataErrors=True, 
-            UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBox DockPanel.Dock="Top" Text="{Binding ToValidationString, 
-            ValidatesOnNotifyDataErrors=True, 
-            UpdateSourceTrigger=PropertyChanged}"/>
-        
-        <Label Content="{Binding Error}"></Label>
+        <TextBox DockPanel.Dock="Top"  
+                 Text="{Binding ToValidationString, Mode=TwoWay, NotifyOnValidationError=True,ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
+                 Height="25">
+            <Validation.ValidationAdornerSiteFor>
+                <Label Content="X"></Label>
+            </Validation.ValidationAdornerSiteFor>
+            <Validation.ErrorTemplate>
+                <ControlTemplate>
+                    <StackPanel>
+                        <!-- Placeholder for the TextBox itself -->
+                        <Border>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding }">
+                                            
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                        <AdornedElementPlaceholder x:Name="textBox"/>
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ErrorContent.ErrorText}" Foreground="Red"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ControlTemplate>
+            </Validation.ErrorTemplate>
+        </TextBox>
+
+        <!--<TextBox 
+            Style="{StaticResource {x:Type TextBox}}"
+            DockPanel.Dock="Top" 
+                 Text="{Binding ToValidationString, ValidatesOnNotifyDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBox DockPanel.Dock="Top" Text="{Binding ToValidationString, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="{Binding Error}"></Label>-->
     </DockPanel>
 </Window>

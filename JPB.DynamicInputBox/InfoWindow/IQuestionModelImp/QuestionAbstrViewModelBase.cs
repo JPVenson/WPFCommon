@@ -13,7 +13,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public abstract class QuestionAbstrViewModelBase<T, TE> : ErrorProviderBase<T, TE>, IQuestionViewModel<T>
         where T : class
-        where TE : class, IErrorProvider<T>, new()
+        where TE : class, IErrorInfoProvider<T>, new()
     {
         private object _input;
         private bool _isInit;
@@ -77,8 +77,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
     }
 
     public class QuestionAbstrViewModelBaseValidation<T, TE> : ValidationRuleBase<QuestionAbstrViewModelBase<T, TE>>
-        where T : class
-        where TE : class, IErrorProvider<T>, new()
+        where T : class, new()
+        where TE : class, IErrorInfoProvider<T>, new()
     {
         public QuestionAbstrViewModelBaseValidation()
         {

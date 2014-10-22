@@ -18,21 +18,21 @@
 
         #endregion
 
-        private IErrorProvider<T> Provider { get; set; }
+        private IErrorInfoProvider<T> InfoProvider { get; set; }
 
-        public void RegisterErrorProvider(IErrorProvider<T> provider)
+        public void RegisterErrorProvider(IErrorInfoProvider<T> infoProvider)
         {
-            Provider = (provider);
+            InfoProvider = (infoProvider);
         }
 
-        public void UnregistErrorProvider(IErrorProvider<T> provider)
+        public void UnregistErrorProvider(IErrorInfoProvider<T> infoProvider)
         {
-            Provider = null;
+            InfoProvider = null;
         }
 
-        public IErrorProvider<T> GetProviderViaType()
+        public IErrorInfoProvider<T> GetProviderViaType()
         {
-            return Provider;
+            return InfoProvider;
         }
     }
 }
