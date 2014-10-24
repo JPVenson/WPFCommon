@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows.Threading;
 using JPB.DynamicInputBox.InfoWindow;
 using JPB.DynamicInputBox.InfoWindow.Controls;
 using JPB.DynamicInputBox.InfoWindow.Wrapper;
@@ -97,8 +98,10 @@ namespace JPB.DynamicInputBox
             IEnumerable<EingabeModus> eingabeModi)
         {
             bool? ret = false;
-            var windowThread = new Thread(() =>
+            Thread windowThread = null;
+            windowThread = new Thread(() =>
             {
+                var fromThread = Dispatcher.FromThread(windowThread);
                 var inputwindow = new UserInputWindow(inputQuestions, returnlist, eingabeModi);
                 ret = inputwindow.ShowDialog();
             });

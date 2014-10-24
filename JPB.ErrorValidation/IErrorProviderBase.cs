@@ -10,7 +10,6 @@ namespace JPB.ErrorValidation
     {
         bool HasError { get; }
         bool AddTypeToText { get; set; }
-        NoError<T> DefaultNoError { get; set; }
         IErrorInfoProvider<T> ErrorInfoProviderSimpleAccessAdapter { get; }
 
         void ForceRefresh();

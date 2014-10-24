@@ -13,7 +13,7 @@ using JPB.WPFBase.MVVM.ViewModel;
 namespace JPB.ErrorValidation
 {
     public class AsyncErrorProviderBase<T, TE> :
-        ErrorProviderBaseBase<T, TE>,
+        ErrorProviderBase<T, TE>,
         INotifyDataErrorInfo
         where T : class
         where TE : class, IErrorInfoProvider<T>, new()

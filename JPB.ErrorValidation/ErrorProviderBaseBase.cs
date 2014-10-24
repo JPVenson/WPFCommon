@@ -7,7 +7,7 @@ using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation
 {
-    public class ErrorProviderBaseBase<T, TE> : AsyncViewModelBase
+    public class ErrorProviderBase<T, TE> : AsyncViewModelBase
         where T : class
         where TE : class, IErrorInfoProvider<T>, new()
     {
@@ -32,7 +32,7 @@ namespace JPB.ErrorValidation
             }
         }
 
-        protected ErrorProviderBaseBase()
+        protected ErrorProviderBase()
         {
             if (ErrorObserver<T>.Instance.GetProviderViaType() == null)
                 ErrorObserver<T>.Instance.RegisterErrorProvider(new TE());
@@ -43,7 +43,6 @@ namespace JPB.ErrorValidation
             AddTypeToText = true;
             Validation = ValidationLogic.BreakAtFirstFail;
             Validate = true;
-            DefaultNoError = new NoError<T> { ErrorText = "OK" };
         }
 
         protected bool Validate { get; set; }
@@ -61,9 +60,6 @@ namespace JPB.ErrorValidation
         }
 
         public bool AddTypeToText { get; set; }
-
-        [XmlIgnore]
-        public NoError<T> DefaultNoError { get; set; }
 
         public bool HasErrors { get { return HasError; } }
 
@@ -99,20 +95,7 @@ namespace JPB.ErrorValidation
             }
 
             var refference = ErrorObserver<T>.Instance.GetProviderViaType().Errors;
-
-            if (refference.Any(s => s is NoError<T>))
-            {
-                IValidation<T> validation = refference.First(s => s is NoError<T>);
-                try
-                {
-                    refference.Remove(validation);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-
+            
             var listOfErrors =
                 ErrorObserver<T>.Instance.GetProviderViaType()
                     .Where(s => s.ErrorIndicator.Contains(errorIndicator) || !s.ErrorIndicator.Any()).ToArray();
@@ -157,10 +140,9 @@ namespace JPB.ErrorValidation
                     break;
             }
 
-            if (!refference.Any(s => s is Error<T> || s is Warning<T>))
+            if (!refference.ToArray().Any(s => s is Error<T> || s is Warning<T>))
             {
                 Error = string.Empty;
-                refference.Add(DefaultNoError);
             }
 
             if (err != null && !err.ErrorText.Equals(Error))

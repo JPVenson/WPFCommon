@@ -7,14 +7,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
     public abstract class ThreadSaveViewModelActor
     {
         protected ThreadSaveViewModelActor()
+            : this(Application.Current.Dispatcher)
         {
-            Dispatcher = Application.Current.Dispatcher;
-            Lock = new object();
+            
         }
 
         protected ThreadSaveViewModelActor(Dispatcher targetDispatcher)
         {
-            Dispatcher = targetDispatcher;
+            Dispatcher = targetDispatcher ?? Application.Current.Dispatcher;
+            Lock = new object();
         }
 
         protected Dispatcher Dispatcher { get; set; }

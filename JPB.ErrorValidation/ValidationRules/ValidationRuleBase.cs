@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Windows.Threading;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.WPFBase.MVVM.ViewModel;
 
@@ -14,7 +16,10 @@ namespace JPB.ErrorValidation.ValidationRules
 
         protected ValidationRuleBase()
         {
-            Errors = new ThreadSaveObservableCollection<IValidation<T>>();
+            Errors = new ThreadSaveObservableCollection<IValidation<T>>(Dispatcher.FromThread(Thread.CurrentThread))
+            {
+                
+            };
         }
 
         #region IErrorInfoProvider<T> Members
@@ -37,8 +42,6 @@ namespace JPB.ErrorValidation.ValidationRules
         {
             get { return Errors.Where(s => s is Warning<T>); }
         }
-
-        public NoError<T> DefaultNoError { get; set; }
 
         public int Count
         {

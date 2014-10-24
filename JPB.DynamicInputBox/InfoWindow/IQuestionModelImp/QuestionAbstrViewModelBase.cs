@@ -4,6 +4,8 @@
 
 #endregion
 
+using System.Threading;
+using System.Windows.Threading;
 using JPB.DynamicInputBox.InfoWindow.Interfaces;
 using JPB.ErrorValidation;
 using JPB.ErrorValidation.ValidationRules;
@@ -22,6 +24,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 
         protected QuestionAbstrViewModelBase(object question, EingabeModus eingabeModus)
         {
+            base.Dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
             SelectedEingabeModus = eingabeModus;
             Question = question;
         }
@@ -74,6 +77,14 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         }
 
         #endregion
+
+        public string GetError(string columnName, T obj)
+        {
+            var validation = base.GetError(columnName, obj);
+            if (validation != null)
+                return validation.ErrorText;
+            return string.Empty;
+        }
     }
 
     public class QuestionAbstrViewModelBaseValidation<T, TE> : ValidationRuleBase<QuestionAbstrViewModelBase<T, TE>>

@@ -1,11 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Windows.Threading;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
     public class ThreadSaveViewModelBase : ThreadSaveViewModelActor, INotifyPropertyChanged
     {
+        public ThreadSaveViewModelBase(Dispatcher fromThread)
+            :base(fromThread)
+        {
+
+        }
+
+        public ThreadSaveViewModelBase()
+        {
+            
+        }
+
         #region INotifyPropertyChanged Members
 
         /// <summary>

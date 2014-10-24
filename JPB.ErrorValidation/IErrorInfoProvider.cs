@@ -13,7 +13,6 @@ namespace JPB.ErrorValidation
 
         ThreadSaveObservableCollection<IValidation<T>> Errors { get; }
         IEnumerable<IValidation<T>> Warnings { get; }
-        NoError<T> DefaultNoError { get; set; }
 
         Type RetrunT();
         IEnumerable<IValidation<T>> RetrunErrors(string columnName);

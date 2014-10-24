@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using System.Windows.Threading;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
@@ -44,6 +45,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public ThreadSaveObservableCollection()
         {
             actorHelper = new ThreadSaveViewModelBase();
+        }
+
+        public ThreadSaveObservableCollection(Dispatcher fromThread)
+        {
+            actorHelper = new ThreadSaveViewModelBase(fromThread);
         }
 
         #region INotifyCollectionChanged Members
@@ -179,7 +185,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
                                 index));
                     });
             }
-
         }
 
         protected override void SetItem(int index, T item)

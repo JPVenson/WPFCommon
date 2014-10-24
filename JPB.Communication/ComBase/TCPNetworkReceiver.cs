@@ -196,7 +196,7 @@ namespace JPB.Communication.ComBase
 
             // Create a new client connection, using the primary socket to
             // spawn a new socket.
-            new TcpConnection(sock.EndAccept(result));
+            new TcpConnection(sock.EndAccept(result)) { Port = Port };
             // Tell the listener socket to start listening again.
             _sock.BeginAccept(OnConnectRequest, sock);
         }

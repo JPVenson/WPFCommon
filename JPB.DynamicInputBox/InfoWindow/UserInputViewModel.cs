@@ -9,6 +9,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Windows.Threading;
 using JPB.DynamicInputBox.InfoWindow.Controls;
 using JPB.DynamicInputBox.InfoWindow.IQuestionModelImp;
 using JPB.ErrorValidation;
@@ -32,6 +34,7 @@ namespace JPB.DynamicInputBox.InfoWindow
         public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort,
             IEnumerable<EingabeModus> inputmode)
         {
+            base.Dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
             Inputmode = inputmode;
             Returnlist = returnlist;
             InputQuestions = inputQuestions;
