@@ -13,7 +13,18 @@ using JPB.ErrorValidation.ValidationTyps;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
-    public abstract class QuestionAbstrViewModelBase<T, TE> : ErrorProviderBase<T, TE>, IQuestionViewModel<T>
+    public interface IQuestionAbstrViewModelBase : IErrorProviderBase
+    {
+        bool IsInit { get; set; }
+        object Question { get; set; }
+        object Input { get; set; }
+        EingabeModus SelectedEingabeModus { get; set; }
+        new void Init();
+    }
+
+    public abstract class QuestionAbstrViewModelBase<T, TE> : ErrorProviderBase<T, TE>,
+        IQuestionViewModel<T>,
+        IQuestionAbstrViewModelBase
         where T : class
         where TE : class, IErrorInfoProvider<T>, new()
     {
@@ -71,6 +82,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             }
         }
 
+        //public bool HasError { get; set; }
+
         public virtual void Init()
         {
             IsInit = true;
@@ -78,7 +91,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 
         #endregion
 
-        public string GetError(string columnName, T obj)
+        string IErrorProviderBase<T>.GetError(string columnName, T obj)
         {
             var validation = base.GetError(columnName, obj);
             if (validation != null)

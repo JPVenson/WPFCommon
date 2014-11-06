@@ -8,8 +8,18 @@ using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation
 {
-    public class ErrorProviderBase<T, TE> : AsyncViewModelBase
-        where T : class
+    public interface IErrorProviderBase
+    {
+        string Error { get; set; }
+        bool Validate { get; set; }
+        bool HasError { get; }
+        bool AddTypeToText { get; set; }
+        bool HasErrors { get; }
+        void Init();
+        void ForceRefresh();
+    }
+
+    public class ErrorProviderBase<T, TE> : AsyncViewModelBase, IErrorProviderBase where T : class
         where TE : class, IErrorInfoProvider<T>, new()
     {
         private string _error;
@@ -44,7 +54,7 @@ namespace JPB.ErrorValidation
             this.Init();
         }
 
-        private void Init()
+        public void Init()
         {
             if (ErrorObserver<T>.Instance.GetProviderViaType() == null)
                 ErrorObserver<T>.Instance.RegisterErrorProvider(new TE());
@@ -57,7 +67,7 @@ namespace JPB.ErrorValidation
             Validate = true;
         }
 
-        protected bool Validate { get; set; }
+        public bool Validate { get; set; }
         protected ValidationLogic Validation { get; set; }
 
         [XmlIgnore]

@@ -4,12 +4,17 @@
 
 #endregion
 
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using JPB.DynamicInputBox.InfoWindow.Wrapper;
+using JPB.ErrorValidation;
+using JPB.ErrorValidation.ValidationRules;
+using JPB.ErrorValidation.ValidationTyps;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
-    public abstract class QuestionMultipleChoiceAbstrViewModel : QuestionViewModel
+    public abstract class QuestionMultipleChoiceAbstrViewModel : QuestionAbstrViewModelBase<QuestionMultipleChoiceAbstrViewModel, QuestionMultiChoiceViewModelValid>
     {
         protected QuestionMultipleChoiceAbstrViewModel(object question, EingabeModus eingabeModus)
             : base(question, eingabeModus)
@@ -46,5 +51,24 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         }
 
         #endregion
+    }
+
+    public class QuestionMultiChoiceViewModelValid : ValidationRuleBase<QuestionMultipleChoiceAbstrViewModel>
+    {
+        public QuestionMultiChoiceViewModelValid()
+        {
+            Add(new Error<QuestionMultipleChoiceAbstrViewModel>(
+                "Bitte wähle mindestens ein Item aus", "Input", s =>
+                {
+                    if (s.Input == null)
+                        return true;
+                    if (s.Input is List<ListBoxItemWrapper>)
+                    {
+                        if (!(s.Input as List<ListBoxItemWrapper>).Any())
+                            return true;
+                    }
+                    return false;
+                }));
+        }
     }
 }

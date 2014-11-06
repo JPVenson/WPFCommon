@@ -54,7 +54,7 @@ namespace JPB.DynamicInputBox.InfoWindow
             {
                 if (value != null && !Equals(SelectedStep, value))
                 {
-                    var vm = value.DataContext as QuestionViewModel;
+                    var vm = value.DataContext as IQuestionAbstrViewModelBase;
                     if (!vm.IsInit)
                         vm.Init();
                     vm.ForceRefresh();
@@ -164,7 +164,7 @@ namespace JPB.DynamicInputBox.InfoWindow
         /// <param name="sender">The transferparameter</param>
         private void NextStep(object sender)
         {
-            var vm = SelectedStep.DataContext as QuestionViewModel;
+            var vm = SelectedStep.DataContext as IQuestionAbstrViewModelBase;
 
             if (Returnlist.Invoke().Count > Index)
                 Returnlist.Invoke()[Index] = (vm.Input);
@@ -184,7 +184,7 @@ namespace JPB.DynamicInputBox.InfoWindow
         private bool CanNextStep(object sender)
         {
             //return !string.IsNullOrEmpty((Steps.DataContext as QuestionViewModel).Input);
-            return !(SelectedStep.DataContext as QuestionViewModel).HasError;
+            return !(SelectedStep.DataContext as IErrorProviderBase).HasError;
         }
 
         #endregion
@@ -198,7 +198,7 @@ namespace JPB.DynamicInputBox.InfoWindow
         /// <param name="sender">The transferparameter</param>
         private void PreviousStep(object sender)
         {
-            var vm = ((QuestionViewModel) SelectedStep.DataContext);
+            var vm = ((IQuestionAbstrViewModelBase) SelectedStep.DataContext);
             if (Returnlist.Invoke().Count > Index)
                 Returnlist.Invoke()[Index] = (vm.Input);
             else
@@ -280,9 +280,9 @@ namespace JPB.DynamicInputBox.InfoWindow
                 : EingabeModus.Text;
         }
 
-        private QuestionViewModel SwitchTypes(EingabeModus eingabemodi, object question)
+        private IQuestionAbstrViewModelBase SwitchTypes(EingabeModus eingabemodi, object question)
         {
-            QuestionViewModel vm = null;
+            IQuestionAbstrViewModelBase vm = null;
 
             switch (eingabemodi)
             {
@@ -331,7 +331,7 @@ namespace JPB.DynamicInputBox.InfoWindow
             {
                 object question = InputQuestions.ElementAt(i);
                 EingabeModus eingabemodi = GetInput(i);
-                QuestionViewModel vm = SwitchTypes(eingabemodi, question);
+                var vm = SwitchTypes(eingabemodi, question);
                 Steps.Add(new QuestionUserControl {DataContext = vm});
             }
 
