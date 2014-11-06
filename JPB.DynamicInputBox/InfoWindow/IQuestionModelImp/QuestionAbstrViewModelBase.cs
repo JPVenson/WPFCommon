@@ -23,8 +23,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         private EingabeModus _selectedEingabeModus;
 
         protected QuestionAbstrViewModelBase(object question, EingabeModus eingabeModus)
+            : base(Dispatcher.FromThread(Thread.CurrentThread))
         {
-            base.Dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
             SelectedEingabeModus = eingabeModus;
             Question = question;
         }

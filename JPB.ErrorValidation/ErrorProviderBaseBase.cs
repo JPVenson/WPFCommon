@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Windows.Threading;
 using System.Xml.Serialization;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.WPFBase.MVVM.ViewModel;
@@ -32,7 +33,18 @@ namespace JPB.ErrorValidation
             }
         }
 
+        protected ErrorProviderBase(Dispatcher disp)
+            : base(disp)
+        {
+            this.Init();
+        }
+
         protected ErrorProviderBase()
+        {
+            this.Init();
+        }
+
+        private void Init()
         {
             if (ErrorObserver<T>.Instance.GetProviderViaType() == null)
                 ErrorObserver<T>.Instance.RegisterErrorProvider(new TE());
@@ -95,7 +107,7 @@ namespace JPB.ErrorValidation
             }
 
             var refference = ErrorObserver<T>.Instance.GetProviderViaType().Errors;
-            
+
             var listOfErrors =
                 ErrorObserver<T>.Instance.GetProviderViaType()
                     .Where(s => s.ErrorIndicator.Contains(errorIndicator) || !s.ErrorIndicator.Any()).ToArray();

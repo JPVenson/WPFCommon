@@ -31,10 +31,9 @@ namespace JPB.DynamicInputBox.InfoWindow
             {"Quit", "OK"},
         };
 
-        public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort,
-            IEnumerable<EingabeModus> inputmode)
+        public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort, IEnumerable<EingabeModus> inputmode, Dispatcher fromThread)
+            : base(fromThread)
         {
-            base.Dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
             Inputmode = inputmode;
             Returnlist = returnlist;
             InputQuestions = inputQuestions;

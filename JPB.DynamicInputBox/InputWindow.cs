@@ -101,9 +101,10 @@ namespace JPB.DynamicInputBox
             Thread windowThread = null;
             windowThread = new Thread(() =>
             {
-                var fromThread = Dispatcher.FromThread(windowThread);
-                var inputwindow = new UserInputWindow(inputQuestions, returnlist, eingabeModi);
+                var fromThread = Dispatcher.CurrentDispatcher;
+                var inputwindow = new UserInputWindow(inputQuestions, returnlist, eingabeModi, fromThread);
                 ret = inputwindow.ShowDialog();
+                fromThread.InvokeShutdown();
             });
             windowThread.Name = "InputWindowThread";
             windowThread.SetApartmentState(ApartmentState.STA);

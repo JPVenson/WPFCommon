@@ -20,8 +20,9 @@ namespace JPB.ErrorValidation
         where TE : class, IErrorInfoProvider<T>, new()
     {
         protected SimpleErrorProviderBase()
+            : base(Dispatcher.FromThread(Thread.CurrentThread))
         {
-            base.Dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
+
         }
 
         public abstract string this[string columnName] { get; }

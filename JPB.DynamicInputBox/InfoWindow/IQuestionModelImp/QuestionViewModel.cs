@@ -15,7 +15,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         public QuestionViewModel(object question, EingabeModus eingabeModus)
             : base(question, eingabeModus)
         {
-            base.Dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
+
         }
     }
 

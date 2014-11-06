@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
@@ -39,6 +40,17 @@ namespace JPB.WPFBase.MVVM.ViewModel
         #endregion
 
         protected Task CurrentTask;
+
+        protected AsyncViewModelBase(Dispatcher disp)
+            : base(disp)
+        {
+            
+        }
+
+        public AsyncViewModelBase()
+        {
+            
+        }
 
         public TaskAwaiter GetAwaiter()
         {
