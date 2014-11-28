@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Windows.Threading;
@@ -13,13 +14,11 @@ namespace JPB.ErrorValidation.ValidationRules
     public abstract class ValidationRuleBase<T> : IErrorInfoProvider<T>
     {
         private readonly ICollection<IValidation<T>> _vallidationErrors = new ObservableCollection<IValidation<T>>();
+        protected ObservableCollection<IValidation<T>> _errors;
 
         protected ValidationRuleBase()
         {
-            Errors = new ThreadSaveObservableCollection<IValidation<T>>(Dispatcher.FromThread(Thread.CurrentThread))
-            {
-                
-            };
+            _errors = new ObservableCollection<IValidation<T>>();
         }
 
         #region IErrorInfoProvider<T> Members
@@ -36,7 +35,10 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public bool WarningAsFailure { get; set; }
 
-        public ThreadSaveObservableCollection<IValidation<T>> Errors { get; set; }
+        public ICollection<IValidation<T>> Errors
+        {
+            get { return _errors; }
+        }
 
         public IEnumerable<IValidation<T>> Warnings
         {
@@ -55,7 +57,7 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public Type RetrunT()
         {
-            return typeof (T);
+            return typeof(T);
         }
 
         public IEnumerable<IValidation<T>> RetrunErrors(string columnName)
@@ -101,5 +103,31 @@ namespace JPB.ErrorValidation.ValidationRules
         }
 
         #endregion
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add { this._errors.CollectionChanged += value; }
+            remove { this._errors.CollectionChanged -= value; }
+        }
+    }
+
+    public class ThreadSaveValidationRuleBase<T> : ValidationRuleBase<T>
+    {
+        public ThreadSaveValidationRuleBase()
+        {
+            Errors = new ThreadSaveObservableCollection<IValidation<T>>(Dispatcher.FromThread(Thread.CurrentThread));
+        }
+
+        public new ThreadSaveObservableCollection<IValidation<T>> Errors
+        {
+            get;
+            set;
+        }
+
+        public new event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add { Errors.CollectionChanged += value; }
+            remove { Errors.CollectionChanged -= value; }
+        }
     }
 }

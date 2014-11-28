@@ -53,9 +53,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncErrorProviderBase.cs" />
-    <Compile Include="BindingProperty\OnValidation.cs" />
     <Compile Include="ErrorObserver.cs" />
-    <Compile Include="ErrorProviderBase.cs" />
+    <Compile Include="SimpleErrorProviderBase.cs" />
     <Compile Include="ErrorProviderBaseBase.cs" />
     <Compile Include="IErrorInfoProvider.cs" />
     <Compile Include="IErrorProviderBase.cs" />

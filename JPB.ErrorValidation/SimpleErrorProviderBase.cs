@@ -27,4 +27,18 @@ namespace JPB.ErrorValidation
 
         public abstract string this[string columnName] { get; }
     }
+
+    public class DataErrorBase<T, TE> : SimpleErrorProviderBase<T, TE> where T : class where TE : class, IErrorInfoProvider<T>, new()
+    {
+        public override string this[string columnName]
+        {
+            get
+            {
+                var validation = base.GetError(columnName, this as T);
+                if (validation != null)
+                    return validation.ErrorText;
+                return string.Empty;
+            }
+        }
+    }
 }

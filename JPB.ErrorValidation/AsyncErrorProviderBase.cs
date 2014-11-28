@@ -20,7 +20,7 @@ namespace JPB.ErrorValidation
     {
         public AsyncErrorProviderBase()
         {
-            base.ErrorInfoProviderSimpleAccessAdapter.Errors.CollectionChanged += Errors_CollectionChanged;
+            base.ErrorInfoProviderSimpleAccessAdapter.CollectionChanged += Errors_CollectionChanged;
 
             ErrorMapper = new ConcurrentDictionary<string, List<IValidation<T>>>();
 

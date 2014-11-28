@@ -8,18 +8,9 @@ using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation
 {
-    public interface IErrorProviderBase
-    {
-        string Error { get; set; }
-        bool Validate { get; set; }
-        bool HasError { get; }
-        bool AddTypeToText { get; set; }
-        bool HasErrors { get; }
-        void Init();
-        void ForceRefresh();
-    }
-
-    public class ErrorProviderBase<T, TE> : AsyncViewModelBase, IErrorProviderBase where T : class
+    public class ErrorProviderBase<T, TE> :
+        AsyncViewModelBase,
+        IErrorProviderBase where T : class
         where TE : class, IErrorInfoProvider<T>, new()
     {
         private string _error;
@@ -34,6 +25,9 @@ namespace JPB.ErrorValidation
             }
             set
             {
+                if(value == _error)
+                    return;
+
                 _error = value;
 
                 base.ThreadSaveAction(() =>
@@ -59,7 +53,6 @@ namespace JPB.ErrorValidation
             if (ErrorObserver<T>.Instance.GetProviderViaType() == null)
                 ErrorObserver<T>.Instance.RegisterErrorProvider(new TE());
             //TODO add async validation
-
             //ErrorInfoProviderSimpleAccessAdapter.Errors.CollectionChanged += ErrorsOnCollectionChanged;
 
             AddTypeToText = true;

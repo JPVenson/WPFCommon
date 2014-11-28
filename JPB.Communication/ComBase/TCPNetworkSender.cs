@@ -160,25 +160,26 @@ namespace JPB.Communication.ComBase
             var task = new Task<T>(() =>
             {
                 var result = default(T);
-                var waitForResponsive = new AutoResetEvent(false);
-                //We await a responce on the same port than we send it
-                var reciever = NetworkFactory.Instance.GetReceiver(Port);
-                //register a callback that is filtered by the Guid we send inside our requst
-                reciever.RegisterRequst(s =>
+                AutoResetEvent waitForResponsive;
+                using (waitForResponsive = new AutoResetEvent(false))
                 {
-                    if (s.Message is T)
-                        result = (T)s.Message;
-                    // ReSharper disable AccessToDisposedClosure
-                    waitForResponsive.Set();
-                    // ReSharper restore AccessToDisposedClosure
-                }, mess.Id);
-                var isSend = SendMessage(mess, ip);
-                if (isSend)
-                {
-                    waitForResponsive.WaitOne(Timeout);
+                    var reciever = NetworkFactory.Instance.GetReceiver(Port);
+                    //register a callback that is filtered by the Guid we send inside our requst
+                    reciever.RegisterRequst(s =>
+                    {
+                        if (s.Message is T)
+                            result = (T)s.Message;
+                        if (waitForResponsive != null) 
+                            waitForResponsive.Set();
+                    }, mess.Id);
+                    var isSend = SendMessage(mess, ip);
+                    if (isSend)
+                    {
+                        waitForResponsive.WaitOne(Timeout);
+                    }
+                    reciever.UnRegisterCallback(mess.Id);
                 }
-                reciever.UnRegisterCallback(mess.Id);
-                waitForResponsive.Dispose();
+                waitForResponsive = null;
                 return result;
             });
             task.Start();

@@ -38,11 +38,6 @@ namespace JPB.Extentions.Extensions
             return source.Where(e => e is T).Cast<T>();
         }
 
-        public static string[] ToStringArray(this List<string> source)
-        {
-            return source.ToArray();
-        }
-
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<Object> enumerableList)
             where T : class
         {
@@ -63,42 +58,6 @@ namespace JPB.Extentions.Extensions
                 obCollection.Add(item);
 
             return obCollection;
-        }
-
-        public static ICollection<T> Cast<T, E>(this ICollection<E> enumerableList, string property)
-            where E : class
-            where T : class
-        {
-            PropertyInfo _compareProperty = typeof(E).GetProperty(property);
-
-            //var buff = sourcelist
-            //    .FirstOrDefault(s => _compareProperty.GetValue(s, null)
-            //        .Equals(_compareProperty.GetValue(Selectetitem, null)));
-
-            var buff = new ObservableCollection<T>();
-
-            foreach (E item in enumerableList)
-                buff.Add(_compareProperty.GetValue(item, null));
-
-            return buff;
-        }
-
-        public static IEnumerable<T> Cast<T, E>(this IEnumerable<E> enumerableList, string property)
-            where E : class
-            where T : class
-        {
-            PropertyInfo _compareProperty = typeof(E).GetProperty(property);
-
-            //var buff = sourcelist
-            //    .FirstOrDefault(s => _compareProperty.GetValue(s, null)
-            //        .Equals(_compareProperty.GetValue(Selectetitem, null)));
-
-            var buff = new List<T>();
-
-            foreach (E item in enumerableList)
-                buff.Add(_compareProperty.GetValue(item, null));
-
-            return buff;
         }
     }
 }

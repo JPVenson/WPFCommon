@@ -20,7 +20,7 @@ namespace JPB.Communication.ComBase
             _sock = new Socket(IPAddress.Any.AddressFamily,
                                SocketType.Stream,
                                ProtocolType.Tcp);
-            _sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true); 
             _sock.Bind(new IPEndPoint(NetworkInfoBase.IpAddress, Port));
 
             // Bind the socket to the address and port.

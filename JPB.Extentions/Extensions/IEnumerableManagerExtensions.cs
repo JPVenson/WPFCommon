@@ -28,25 +28,7 @@ namespace JPB.Extentions.Extensions
             }
             return -1;
         }
-
-        /// <summary>
-        ///     Add an element to the end of the <c>IEnumerable</c>
-        /// </summary>
-        /// <typeparam name="T">The source Type</typeparam>
-        /// <param name="source">An IEnumerable</param>
-        /// <param name="item">The neu element if null a new element</param>
-        public static void Add<T>(this IEnumerable<T> source, T item) where T : new()
-        {
-            var list1 = source as List<T>;
-            var list = source as List<T>;
-
-            if (!(item == null))
-            {
-                if (list != null) list.Add(item);
-            }
-            else if (list1 != null) list1.Add(new T());
-        }
-
+        
         /// <summary cref="Can be Null">
         ///     Adding the <see>ItemToAdd</see> to the <see>sourcelist</see> and return the new added item
         /// </summary>
