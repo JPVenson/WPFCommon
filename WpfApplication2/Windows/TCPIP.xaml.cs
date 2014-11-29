@@ -10,22 +10,24 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using JPB.DynamicInputBox;
-using JPB.DynamicInputBox.InfoWindow;
 
-namespace WpfApplication2
+namespace WpfApplication2.Windows
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for TCPIP.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class TCPIP : Window
     {
-        public MainWindow()
+        public TCPIP()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
+            this.DataContext = new TcpIpDebugger();
+
+            Application.Current.MainWindow.Closing += (sender, args) =>
+            {
+               this.Close();
+            };
         }
     }
 }

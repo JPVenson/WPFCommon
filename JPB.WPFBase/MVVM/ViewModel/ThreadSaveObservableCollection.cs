@@ -100,8 +100,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
             {
                 actorHelper.ThreadSaveAction(
                     () =>
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
-                            enumerable.Last())));
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,enumerable.Last())));
             }
         }
 

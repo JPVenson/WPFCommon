@@ -10,22 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using JPB.DynamicInputBox;
-using JPB.DynamicInputBox.InfoWindow;
 
-namespace WpfApplication2
+namespace WpfApplication2.Windows
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for recs.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class recs : Window
     {
-        public MainWindow()
+        public recs()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
         }
     }
 }

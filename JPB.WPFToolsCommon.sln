@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApplication1", "WpfAppli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApplication2", "WpfApplication2\WpfApplication2.csproj", "{0D8FC4C1-A490-43D2-A243-771D467DAB2F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFNetworkIntigration", "JPB.WPFNetworkIntigration\JPB.WPFNetworkIntigration.csproj", "{C7FA6C12-319F-45B2-8428-02DBA2586569}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,14 @@ Global
 		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Server|Any CPU.ActiveCfg = Release|Any CPU
 		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Server|Any CPU.Build.0 = Release|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.ExternalRelease|Any CPU.Build.0 = Release|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Server|Any CPU.ActiveCfg = Release|Any CPU
+		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Server|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
