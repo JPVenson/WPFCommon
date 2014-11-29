@@ -39,5 +39,10 @@
         {
             get { return "GUS-ABB1D663-B6BF-42BD-90A6-DFBC196AE1CE"; }
         }
+
+        public static string CollectionUpdateItem
+        {
+            get { return "UPI-1A0AE184-3C66-4B73-9E0A-6C2B9C393EFC"; }
+        }
     }
 }

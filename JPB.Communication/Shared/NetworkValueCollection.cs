@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,7 +50,8 @@ namespace JPB.Communication.Shared
         public List<string> CollectionRecievers { get; protected set; }
 
         protected ObservableCollection<T> _localValues;
-        readonly TCPNetworkSender _tcpNetworkSernder;
+        protected TCPNetworkReceiver tcpNetworkReceiver;
+        protected readonly TCPNetworkSender _tcpNetworkSernder;
 
         public NetworkValueCollection(short port, string guid)
         {
@@ -66,7 +68,7 @@ namespace JPB.Communication.Shared
             Guid = guid;
             _localValues = new ObservableCollection<T>();
             SyncRoot = new object();
-            TCPNetworkReceiver tcpNetworkReceiver = NetworkFactory.Instance.GetReceiver(port);
+            tcpNetworkReceiver = NetworkFactory.Instance.GetReceiver(port);
             tcpNetworkReceiver.RegisterChanged(pPullAddMessage, NetworkCollectionProtocol.CollectionAdd);
             tcpNetworkReceiver.RegisterChanged(pPullClearMessage, NetworkCollectionProtocol.CollectionReset);
             tcpNetworkReceiver.RegisterChanged(pPullRemoveMessage, NetworkCollectionProtocol.CollectionRemove);
@@ -220,7 +222,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             }
         }
 
-        protected void SendPessage(string id, T value)
+        protected void SendPessage(string id, object value)
         {
             var mess = new MessageBase(new NetworkCollectionMessage(value) { Guid = Guid }) { InfoState = id };
 
@@ -269,7 +271,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             return GetEnumerator();
         }
 
-        public void Add(T item)
+        public virtual void Add(T item)
         {
             lock (SyncRoot)
             {
@@ -350,6 +352,83 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
                     _localValues.Add(item);
                 }
             }
+        }
+    }
+
+    public interface IUniqItem : IComparable
+    {
+        object Guid { get; set; }
+    }
+
+    public class NetworkCollection<T> : NetworkValueCollection<T>
+        where T : class, INotifyPropertyChanged,
+        IUniqItem,
+        new()
+    {
+        public NetworkCollection(short port, string guid)
+            : base(port, guid)
+        {
+            base.tcpNetworkReceiver.RegisterChanged(pPullPropertyChanged, NetworkCollectionProtocol.CollectionUpdateItem);
+        }
+
+        private void pPullPropertyChanged(MessageBase obj)
+        {
+            PullPropertyChanged(obj);
+        }
+
+        protected void PullPropertyChanged(MessageBase obj)
+        {
+            if (obj.Message is NetworkCollectionMessage)
+            {
+                var mess = obj.Message as NetworkCollectionMessage;
+                if (mess.Guid != null && Guid.Equals(mess.Guid) && mess.Value is T)
+                {
+                    var updateInfo = mess.Value as UpdateItemPropertyWrapper;
+                    
+                    lock (SyncRoot)
+                    {
+                        var localItem = _localValues.FirstOrDefault(s => s.Guid == updateInfo.Guid);
+                        if (localItem == null)
+                            return;
+                        typeof(T).GetProperty(updateInfo.Property).SetValue(localItem, updateInfo.Value);
+                    }
+                }
+            }
+        }
+
+        public override void Add(T item)
+        {
+            base.Add(item);
+            item.PropertyChanged += item_PropertyChanged;
+        }
+
+        [Serializable]
+        public class UpdateItemPropertyWrapper
+        {
+            public UpdateItemPropertyWrapper()
+            {
+
+            }
+
+            public object Guid { get; set; }
+            public string Property { get; set; }
+            public object Value { get; set; }
+        }
+
+        void item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var obj = sender as T;
+            if (obj == null)
+                return;
+
+            var changedProperty = typeof(T).GetProperty(e.PropertyName).GetValue(obj);
+
+            base.SendPessage(NetworkCollectionProtocol.CollectionUpdateItem, new UpdateItemPropertyWrapper()
+            {
+                Property = e.PropertyName,
+                Value = changedProperty,
+                Guid = obj.Guid
+            });
         }
     }
 }
