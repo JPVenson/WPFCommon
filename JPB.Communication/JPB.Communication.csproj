@@ -66,7 +66,6 @@
     <Compile Include="ComBase\TCPNetworkSender.cs" />
     <Compile Include="ComBase\ConnectionBase.cs" />
     <Compile Include="ComBase\TcpConnection.cs" />
-    <Compile Include="ComBase\InfoState.cs" />
     <Compile Include="ComBase\NetworkInfoBase.cs" />
     <Compile Include="ComBase\TcpMessage.cs" />
     <Compile Include="NetworkFactory.cs" />

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ using JPB.Communication.ComBase.Messages;
 namespace JPB.Communication.Shared
 {
     /// <summary>
-    /// This class holds and Updates values that will be Synced over the Network
+    /// This class holds and Updates unsorted values that will be Synced over the Network
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class NetworkValueCollection<T> :
@@ -22,6 +21,11 @@ namespace JPB.Communication.Shared
         INotifyCollectionChanged,
         IDisposable
     {
+        public static NetworkValueCollection<T> CreateNetworkValueCollection(short port, string guid)
+        {
+            return new NetworkValueCollection<T>(port, guid);
+        }
+
         static NetworkValueCollection()
         {
             Guids = new List<string>();
@@ -53,7 +57,7 @@ namespace JPB.Communication.Shared
         protected TCPNetworkReceiver tcpNetworkReceiver;
         protected readonly TCPNetworkSender _tcpNetworkSernder;
 
-        public NetworkValueCollection(short port, string guid)
+        protected NetworkValueCollection(short port, string guid)
         {
             RegisterCollecion(guid);
 
@@ -68,6 +72,7 @@ namespace JPB.Communication.Shared
             Guid = guid;
             _localValues = new ObservableCollection<T>();
             SyncRoot = new object();
+
             tcpNetworkReceiver = NetworkFactory.Instance.GetReceiver(port);
             tcpNetworkReceiver.RegisterChanged(pPullAddMessage, NetworkCollectionProtocol.CollectionAdd);
             tcpNetworkReceiver.RegisterChanged(pPullClearMessage, NetworkCollectionProtocol.CollectionReset);
@@ -140,6 +145,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
         public object SyncRoot { get; protected set; }
         public bool IsReadOnly { get { return false; } }
         public bool IsDisposing { get; protected set; }
+
         public bool IsSynchronized
         {
             get { return !Monitor.IsEntered(SyncRoot); }
@@ -222,7 +228,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             }
         }
 
-        protected void SendPessage(string id, object value)
+        protected async void SendPessage(string id, object value)
         {
             var mess = new MessageBase(new NetworkCollectionMessage(value) { Guid = Guid }) { InfoState = id };
 
@@ -233,7 +239,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             }
 
             //Possible long term work
-            var sendMultiMessage = _tcpNetworkSernder.SendMultiMessage(mess, ips);
+            var sendMultiMessage = await _tcpNetworkSernder.SendMultiMessageAsync(mess, ips);
 
             lock (SyncRoot)
             {
@@ -241,17 +247,17 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             }
         }
 
-        protected void PushAddMessage(T item)
+        protected async void PushAddMessage(T item)
         {
             SendPessage(NetworkCollectionProtocol.CollectionAdd, item);
         }
 
-        protected void PushClearMessage()
+        protected async void PushClearMessage()
         {
             SendPessage(NetworkCollectionProtocol.CollectionReset, default(T));
         }
 
-        protected void PushRemoveMessage(T item)
+        protected async void PushRemoveMessage(T item)
         {
             SendPessage(NetworkCollectionProtocol.CollectionRemove, item);
         }
@@ -289,6 +295,15 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             }
         }
 
+        public bool Remove(T item)
+        {
+            lock (SyncRoot)
+            {
+                PushRemoveMessage(item);
+                return _localValues.Remove(item);
+            }
+        }
+
         public bool Contains(T item)
         {
             lock (SyncRoot)
@@ -302,15 +317,6 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             lock (SyncRoot)
             {
                 _localValues.CopyTo(array, arrayIndex);
-            }
-        }
-
-        public bool Remove(T item)
-        {
-            lock (SyncRoot)
-            {
-                PushRemoveMessage(item);
-                return _localValues.Remove(item);
             }
         }
 
@@ -352,83 +358,6 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
                     _localValues.Add(item);
                 }
             }
-        }
-    }
-
-    public interface IUniqItem : IComparable
-    {
-        object Guid { get; set; }
-    }
-
-    public class NetworkCollection<T> : NetworkValueCollection<T>
-        where T : class, INotifyPropertyChanged,
-        IUniqItem,
-        new()
-    {
-        public NetworkCollection(short port, string guid)
-            : base(port, guid)
-        {
-            base.tcpNetworkReceiver.RegisterChanged(pPullPropertyChanged, NetworkCollectionProtocol.CollectionUpdateItem);
-        }
-
-        private void pPullPropertyChanged(MessageBase obj)
-        {
-            PullPropertyChanged(obj);
-        }
-
-        protected void PullPropertyChanged(MessageBase obj)
-        {
-            if (obj.Message is NetworkCollectionMessage)
-            {
-                var mess = obj.Message as NetworkCollectionMessage;
-                if (mess.Guid != null && Guid.Equals(mess.Guid) && mess.Value is T)
-                {
-                    var updateInfo = mess.Value as UpdateItemPropertyWrapper;
-                    
-                    lock (SyncRoot)
-                    {
-                        var localItem = _localValues.FirstOrDefault(s => s.Guid == updateInfo.Guid);
-                        if (localItem == null)
-                            return;
-                        typeof(T).GetProperty(updateInfo.Property).SetValue(localItem, updateInfo.Value);
-                    }
-                }
-            }
-        }
-
-        public override void Add(T item)
-        {
-            base.Add(item);
-            item.PropertyChanged += item_PropertyChanged;
-        }
-
-        [Serializable]
-        public class UpdateItemPropertyWrapper
-        {
-            public UpdateItemPropertyWrapper()
-            {
-
-            }
-
-            public object Guid { get; set; }
-            public string Property { get; set; }
-            public object Value { get; set; }
-        }
-
-        void item_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            var obj = sender as T;
-            if (obj == null)
-                return;
-
-            var changedProperty = typeof(T).GetProperty(e.PropertyName).GetValue(obj);
-
-            base.SendPessage(NetworkCollectionProtocol.CollectionUpdateItem, new UpdateItemPropertyWrapper()
-            {
-                Property = e.PropertyName,
-                Value = changedProperty,
-                Guid = obj.Guid
-            });
         }
     }
 }

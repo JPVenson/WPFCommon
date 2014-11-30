@@ -21,30 +21,58 @@ namespace JPB.Communication.ComBase
 
         protected virtual void RaiseMessageSended(MessageBase message)
         {
-            var handler = OnMessageSend;
-            if (handler != null)
-                handler(message, Port);
+            try
+            {
+                var handler = OnMessageSend;
+                if (handler != null)
+                    handler(message, Port);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         protected virtual void RaiseIncommingMessage(string strReceived)
         {
-            var handler = OnIncommingMessage;
-            if (handler != null)
-                handler(this, strReceived);
+            try
+            {
+                var handler = OnIncommingMessage;
+                if (handler != null)
+                    handler(this, strReceived);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         protected virtual void RaiseNewItemLoadedFail(string strReceived)
         {
-            var handler = OnNewItemLoadedFail;
-            if (handler != null)
-                handler(this, strReceived);
+            try
+            {
+                var handler = OnNewItemLoadedFail;
+                if (handler != null)
+                    handler(this, strReceived);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         protected virtual void RaiseNewItemLoadedSuccess(MessageBase loadMessageBaseFromBinary)
         {
-            var handler = OnNewItemLoadedSuccess;
-            if (handler != null)
-                handler(loadMessageBaseFromBinary, Port);
+            try
+            {
+                var handler = OnNewItemLoadedSuccess;
+                if (handler != null)
+                    handler(loadMessageBaseFromBinary, Port);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         internal static Encoding Encoding = Encoding.UTF8;

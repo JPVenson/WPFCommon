@@ -40,6 +40,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IUniqItem.cs" />
+    <Compile Include="NetworkCollection.cs" />
     <Compile Include="NetworkValueCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

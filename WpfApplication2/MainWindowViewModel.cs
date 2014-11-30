@@ -69,9 +69,6 @@ namespace WpfApplication2
             dp.Children.Add(recs);
             rec.Content = dp;
             rec.Show();
-
-
-            
         }
 
         private string _inputText;

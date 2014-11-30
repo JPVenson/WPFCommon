@@ -14,7 +14,6 @@ namespace JPB.Communication.ComBase
         
         internal bool Parse(string strReceived)
         {
-            //Console.WriteLine("RECIVED: \"" + strReceived + "\"\r\n");
             TcpMessage item;
             try
             {
