@@ -27,21 +27,20 @@ namespace WpfApplication2
             RemoveSelectedFromListCommand = new DelegateCommand(ExecuteRemoveSelectedFromList, CanExecuteRemoveSelectedFromList);
             NetworkValueCollection = new BindableNetworkValueCollection<string>(1337, "test");
 
-            string showInput;
-            IPAddress buffOutput;
-            do
-            {
-                showInput = InputWindow.ShowInput("Connect to: ", EingabeModus.Text) as string;
-                if(string.IsNullOrEmpty(showInput))
-                    break;
-            } while (!IPAddress.TryParse(showInput, out buffOutput));
+            string showInput = "VS-VIRT1-NATDEV";
 
-            var master = "192.168.1.10";
-            var slave = "192.168.1.5";
-            if (!string.IsNullOrEmpty(showInput))
-            {
-                NetworkValueCollection.Connect(showInput);
-            }
+            //IPAddress buffOutput;
+            //do
+            //{
+            //    showInput = InputWindow.ShowInput("Connect to: ", EingabeModus.Text) as string;
+            //    if (string.IsNullOrEmpty(showInput))
+            //        break;
+            //    var firstOrDefault = Dns.GetHostAddresses(showInput).FirstOrDefault();
+            //    if (firstOrDefault != null)
+            //        showInput = firstOrDefault.ToString();
+            //} while (!IPAddress.TryParse(showInput, out buffOutput));
+
+            NetworkValueCollection.Connect("192.168.0.222");
 
             new TCPIP().Show();
             new ActionTriggerWindow(NetworkValueCollection).Show();
@@ -111,7 +110,7 @@ namespace WpfApplication2
 
         public void ExecuteAddToList(object sender)
         {
-            NetworkValueCollection.Add(InputText);
+            NetworkValueCollection.Add(string.Format("{0}:{1}", Environment.UserName, InputText));
         }
 
         public bool CanExecuteAddToList(object sender)

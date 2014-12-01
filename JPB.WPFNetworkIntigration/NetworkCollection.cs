@@ -6,14 +6,15 @@ using JPB.Communication.ComBase.Messages;
 namespace JPB.Communication.Shared
 {
     public class NetworkCollection<T> : NetworkValueCollection<T>
-        where T : class, INotifyPropertyChanged,
+        where T : class,
+            INotifyPropertyChanged,
             IUniqItem,
             new()
     {
         public NetworkCollection(short port, string guid)
             : base(port, guid)
         {
-            base.tcpNetworkReceiver.RegisterChanged(pPullPropertyChanged, NetworkCollectionProtocol.CollectionUpdateItem);
+            base.TcpNetworkReceiver.RegisterChanged(pPullPropertyChanged, NetworkCollectionProtocol.CollectionUpdateItem);
         }
 
         private void pPullPropertyChanged(MessageBase obj)
@@ -29,10 +30,10 @@ namespace JPB.Communication.Shared
                 if (mess.Guid != null && Guid.Equals(mess.Guid) && mess.Value is T)
                 {
                     var updateInfo = mess.Value as UpdateItemPropertyWrapper;
-                    
+
                     lock (SyncRoot)
                     {
-                        var localItem = _localValues.FirstOrDefault(s => s.Guid == updateInfo.Guid);
+                        var localItem = LocalValues.FirstOrDefault(s => s.Guid == updateInfo.Guid);
                         if (localItem == null)
                             return;
                         typeof(T).GetProperty(updateInfo.Property).SetValue(localItem, updateInfo.Value);

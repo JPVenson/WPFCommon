@@ -39,6 +39,9 @@ namespace JPB.Communication.ComBase.Messages
             InfoState = info.GetValue("InfoState", typeof(object));
             Id = (Guid)info.GetValue("ID", typeof(Guid));
             RecievedAt = (DateTime)info.GetValue("RecievedAt", typeof(DateTime));
+
+            Sender = (string)info.GetValue("Sender", typeof(string));
+            Reciver = (string)info.GetValue("Reciver", typeof(string));
         }
 
         public object Message
@@ -76,6 +79,9 @@ namespace JPB.Communication.ComBase.Messages
                 Message = new object();
             if (InfoState == null)
                 InfoState = new object();
+
+            info.AddValue("Reciver", Reciver, Reciver.GetType());
+            info.AddValue("Sender", Sender, Sender.GetType());
 
             info.AddValue("Message", Message, Message.GetType());
             info.AddValue("InfoState", InfoState, InfoState.GetType());

@@ -49,13 +49,13 @@ namespace JPB.Communication.Shared
             return sender;
         }
 
-        public string ConnectedToHost { get; private set; }
+        public string ConnectedToHost { get; protected set; }
         protected static List<string> Guids;
         public List<string> CollectionRecievers { get; protected set; }
 
-        protected ObservableCollection<T> _localValues;
-        protected TCPNetworkReceiver tcpNetworkReceiver;
-        protected readonly TCPNetworkSender _tcpNetworkSernder;
+        protected ICollection<T> LocalValues;
+        protected readonly TCPNetworkReceiver TcpNetworkReceiver;
+        protected readonly TCPNetworkSender TcpNetworkSernder;
 
         protected NetworkValueCollection(short port, string guid)
         {
@@ -70,31 +70,53 @@ namespace JPB.Communication.Shared
 
             Port = port;
             Guid = guid;
-            _localValues = new ObservableCollection<T>();
+            LocalValues = new ObservableCollection<T>();
             SyncRoot = new object();
 
-            tcpNetworkReceiver = NetworkFactory.Instance.GetReceiver(port);
-            tcpNetworkReceiver.RegisterChanged(pPullAddMessage, NetworkCollectionProtocol.CollectionAdd);
-            tcpNetworkReceiver.RegisterChanged(pPullClearMessage, NetworkCollectionProtocol.CollectionReset);
-            tcpNetworkReceiver.RegisterChanged(pPullRemoveMessage, NetworkCollectionProtocol.CollectionRemove);
-            tcpNetworkReceiver.RegisterChanged(PullRegisterMessage, NetworkCollectionProtocol.CollectionRegisterUser);
-            tcpNetworkReceiver.RegisterChanged(PullUnRegisterMessage, NetworkCollectionProtocol.CollectionUnRegisterUser);
-            tcpNetworkReceiver.RegisterRequstHandler(PullGetCollectionMessage, NetworkCollectionProtocol.CollectionGetCollection);
-            tcpNetworkReceiver.RegisterRequstHandler(PullConnectMessage, NetworkCollectionProtocol.CollectionGetUsers);
 
-            _tcpNetworkSernder = NetworkFactory.Instance.GetSender(port);
+            TcpNetworkReceiver = NetworkFactory.Instance.GetReceiver(port);
+            TcpNetworkSernder = NetworkFactory.Instance.GetSender(port);
+            RegisterCallbacks();
+        }
+
+        private void RegisterCallbacks()
+        {
+            TcpNetworkReceiver.RegisterChanged(pPullAddMessage, NetworkCollectionProtocol.CollectionAdd);
+            TcpNetworkReceiver.RegisterChanged(pPullClearMessage, NetworkCollectionProtocol.CollectionReset);
+            TcpNetworkReceiver.RegisterChanged(pPullRemoveMessage, NetworkCollectionProtocol.CollectionRemove);
+            TcpNetworkReceiver.RegisterChanged(PullRegisterMessage, NetworkCollectionProtocol.CollectionRegisterUser);
+            TcpNetworkReceiver.RegisterChanged(PullUnRegisterMessage, NetworkCollectionProtocol.CollectionUnRegisterUser);
+            TcpNetworkReceiver.RegisterRequstHandler(PullGetCollectionMessage, NetworkCollectionProtocol.CollectionGetCollection);
+            TcpNetworkReceiver.RegisterRequstHandler(PullConnectMessage, NetworkCollectionProtocol.CollectionGetUsers);
+        }
+
+        private void UnRegisterCallbacks()
+        {
+            TcpNetworkReceiver.UnregisterChanged(pPullAddMessage, NetworkCollectionProtocol.CollectionAdd);
+            TcpNetworkReceiver.UnregisterChanged(pPullClearMessage, NetworkCollectionProtocol.CollectionReset);
+            TcpNetworkReceiver.UnregisterChanged(pPullRemoveMessage, NetworkCollectionProtocol.CollectionRemove);
+            TcpNetworkReceiver.UnregisterChanged(PullRegisterMessage, NetworkCollectionProtocol.CollectionRegisterUser);
+            TcpNetworkReceiver.UnregisterChanged(PullUnRegisterMessage, NetworkCollectionProtocol.CollectionUnRegisterUser);
+            TcpNetworkReceiver.UnRegisterRequstHandler(PullGetCollectionMessage, NetworkCollectionProtocol.CollectionGetCollection);
+            TcpNetworkReceiver.UnRegisterRequstHandler(PullConnectMessage, NetworkCollectionProtocol.CollectionGetUsers);
         }
 
         protected object PullConnectMessage(RequstMessage arg)
         {
-            lock (SyncRoot)
-            {
-                if (!this.CollectionRecievers.Contains(arg.Sender))
-                    this.CollectionRecievers.Add(arg.Sender);
-                if (!this.CollectionRecievers.Contains(NetworkInfoBase.IpAddress.ToString()))
-                    this.CollectionRecievers.Add(NetworkInfoBase.IpAddress.ToString());
-                return this.CollectionRecievers.ToArray();
-            }
+            if (arg.Message is string && arg.Message == Guid)
+                lock (SyncRoot)
+                {
+                    if (!this.CollectionRecievers.Contains(arg.Sender))
+                    {
+                        this.CollectionRecievers.Add(arg.Sender);
+                    }
+                    if (!this.CollectionRecievers.Contains(NetworkInfoBase.IpAddress.ToString()))
+                    {
+                        this.CollectionRecievers.Add(NetworkInfoBase.IpAddress.ToString());
+                    }
+                    return this.CollectionRecievers.ToArray();
+                }
+            return null;
         }
 
         /// <summary>
@@ -105,11 +127,13 @@ namespace JPB.Communication.Shared
         /// </summary>
         /// <param name="host"></param>
         /// <returns></returns>
-        public async Task<bool> Connect(string host)
+        public virtual async Task<bool> Connect(string host)
         {
+            var collection = GetCollection(host, this.Port);
+
             ConnectedToHost = host;
-            var sendRequstMessage = await _tcpNetworkSernder.SendRequstMessage<string[]>(
-                new RequstMessage() { InfoState = NetworkCollectionProtocol.CollectionGetUsers }, host);
+            var sendRequstMessage = await TcpNetworkSernder.SendRequstMessage<string[]>(
+                new RequstMessage() { InfoState = NetworkCollectionProtocol.CollectionGetUsers, Message = Guid }, host);
 
             var users = sendRequstMessage;
 
@@ -120,13 +144,15 @@ namespace JPB.Communication.Shared
 
             this.CollectionRecievers = new List<string>(users);
 #pragma warning disable 4014
-            _tcpNetworkSernder.SendMultiMessageAsync(
+            TcpNetworkSernder.SendMultiMessageAsync(
 #pragma warning restore 4014
 new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser }, users);
+            Registerd = true;
 
-            foreach (var item in await GetCollection(host, this.Port))
+            foreach (var item in await collection)
             {
-                _localValues.Add(item);
+                LocalValues.Add(item);
+                TriggerAdd(item);
             }
             return true;
         }
@@ -135,16 +161,18 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
         {
             lock (SyncRoot)
             {
-                return _localValues.ToArray();
+                return LocalValues.ToArray();
             }
         }
 
         public short Port { get; private set; }
         public string Guid { get; protected set; }
-        public int Count { get { return _localValues.Count; } }
+        public int Count { get { return LocalValues.Count; } }
         public object SyncRoot { get; protected set; }
         public bool IsReadOnly { get { return false; } }
         public bool IsDisposing { get; protected set; }
+
+        public bool Registerd { get; protected set; }
 
         public bool IsSynchronized
         {
@@ -164,7 +192,25 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
         {
             lock (SyncRoot)
             {
-                CollectionRecievers.RemoveAll(s => s.Equals(obj.Sender));
+                //We got a Single 
+                if (obj.Message is IEnumerable<string>)
+                {
+                    var diabled = obj.Message as IEnumerable<string>;
+                    CollectionRecievers.RemoveAll(s => diabled.Contains(s));
+                }
+                else
+                {
+                    CollectionRecievers.RemoveAll(s => s == obj.Sender);
+                }
+            }
+        }
+
+        protected void PushUnRegisterMessage()
+        {
+            lock (SyncRoot)
+            {
+                Registerd = false;
+                TcpNetworkSernder.SendMultiMessageAsync(new MessageBase(new object()), CollectionRecievers.ToArray());
             }
         }
 
@@ -192,7 +238,8 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
                 {
                     lock (SyncRoot)
                     {
-                        _localValues.Add((T)mess.Value);
+                        LocalValues.Add((T)mess.Value);
+                        TriggerAdd((T)mess.Value);
                     }
                 }
             }
@@ -207,7 +254,8 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
                 {
                     lock (SyncRoot)
                     {
-                        _localValues.Clear();
+                        LocalValues.Clear();
+                        TriggerReset();
                     }
                 }
             }
@@ -222,7 +270,11 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
                 {
                     lock (SyncRoot)
                     {
-                        _localValues.Remove((T)mess.Value);
+                        var value = (T)mess.Value;
+                        var indexOf = IndexOf(value);
+                        var remove = LocalValues.Remove(value);
+                        if (remove)
+                            TriggerRemove(value, indexOf);
                     }
                 }
             }
@@ -230,7 +282,13 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
 
         protected async void SendPessage(string id, object value)
         {
-            var mess = new MessageBase(new NetworkCollectionMessage(value) { Guid = Guid }) { InfoState = id };
+            var mess = new MessageBase(new NetworkCollectionMessage(value)
+            {
+                Guid = Guid
+            })
+            {
+                InfoState = id
+            };
 
             string[] ips;
             lock (SyncRoot)
@@ -239,7 +297,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             }
 
             //Possible long term work
-            var sendMultiMessage = await _tcpNetworkSernder.SendMultiMessageAsync(mess, ips);
+            var sendMultiMessage = await TcpNetworkSernder.SendMultiMessageAsync(mess, ips);
 
             lock (SyncRoot)
             {
@@ -267,7 +325,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             T[] array;
             lock (SyncRoot)
             {
-                array = _localValues.ToArray();
+                array = LocalValues.ToArray();
             }
             return array.Cast<T>().GetEnumerator();
         }
@@ -282,7 +340,8 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             lock (SyncRoot)
             {
                 PushAddMessage(item);
-                _localValues.Add(item);
+                LocalValues.Add(item);
+                TriggerAdd(item);
             }
         }
 
@@ -291,8 +350,25 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             lock (SyncRoot)
             {
                 PushClearMessage();
-                _localValues.Clear();
+                LocalValues.Clear();
+                TriggerReset();
             }
+        }
+
+        public int IndexOf(T item)
+        {
+            int result = -1;
+            for (int i = 0; i < LocalValues.Count; i++)
+            {
+                var localValue = LocalValues.ElementAt(i);
+
+                if (localValue.Equals(item))
+                {
+                    result = i;
+                    break;
+                }
+            }
+            return result;
         }
 
         public bool Remove(T item)
@@ -300,7 +376,10 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             lock (SyncRoot)
             {
                 PushRemoveMessage(item);
-                return _localValues.Remove(item);
+                var remove = LocalValues.Remove(item);
+                if (remove)
+                    TriggerRemove(item, IndexOf(item));
+                return remove;
             }
         }
 
@@ -308,7 +387,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
         {
             lock (SyncRoot)
             {
-                return _localValues.Contains(item);
+                return LocalValues.Contains(item);
             }
         }
 
@@ -316,7 +395,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
         {
             lock (SyncRoot)
             {
-                _localValues.CopyTo(array, arrayIndex);
+                LocalValues.CopyTo(array, arrayIndex);
             }
         }
 
@@ -324,9 +403,9 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
         {
             lock (SyncRoot)
             {
-                for (int i = index; i < _localValues.Count; i++)
+                for (int i = index; i < LocalValues.Count; i++)
                 {
-                    var localValue = _localValues[i];
+                    var localValue = LocalValues.ElementAt(i);
                     array.SetValue(localValue, i);
                 }
             }
@@ -338,14 +417,40 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
                 return;
 
             IsDisposing = true;
+            UnRegisterCallbacks();
+
             Guids.Remove(Guid);
-            _localValues = null;
+            LocalValues = null;
+            PushUnRegisterMessage();
         }
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged
+        ~NetworkValueCollection()
         {
-            add { this._localValues.CollectionChanged += value; }
-            remove { this._localValues.CollectionChanged -= value; }
+            Dispose();
+        }
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public void TriggerAdd(T added)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added));
+        }
+
+        public void TriggerRemove(T removed, int result)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed, result));
+        }
+
+        public void TriggerReset()
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            var handler = CollectionChanged;
+            if (handler != null)
+                handler(this, e);
         }
 
         public virtual async void Reload()
@@ -353,9 +458,10 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             var collection = await GetCollection(ConnectedToHost, 1337);
             lock (SyncRoot)
             {
+                LocalValues.Clear();
                 foreach (var item in collection)
                 {
-                    _localValues.Add(item);
+                    LocalValues.Add(item);
                 }
             }
         }

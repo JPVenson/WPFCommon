@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using JPB.Communication.ComBase;
 using JPB.DynamicInputBox;
 using JPB.DynamicInputBox.InfoWindow;
 
@@ -26,6 +27,7 @@ namespace WpfApplication2
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
+            Title = NetworkInfoBase.IpAddress.ToString();
         }
     }
 }

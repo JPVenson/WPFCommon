@@ -43,12 +43,21 @@ namespace JPB.Communication.ComBase
                     {
                         //message with return value inbound
                         var requstInbound = messCopy as RequstMessage;
-                        var firstOrDefault = _requestHandler.FirstOrDefault(pendingrequest => pendingrequest.Item2.Equals(requstInbound.InfoState));
-                        if (firstOrDefault != null)
+                        var firstOrDefault = _requestHandler.Where(pendingrequest => pendingrequest.Item2.Equals(requstInbound.InfoState)).ToArray();
+                        if (firstOrDefault.Any())
                         {
-                            //Found a handler for that message and executed it
-                            var result = firstOrDefault.Item1(requstInbound);
-                            if (result == null)
+                            object result = null;
+
+                            foreach (var tuple in firstOrDefault)
+                            {
+                                //Found a handler for that message and executed it
+
+                                result = tuple.Item1(requstInbound);
+                                if (result == null)
+                                    continue;
+                            }
+
+                            if(result == null)
                                 return;
 
                             var sender = NetworkFactory.Instance.GetSender(Port);
@@ -123,6 +132,24 @@ namespace JPB.Communication.ComBase
 
         public bool IsDisposing { get; private set; }
 
+        public void UnregisterChanged(Action<MessageBase> action, object state)
+        {
+            var enumerable = _updated.FirstOrDefault(s => s.Item1 == action && s.Item2 == state);
+            if (enumerable != null)
+            {
+                _updated.Remove(enumerable);
+            }
+        }
+
+        public void UnregisterChanged(Action<MessageBase> action)
+        {
+            var enumerable = _updated.FirstOrDefault(s => s.Item1 == action);
+            if (enumerable != null)
+            {
+                _updated.Remove(enumerable);
+            }
+        }
+
         /// <summary>
         /// Register a Callback localy that will be used when a new message is inbound that has state in its InfoState
         /// </summary>
@@ -151,6 +178,25 @@ namespace JPB.Communication.ComBase
         public void RegisterRequstHandler(Func<RequstMessage, object> action, object state)
         {
             _requestHandler.Add(new Tuple<Func<RequstMessage, object>, object>(action, state));
+        }
+
+
+        public void UnRegisterRequstHandler(Func<RequstMessage, object> action, object state)
+        {
+            var enumerable = _requestHandler.FirstOrDefault(s => s.Item1 == action && state == s.Item2);
+            if (enumerable != null)
+            {
+                _requestHandler.Remove(enumerable);
+            }
+        }
+
+        public void UnRegisterRequstHandler(Func<RequstMessage, object> action)
+        {
+            var enumerable = _requestHandler.FirstOrDefault(s => s.Item1 == action);
+            if (enumerable != null)
+            {
+                _requestHandler.Remove(enumerable);
+            }
         }
 
         internal void RegisterRequst(Action<RequstMessage> action, Guid guid)
