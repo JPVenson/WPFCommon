@@ -5,13 +5,13 @@ using JPB.Communication.ComBase.Messages;
 
 namespace JPB.Communication.Shared
 {
-    public class NetworkCollection<T> : NetworkValueCollection<T>
+    public class NetworkBag<T> : NetworkValueBag<T>
         where T : class,
             INotifyPropertyChanged,
             IUniqItem,
             new()
     {
-        public NetworkCollection(short port, string guid)
+        public NetworkBag(short port, string guid)
             : base(port, guid)
         {
             base.TcpNetworkReceiver.RegisterChanged(pPullPropertyChanged, NetworkCollectionProtocol.CollectionUpdateItem);

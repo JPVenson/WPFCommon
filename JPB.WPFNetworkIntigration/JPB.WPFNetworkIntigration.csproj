@@ -41,8 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IUniqItem.cs" />
-    <Compile Include="NetworkCollection.cs" />
-    <Compile Include="BindableNetworkValueCollection.cs" />
+    <Compile Include="NetworkBag.cs" />
+    <Compile Include="BindableNetworkValueBag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
