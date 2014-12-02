@@ -85,7 +85,7 @@
     </Compile>
     <Compile Include="Shared\NetworkCollectionMessage.cs" />
     <Compile Include="Shared\NetworkCollectionProtocol.cs" />
-    <Compile Include="Shared\NetworkValueCollection.cs" />
+    <Compile Include="Shared\NetworkValueBag.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
