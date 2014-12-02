@@ -459,6 +459,10 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             lock (SyncRoot)
             {
                 LocalValues.Clear();
+
+                if (collection == null)
+                    return;
+
                 foreach (var item in collection)
                 {
                     LocalValues.Add(item);
