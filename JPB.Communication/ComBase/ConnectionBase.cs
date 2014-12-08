@@ -11,14 +11,16 @@ namespace JPB.Communication.ComBase
         {
 
         }
+
+        public const string ErrorDueParse = "ERR / Message is Corrupt";
         
-        internal bool Parse(string strReceived)
+        internal bool Parse(byte[] received)
         {
             TcpMessage item;
             try
             {
-                RaiseIncommingMessage(strReceived);
-                item = DeSerialize(strReceived);
+                item = DeSerialize(received);
+                RaiseIncommingMessage(item);
 
                 if (item != null)
                 {
@@ -30,7 +32,17 @@ namespace JPB.Communication.ComBase
             }
             catch (Exception)
             {
-                RaiseNewItemLoadedFail(strReceived);
+                string source;
+                try
+                {
+                    source = this.Serlilizer.ResolveStringContent(received);
+                }
+                catch (Exception)
+                {
+                    source = ErrorDueParse;
+                }
+
+                RaiseNewItemLoadedFail(source);
                 return false;
             }
         }

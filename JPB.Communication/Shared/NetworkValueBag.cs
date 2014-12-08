@@ -439,6 +439,7 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
 
         /// <summary>
         /// To be Supported
+        /// throw new NotImplementedException();
         /// </summary>
         /// <param name="index"></param>
         /// <param name="item"></param>
@@ -534,20 +535,19 @@ new MessageBase() { InfoState = NetworkCollectionProtocol.CollectionRegisterUser
             }
         }
 
-
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        public void TriggerAdd(T added)
+        protected virtual void TriggerAdd(T added)
         {
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added));
         }
 
-        public void TriggerRemove(T removed, int result)
+        protected virtual void TriggerRemove(T removed, int result)
         {
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed, result));
         }
 
-        public void TriggerReset()
+        protected virtual void TriggerReset()
         {
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }

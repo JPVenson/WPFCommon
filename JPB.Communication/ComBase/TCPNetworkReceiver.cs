@@ -24,7 +24,7 @@ namespace JPB.Communication.ComBase
             _sock.Bind(new IPEndPoint(NetworkInfoBase.IpAddress, Port));
 
             // Bind the socket to the address and port.
-
+            _sock.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.MaxConnections);
             // Start listening.
             _sock.Listen(5000);
             // Set up the callback to be notified when somebody requests
@@ -61,7 +61,11 @@ namespace JPB.Communication.ComBase
                                 return;
 
                             var sender = NetworkFactory.Instance.GetSender(Port);
-                            sender.SendMessageAsync(new RequstMessage() { Message = result, ResponseFor = requstInbound.Id }, messCopy.Sender);
+                            sender.SendMessageAsync(new RequstMessage()
+                            {
+                                Message = result,
+                                ResponseFor = requstInbound.Id
+                            }, messCopy.Sender);
                         }
                         else
                         {

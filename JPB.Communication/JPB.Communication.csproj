@@ -54,11 +54,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComBase\BinaryCompressedMessageSerilalizer.cs" />
+    <Compile Include="ComBase\DefaultMessageSerlilizer.cs" />
+    <Compile Include="ComBase\IMessageSerializer.cs" />
+    <Compile Include="ComBase\InternalMemoryHolder.cs" />
+    <Compile Include="ComBase\MessageJsonSerlalizer.cs" />
     <Compile Include="ComBase\Messages\MessageBase.cs" />
     <Compile Include="ComBase\Messages\RequstMessage.cs" />
     <Compile Include="ComBase\Networkbase.cs" />

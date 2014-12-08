@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security;
 using System.Text;
 using System.Xml.Serialization;
 using JPB.Communication.ComBase.Messages;
+using JPB.Communication.Properties;
 
 namespace JPB.Communication.ComBase
 {
@@ -12,11 +14,22 @@ namespace JPB.Communication.ComBase
 
     public abstract class Networkbase
     {
+        protected Networkbase()
+        {
+            Serlilizer = DefaultMessageSerializer;
+        }
+
         public abstract short Port { get; internal set; }
+
+        public IMessageSerializer Serlilizer { get; set; }
+
+        public static readonly IMessageSerializer DefaultMessageSerializer = new DefaultMessageSerlilizer();
+        public static readonly IMessageSerializer CompressedDefaultMessageSerializer = new BinaryCompressedMessageSerilalizer();
+        public static readonly IMessageSerializer JsonMessageSerializer = new MessageJsonSerlalizer();
 
         public static event MessageDelegate OnNewItemLoadedSuccess;
         public static event EventHandler<string> OnNewItemLoadedFail;
-        public static event EventHandler<string> OnIncommingMessage;
+        public static event EventHandler<TcpMessage> OnIncommingMessage;
         public static event MessageDelegate OnMessageSend;
 
         protected virtual void RaiseMessageSended(MessageBase message)
@@ -33,7 +46,7 @@ namespace JPB.Communication.ComBase
             }
         }
 
-        protected virtual void RaiseIncommingMessage(string strReceived)
+        protected virtual void RaiseIncommingMessage(TcpMessage strReceived)
         {
             try
             {
@@ -75,18 +88,11 @@ namespace JPB.Communication.ComBase
             }
         }
 
-        internal static Encoding Encoding = Encoding.UTF8;
-
-        public static TcpMessage DeSerialize(string source)
+        public TcpMessage DeSerialize(byte[] source)
         {
             try
             {
-                using (var textReader = new StringReader(source))
-                {
-                    var deserializer = new XmlSerializer(typeof(TcpMessage));
-                    var tcpMessage = (TcpMessage)deserializer.Deserialize(textReader);
-                    return tcpMessage;
-                }
+                return this.Serlilizer.DeSerializeMessage(source);
             }
             catch (Exception e)
             {
@@ -94,34 +100,39 @@ namespace JPB.Communication.ComBase
             }
         }
 
-        public static byte[] Serialize(TcpMessage a)
+        public byte[] Serialize(TcpMessage a)
         {
-            using (var stream = new MemoryStream())
+            try
             {
-                var serializer = new XmlSerializer(a.GetType());
-                serializer.Serialize(stream, a);
-                return stream.ToArray();
+                return this.Serlilizer.SerializeMessage(a);
+            }
+            catch (Exception e)
+            {
+                return new byte[0];
             }
         }
 
         public byte[] SaveMessageBaseAsBinary(MessageBase A)
         {
-            using (var fs = new MemoryStream())
+            try
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(fs, A);
-                var array = fs.ToArray();
-                return array;
+                return this.Serlilizer.SerializeMessageContent(A);
+            }
+            catch (Exception e)
+            {
+                return new byte[0];
             }
         }
 
-        public MessageBase LoadMessageBaseFromBinary(Byte[] source)
+        public MessageBase LoadMessageBaseFromBinary(byte[] source)
         {
-            using (var memst = new MemoryStream(source))
+            try
             {
-                var formatter = new BinaryFormatter();
-                var deserialize = (MessageBase)formatter.Deserialize(memst);
-                return deserialize;
+                return this.Serlilizer.DeSerializeMessageContent(source);
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
 

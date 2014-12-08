@@ -19,7 +19,7 @@ namespace JPB.Communication
         private Dictionary<short, TCPNetworkSender> _senders;
         private TCPNetworkReceiver _commonReciever;
         private TCPNetworkSender _commonSender;
-        private Object _mutex;
+        private readonly Object _mutex;
 
         public bool ShouldRaiseEvents { get; set; }
 

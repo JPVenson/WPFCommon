@@ -226,13 +226,16 @@ namespace JPB.Communication.ComBase
 
         /// <summary>
         /// To be Supplied
+        /// throw NotImplementedException
+        /// Sender is working but there is no Server Conzept
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="mess"></param>
         /// <param name="ip"></param>
+        /// <exception cref="NotImplementedException"></exception>
         public async void SendFile(FileStream stream, MessageBase mess, string ip)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("This side is working but there is no Reciever Imp");
 
             var client = await CreateClientSockAsync(ip, Port);
             if (client == null)
