@@ -12,8 +12,8 @@ using System.Windows.Threading;
 namespace JPB.WPFBase.MVVM.ViewModel
 {
     [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
-    public class ThreadSaveObservableCollection<T> : 
-        Collection<T>, 
+    public class ThreadSaveObservableCollection<T> :
+        Collection<T>,
         INotifyCollectionChanged,
         INotifyPropertyChanged
     {
@@ -86,7 +86,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 SendPropertyChanged("Count");
                 SendPropertyChanged("Item[]");
                 actorHelper.ThreadSaveAction(
-                    () => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem)));
+                    () => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem, index)));
             }
         }
 
@@ -100,7 +100,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
             {
                 actorHelper.ThreadSaveAction(
                     () =>
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,enumerable.Last())));
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable.Last())));
             }
         }
 
