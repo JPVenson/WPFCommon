@@ -5,6 +5,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -16,14 +17,21 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionActionViewModel : QuestionViewModel
     {
-        public QuestionActionViewModel(object question, EingabeModus eingabeModus)
-            : base(question, eingabeModus)
+        public QuestionActionViewModel(object question, InputMode inputMode)
+            : base(question, inputMode)
         {
-            base.ErrorInfoProviderSimpleAccessAdapter.Add(
-                new Error<QuestionViewModel>("Bitte warten bis die Action abgelaufen ist", "Input", s => IsRuning));
-            RunActionCommand = new DelegateCommand(RunAction, CanRunAction);
+            if (CultureInfo.CurrentCulture.Equals(new CultureInfo("DE")))
+                base.ErrorInfoProviderSimpleAccessAdapter.Add(
+                    new Error<QuestionViewModel>("Bitte warten bis die Action abgelaufen ist", "Input", s => IsRuning));
+            else
+            {
+                base.ErrorInfoProviderSimpleAccessAdapter.Add(
+                    new Error<QuestionViewModel>("Please wait", "Input", s => IsRuning));
+            }
 
-            if (!(Question is IWaiterWrapper))
+                RunActionCommand = new DelegateCommand(RunAction, CanRunAction);
+
+            if (!(Question is IWaiterWrapper<object>))
             {
                 if (!(Question is Func<object>))
                     throw new ArgumentException("can not parse parameter");
@@ -40,7 +48,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         /// <param name="sender">The transferparameter</param>
         private void RunAction(object sender)
         {
-            ProgressWaiter(Question as IWaiterWrapper);
+            ProgressWaiter(Question as IWaiterWrapper<object>);
         }
 
         /// <summary>
@@ -54,13 +62,13 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 
         #endregion
 
-        private IWaiterWrapper PreEncapsulateAction(Func<object> action)
+        private IWaiterWrapper<object> PreEncapsulateAction(Func<object> action)
         {
-            var input = new WaiterWrapperImpl(action, "Arbeite . . .") {MaxProgress = 0};
+            var input = new WaiterWrapperImpl<object>(action, "Arbeite . . .") { MaxProgress = 0 };
             return input;
         }
 
-        private void ProgressWaiter(IWaiterWrapper waiter)
+        private void ProgressWaiter<T>(IWaiterWrapper<T> waiter)
         {
             IsRuning = true;
             base.ForceRefresh();

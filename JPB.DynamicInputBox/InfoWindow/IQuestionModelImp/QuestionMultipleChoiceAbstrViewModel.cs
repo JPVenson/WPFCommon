@@ -16,8 +16,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public abstract class QuestionMultipleChoiceAbstrViewModel : QuestionAbstrViewModelBase<QuestionMultipleChoiceAbstrViewModel, QuestionMultiChoiceViewModelValid>
     {
-        protected QuestionMultipleChoiceAbstrViewModel(object question, EingabeModus eingabeModus)
-            : base(question, eingabeModus)
+        protected QuestionMultipleChoiceAbstrViewModel(object question, InputMode inputMode)
+            : base(question, inputMode)
         {
             Output = new ObservableCollection<IListBoxItemWrapper>();
         }

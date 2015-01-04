@@ -9,8 +9,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionMutliOrSingelInputViewModel : QuestionMultipleChoiceAbstrViewModel
     {
-        public QuestionMutliOrSingelInputViewModel(object question, EingabeModus eingabeModus)
-            : base(question, eingabeModus)
+        public QuestionMutliOrSingelInputViewModel(object question, InputMode inputMode)
+            : base(question, inputMode)
         {
            
         }

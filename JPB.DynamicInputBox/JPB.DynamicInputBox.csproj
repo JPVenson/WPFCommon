@@ -58,7 +58,7 @@
     <Compile Include="InfoWindow\Controls\UserInputWindow.xaml.cs">
       <DependentUpon>UserInputWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InfoWindow\EingabeModus.cs" />
+    <Compile Include="InfoWindow\InputMode.cs" />
     <Compile Include="InfoWindow\IEnumerableManagerExtensions.cs" />
     <Compile Include="InfoWindow\Interfaces\IDynamicInputDescriptor.cs" />
     <Compile Include="InfoWindow\Interfaces\IInputDescriptor.cs" />
@@ -76,6 +76,7 @@
     <Compile Include="InfoWindow\Wrapper\IWaiterWrapper.cs" />
     <Compile Include="InfoWindow\Wrapper\ListBoxItemWrapper.cs" />
     <Compile Include="InfoWindow\Wrapper\WaiterWrapper.cs" />
+    <Compile Include="InfoWindow\Wrapper\WaiterWrapperImpl.cs" />
     <Compile Include="InputWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

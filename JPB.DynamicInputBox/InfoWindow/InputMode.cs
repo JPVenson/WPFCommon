@@ -6,7 +6,7 @@
 
 namespace JPB.DynamicInputBox.InfoWindow
 {
-    public enum EingabeModus
+    public enum InputMode
     {
         ///// <summary>
         /////     Select a Path
@@ -18,7 +18,7 @@ namespace JPB.DynamicInputBox.InfoWindow
         ///     Select a Intinger
         ///     Returrns the Intinger
         /// </summary>
-        Zahl,
+        Number,
 
         /// <summary>
         ///     A normal Text reprersented by a TextBox

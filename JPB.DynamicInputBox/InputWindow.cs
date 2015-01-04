@@ -40,11 +40,11 @@ namespace JPB.DynamicInputBox
             return default(T);
         }
 
-        public static object ShowInput(IWaiterWrapper inputQuestion)
+        public static object ShowInput<T>(IWaiterWrapper<T> inputQuestion)
         {
             var returns = new List<object>();
-            if (WindowThread(new List<object> {inputQuestion}, () => returns,
-                new List<EingabeModus> {EingabeModus.ShowProgress}))
+            if (WindowThread(new List<object> { inputQuestion }, () => returns,
+                new List<InputMode> { InputMode.ShowProgress }))
                 return returns.FirstOrDefault();
             return null;
         }
@@ -52,8 +52,8 @@ namespace JPB.DynamicInputBox
         public static object ShowInput(Func<object> inputQuestion)
         {
             var returns = new List<object>();
-            if (WindowThread(new List<object> {inputQuestion}, () => returns,
-                new List<EingabeModus> {EingabeModus.ShowProgress}))
+            if (WindowThread(new List<object> { inputQuestion }, () => returns,
+                new List<InputMode> { InputMode.ShowProgress }))
                 return returns.FirstOrDefault();
             return null;
         }
@@ -61,26 +61,72 @@ namespace JPB.DynamicInputBox
         public static string ShowInput(string inputQuestion)
         {
             var returns = new List<object>();
-            if (WindowThread(new List<object> {inputQuestion}, () => returns, new List<EingabeModus> {EingabeModus.Text}))
+            if (WindowThread(new List<object> { inputQuestion }, () => returns, new List<InputMode> { InputMode.Text }))
                 return returns.FirstOrDefault() as string;
             return null;
         }
 
-        public static object ShowInput(string inputQuestion, EingabeModus modus)
+        #region InputMode Helper
+
+        public static string ShowSingelLineInput(string header)
+        {
+            return ShowInput(header, InputMode.Text) as string;
+        }
+
+        public static long? ShowNumberInput(string header)
+        {
+            return (long?)ShowInput(header, InputMode.Number);
+        }
+
+        public static string ShowRichTextInput(string header)
+        {
+            return ShowInput(header, InputMode.RichText) as string;
+        }
+
+        public static string ShowSingelSelectInput(string header, params string[] values)
+        {
+            var wrapper = ShowInput(values.Aggregate(header, (e, f) => "#q" + e + f), InputMode.RadioBox) as IListBoxItemWrapper;
+            return values[wrapper.Index];
+        }
+
+        public static string[] ShowMultiSelectInput(string header, params string[] values)
+        {
+            var wrapper = ShowInput(values.Aggregate(header, (e, f) => "#q" + e + f), InputMode.CheckBox) as IListBoxItemWrapper[];
+            return wrapper.Select(s => s.Text).ToArray();
+        }
+
+        public static bool[] ShowMultiBooleanInput(string header, params string[] values)
+        {
+            var wrapper = ShowInput(values.Aggregate(header, (e, f) => "#q" + e + f), InputMode.CheckBox) as IListBoxItemWrapper[];
+            return wrapper.Select(s => s.IsChecked).ToArray();
+        }
+
+        public static T ShowActionInput<T>(string header, Func<T> values)
+        {
+            IWaiterWrapper<T> wrapper = new WaiterWrapperImpl<T>(values,header);
+            var showInput = ShowInput<T>(wrapper);
+            if (showInput is T)
+                return (T) showInput;
+            return default(T);
+        }
+
+        #endregion
+
+        public static object ShowInput(string inputQuestion, InputMode modus)
         {
             var returns = new List<object>();
-            if (WindowThread(new List<object> {inputQuestion}, () => returns, new List<EingabeModus> {modus}))
+            if (WindowThread(new List<object> { inputQuestion }, () => returns, new List<InputMode> { modus }))
                 return returns.FirstOrDefault();
             return null;
         }
 
         public static bool ShowInput(Func<List<object>> updateDelegate, List<object> inputQuestions,
-            List<EingabeModus> eingabeModi)
+            List<InputMode> eingabeModi)
         {
             return WindowThread(inputQuestions, updateDelegate, eingabeModi);
         }
 
-        public static IEnumerable<object> ShowInput(List<object> inputQuestions, List<EingabeModus> eingabeModi)
+        public static IEnumerable<object> ShowInput(List<object> inputQuestions, List<InputMode> eingabeModi)
         {
             var returns = new List<object>();
             WindowThread(inputQuestions, () => returns, eingabeModi);
@@ -90,12 +136,12 @@ namespace JPB.DynamicInputBox
         public static IEnumerable<object> ShowInput(List<object> inputQuestions)
         {
             var returns = new List<object>();
-            WindowThread(inputQuestions, () => returns, returns.Select(retursn => EingabeModus.Text));
+            WindowThread(inputQuestions, () => returns, returns.Select(retursn => InputMode.Text));
             return returns;
         }
 
         private static bool WindowThread(List<object> inputQuestions, Func<List<object>> returnlist,
-            IEnumerable<EingabeModus> eingabeModi)
+            IEnumerable<InputMode> eingabeModi)
         {
             bool? ret = false;
             Thread windowThread = null;

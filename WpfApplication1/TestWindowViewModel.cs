@@ -1,6 +1,8 @@
-﻿using JPB.ErrorValidation;
+﻿using System.Threading;
+using JPB.ErrorValidation;
 using JPB.ErrorValidation.ValidationRules;
 using JPB.ErrorValidation.ValidationTyps;
+using JPB.WPFBase.MVVM.DelegateCommand;
 
 namespace WpfApplication1
 {
@@ -8,7 +10,13 @@ namespace WpfApplication1
     {
         public TestWindowViewModel()
         {
+            TaskACommand = new AsyncDelegateCommand(ExecuteTaskA, CanExecuteTaskA);
+            TaskBCommand = new AsyncDelegateCommand(ExecuteTaskB, CanExecuteTaskB);
+            TaskBCommand.AsyncCanExecute = true;
+            TaskACommand.AsyncCanExecute = true;
 
+            TaskACommand.AddDependency(TaskBCommand, DependLevel.Complete);
+            TaskBCommand.AddDependency(TaskACommand, DependLevel.WorkingOnly);
         }
 
         private string _toValidationString;
@@ -21,6 +29,32 @@ namespace WpfApplication1
                 _toValidationString = value;
                 SendPropertyChanged(() => ToValidationString);
             }
+        }
+
+        public AsyncDelegateCommand TaskBCommand { get; private set; }
+
+        public void ExecuteTaskB(object sender)
+        {
+            Thread.CurrentThread.Join(10000);
+            ToValidationString = 1337.ToString();
+        }
+
+        public bool CanExecuteTaskB(object sender)
+        {
+            Thread.CurrentThread.Join(2000);
+            return true;
+        }
+
+        public AsyncDelegateCommand TaskACommand { get; private set; }
+
+        public void ExecuteTaskA(object sender)
+        {
+            Thread.CurrentThread.Join(10000);
+        }
+
+        public bool CanExecuteTaskA(object sender)
+        {
+            return true;
         }
     }
 

@@ -31,7 +31,7 @@ namespace JPB.DynamicInputBox.InfoWindow
             {"Quit", "OK"},
         };
 
-        public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort, IEnumerable<EingabeModus> inputmode, Dispatcher fromThread)
+        public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort, IEnumerable<InputMode> inputmode, Dispatcher fromThread)
             : base(fromThread)
         {
             Inputmode = inputmode;
@@ -41,7 +41,7 @@ namespace JPB.DynamicInputBox.InfoWindow
             Init();
         }
 
-        public IEnumerable<EingabeModus> Inputmode { get; set; }
+        public IEnumerable<InputMode> Inputmode { get; set; }
 
         #region SelectedStep property
 
@@ -273,44 +273,44 @@ namespace JPB.DynamicInputBox.InfoWindow
 
         #endregion
 
-        private EingabeModus GetInput(int i)
+        private InputMode GetInput(int i)
         {
             return Inputmode != null && Inputmode.Count() > i
                 ? Inputmode.ElementAt(i)
-                : EingabeModus.Text;
+                : InputMode.Text;
         }
 
-        private IQuestionAbstrViewModelBase SwitchTypes(EingabeModus eingabemodi, object question)
+        private IQuestionAbstrViewModelBase SwitchTypes(InputMode eingabemodi, object question)
         {
             IQuestionAbstrViewModelBase vm = null;
 
             switch (eingabemodi)
             {
-                case EingabeModus.Text:
+                case InputMode.Text:
                     vm = new QuestionViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.RichText:
+                case InputMode.RichText:
                     vm = new QuestionViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.Zahl:
+                case InputMode.Number:
                     vm = new QuestionViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.Date:
+                case InputMode.Date:
                     vm = new QuestionViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.ShowProgress:
+                case InputMode.ShowProgress:
                     vm = new QuestionActionViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.RadioBox:
+                case InputMode.RadioBox:
                     vm = new QuestionMutliOrSingelInputViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.CheckBox:
+                case InputMode.CheckBox:
                     vm = new QuestionMutliOrSingelInputViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.MultiInput:
+                case InputMode.MultiInput:
                     vm = new QuestionMultiInputViewModel(question, eingabemodi);
                     break;
-                case EingabeModus.ListView:
+                case InputMode.ListView:
                     vm = new QuestionSimpleList(question, eingabemodi);
                     break;
                 default:
@@ -330,7 +330,7 @@ namespace JPB.DynamicInputBox.InfoWindow
             for (int i = 0; i < InputQuestions.Count(); i++)
             {
                 object question = InputQuestions.ElementAt(i);
-                EingabeModus eingabemodi = GetInput(i);
+                InputMode eingabemodi = GetInput(i);
                 var vm = SwitchTypes(eingabemodi, question);
                 Steps.Add(new QuestionUserControl {DataContext = vm});
             }
@@ -375,7 +375,7 @@ namespace JPB.DynamicInputBox.InfoWindow
 
 //public class InputModeToViewModelToViewSelector<T>
 //{
-//    public InputModeToViewModelToViewSelector(EingabeModus inputModi, T questionViewModels, UIElement views)
+//    public InputModeToViewModelToViewSelector(InputMode inputModi, T questionViewModels, UIElement views)
 //    {
 //        InputModi = inputModi;
 //        QuestionViewModels = questionViewModels;
@@ -384,7 +384,7 @@ namespace JPB.DynamicInputBox.InfoWindow
 
 //    #region InputModi property
 
-//    public EingabeModus InputModi { get; set; }
+//    public InputMode InputModi { get; set; }
 
 //    #endregion
 
@@ -415,7 +415,7 @@ namespace JPB.DynamicInputBox.InfoWindow
 
 //    #endregion
 
-//    public void Add(QuestionViewModel viewmodel, EingabeModus input, UIElement view)
+//    public void Add(QuestionViewModel viewmodel, InputMode input, UIElement view)
 //    {
 //        InputModeToViewModelToViewSelectors.Add(new InputModeToViewModelToViewSelector<QuestionViewModel>(input, viewmodel, view));
 //    }
@@ -447,7 +447,7 @@ namespace JPB.DynamicInputBox.InfoWindow
 
 //if (Returnlist.Invoke().Count > Index)
 //{
-//    if (eingabemodi != EingabeModus.ShowProgress)
+//    if (eingabemodi != InputMode.ShowProgress)
 //        vm.Input = Returnlist.Invoke()[Index];
 //}
 
@@ -461,7 +461,7 @@ namespace JPB.DynamicInputBox.InfoWindow
 //{
 //    var eingabemodi = Inputmode != null && Inputmode.Count() > index
 //                                   ? Inputmode.ElementAt(index)
-//                                   : EingabeModus.Text;
+//                                   : InputMode.Text;
 
 //    var vm = Steps[Index].DataContext as QuestionViewModel;
 
@@ -473,7 +473,7 @@ namespace JPB.DynamicInputBox.InfoWindow
 
 //    if (Returnlist.Invoke().Count > Index)
 //    {
-//        if (eingabemodi != EingabeModus.ShowProgress)
+//        if (eingabemodi != InputMode.ShowProgress)
 //            vm.Input = Returnlist.Invoke()[Index];
 //    }
 

@@ -9,7 +9,7 @@ using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.DynamicInputBox.InfoWindow.Wrapper
 {
-    public abstract class WaiterWrapper : ViewModelBase, IWaiterWrapper
+    public abstract class WaiterWrapper<T> : ViewModelBase, IWaiterWrapper<T>
     {
         protected WaiterWrapper()
         {
@@ -61,9 +61,9 @@ namespace JPB.DynamicInputBox.InfoWindow.Wrapper
 
         #region WorkerFunction property
 
-        private Func<object> _workerFunction = default(Func<object>);
+        private Func<T> _workerFunction = default(Func<T>);
 
-        public Func<object> WorkerFunction
+        public Func<T> WorkerFunction
         {
             get { return _workerFunction; }
             set
@@ -90,20 +90,6 @@ namespace JPB.DynamicInputBox.InfoWindow.Wrapper
         }
 
         #endregion
-
-        public override string ToString()
-        {
-            return WaiterText;
-        }
-    }
-
-    public class WaiterWrapperImpl : WaiterWrapper
-    {
-        public WaiterWrapperImpl(Func<object> workerFunction, string waiterText)
-        {
-            base.WaiterText = waiterText;
-            base.WorkerFunction = workerFunction;
-        }
 
         public override string ToString()
         {

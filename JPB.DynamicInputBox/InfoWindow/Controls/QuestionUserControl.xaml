@@ -83,7 +83,7 @@
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="Zahl">
+                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="Number">
                     <Setter Property="Content">
                         <Setter.Value>
                             <TextBox Margin="5"

@@ -18,7 +18,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         bool IsInit { get; set; }
         object Question { get; set; }
         object Input { get; set; }
-        EingabeModus SelectedEingabeModus { get; set; }
+        InputMode SelectedInputMode { get; set; }
         new void Init();
     }
 
@@ -31,12 +31,12 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         private object _input;
         private bool _isInit;
         private object _question;
-        private EingabeModus _selectedEingabeModus;
+        private InputMode _selectedInputMode;
 
-        protected QuestionAbstrViewModelBase(object question, EingabeModus eingabeModus)
+        protected QuestionAbstrViewModelBase(object question, InputMode inputMode)
             : base(Dispatcher.FromThread(Thread.CurrentThread))
         {
-            SelectedEingabeModus = eingabeModus;
+            SelectedInputMode = inputMode;
             Question = question;
         }
 
@@ -72,13 +72,13 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             }
         }
 
-        public EingabeModus SelectedEingabeModus
+        public InputMode SelectedInputMode
         {
-            get { return _selectedEingabeModus; }
+            get { return _selectedInputMode; }
             set
             {
-                _selectedEingabeModus = value;
-                SendPropertyChanged(() => SelectedEingabeModus);
+                _selectedInputMode = value;
+                SendPropertyChanged(() => SelectedInputMode);
             }
         }
 

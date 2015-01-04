@@ -11,8 +11,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionMultiInputViewModel : QuestionMultipleChoiceAbstrViewModel
     {
-        public QuestionMultiInputViewModel(object question, EingabeModus eingabeModus)
-            : base(question, eingabeModus)
+        public QuestionMultiInputViewModel(object question, InputMode inputMode)
+            : base(question, inputMode)
         {
             AddInputCommand = new DelegateCommand(AddInput, CanAddInput);
             RemoveSelectedInputCommand = new DelegateCommand(RemoveSelectedInput, CanRemoveSelectedInput);

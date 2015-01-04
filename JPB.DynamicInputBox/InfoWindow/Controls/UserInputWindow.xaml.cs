@@ -8,7 +8,7 @@ namespace JPB.DynamicInputBox.InfoWindow.Controls
 {
     public partial class UserInputWindow : Window
     {
-        internal UserInputWindow(List<object> inputQuestions, Func<List<object>> returnlist, IEnumerable<EingabeModus> eingabeModi, Dispatcher fromThread)
+        internal UserInputWindow(List<object> inputQuestions, Func<List<object>> returnlist, IEnumerable<InputMode> eingabeModi, Dispatcher fromThread)
         {
             InitializeComponent();
             DataContext = new UserInputViewModel(inputQuestions, returnlist, () =>

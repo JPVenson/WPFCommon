@@ -15,8 +15,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionComplexList : QuestionMultipleChoiceAbstrViewModel
     {
-        public QuestionComplexList(object question, EingabeModus eingabeModus)
-            : base(question, eingabeModus)
+        public QuestionComplexList(object question, InputMode inputMode)
+            : base(question, inputMode)
         {
             Input = "EMPTY";
         }
@@ -59,8 +59,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 
     public class QuestionSimpleList : QuestionMultipleChoiceAbstrViewModel
     {
-        public QuestionSimpleList(object question, EingabeModus eingabeModus)
-            : base(question, eingabeModus)
+        public QuestionSimpleList(object question, InputMode inputMode)
+            : base(question, inputMode)
         {
             Input = "EMPTY";
         }

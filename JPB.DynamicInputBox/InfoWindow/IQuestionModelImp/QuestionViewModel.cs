@@ -13,8 +13,8 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
     public class QuestionViewModel : QuestionAbstrViewModelBase<QuestionViewModel, QuestionViewModelValidation>
     {
-        public QuestionViewModel(object question, EingabeModus eingabeModus)
-            : base(question, eingabeModus)
+        public QuestionViewModel(object question, InputMode inputMode)
+            : base(question, inputMode)
         {
 
         }

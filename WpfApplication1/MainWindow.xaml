@@ -50,6 +50,8 @@
     </Window.Resources>
 
     <DockPanel>
+        <Button Command="{Binding TaskACommand}">TaskA</Button>
+        <Button Command="{Binding TaskBCommand}">TaskB</Button>
         <TextBox DockPanel.Dock="Top"  
                  Text="{Binding ToValidationString, Mode=TwoWay, NotifyOnValidationError=True,ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
                  Height="25">
