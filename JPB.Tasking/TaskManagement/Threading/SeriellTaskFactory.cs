@@ -34,6 +34,7 @@ namespace JPB.Tasking.TaskManagement.Threading
         {
             if (_working)
                 return;
+
             _working = true;
             _thread = new Thread(Worker);
             _thread.SetApartmentState(ApartmentState.MTA);

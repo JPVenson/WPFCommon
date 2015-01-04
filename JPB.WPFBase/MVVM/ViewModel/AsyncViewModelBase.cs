@@ -44,10 +44,22 @@ namespace JPB.WPFBase.MVVM.ViewModel
         protected AsyncViewModelBase(Dispatcher disp)
             : base(disp)
         {
-            
+            disp.ShutdownFinished += disp_ShutdownStarted;
         }
 
-        public AsyncViewModelBase()
+        void disp_ShutdownStarted(object sender, EventArgs e)
+        {
+            if (CurrentTask != null)
+            {
+                CurrentTask.Wait(TimeSpan.FromSeconds(1));
+                if (CurrentTask.Status == TaskStatus.Running)
+                {
+                    CurrentTask.Dispose();
+                }
+            }
+        }
+
+        protected AsyncViewModelBase()
         {
             
         }
@@ -150,7 +162,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 task.ContinueWith(s => CreateContinue(s, continueWith, setWOrking)());
                 if (setWOrking)
                     CurrentTask = task;
-                task.Start();
+                BackgroundSimpleWork(task);
             }
         }
 
