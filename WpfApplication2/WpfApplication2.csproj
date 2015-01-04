@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JPB.Communication">
+      <HintPath>..\JPB.WPFNetworkIntigration\3Th Party\JPB.Communication.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -125,10 +128,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JPB.Communication\JPB.Communication.csproj">
-      <Project>{50077C76-3ADF-4E5C-A230-B1474674BDD7}</Project>
-      <Name>JPB.Communication</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JPB.DynamicInputBox\JPB.DynamicInputBox.csproj">
       <Project>{7D032140-B57A-4EFE-B6FA-C83E01AECC93}</Project>
       <Name>JPB.DynamicInputBox</Name>
@@ -138,7 +137,7 @@
       <Name>JPB.WPFBase</Name>
     </ProjectReference>
     <ProjectReference Include="..\JPB.WPFNetworkIntigration\JPB.WPFNetworkIntigration.csproj">
-      <Project>{C7FA6C12-319F-45B2-8428-02DBA2586569}</Project>
+      <Project>{c7fa6c12-319f-45b2-8428-02dba2586569}</Project>
       <Name>JPB.WPFNetworkIntigration</Name>
     </ProjectReference>
   </ItemGroup>

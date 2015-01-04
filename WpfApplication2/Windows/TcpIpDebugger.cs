@@ -19,7 +19,7 @@ namespace WpfApplication2.Windows
             Networkbase.OnMessageSend += NetworkbaseOnOnMessageSend;
         }
 
-        private void NetworkbaseOnOnMessageSend(MessageBase mess, short port)
+        private void NetworkbaseOnOnMessageSend(MessageBase mess, ushort port1)
         {
             base.BeginThreadSaveAction(() =>
             {
@@ -27,7 +27,7 @@ namespace WpfApplication2.Windows
             });
         }
 
-        private void TCPNetworkReceiver_OnIncommingMessage(MessageBase mess, short port)
+        private void TCPNetworkReceiver_OnIncommingMessage(MessageBase mess, ushort port1)
         {
             base.BeginThreadSaveAction(() =>
             {

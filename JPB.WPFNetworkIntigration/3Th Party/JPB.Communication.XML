@@ -1,0 +1,879 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>JPB.Communication</name>
+    </assembly>
+    <members>
+        <member name="T:JPB.Communication.ComBase.Serializer.Contracts.IMessageSerializer">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Serializer.Contracts.IMessageSerializer.SerializeMessage(JPB.Communication.ComBase.NetworkMessage)">
+            <summary>
+            Is used to convert the Complete Message Object into a byte[] that will be transferted to the remote computer
+            </summary>
+            <param name="a"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Serializer.Contracts.IMessageSerializer.SerializeMessageContent(JPB.Communication.ComBase.Messages.MessageBase)">
+            <summary>
+            Is used to convert the message object that is a Property of the TCP message into an other format then the TCP message 
+            </summary>
+            <param name="mess"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Serializer.Contracts.IMessageSerializer.DeSerializeMessage(System.Byte[])">
+            <summary>
+            Converts the output from the TCP network adapter into a valid TCP message
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Serializer.Contracts.IMessageSerializer.DeSerializeMessageContent(System.Byte[])">
+            <summary>
+            Converts the content of an TCP message into an object that will be deliverd to the Components
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Serializer.Contracts.IMessageSerializer.ResolveStringContent(System.Byte[])">
+            <summary>
+            tries to convert the Message to a string Representation
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="T:JPB.Communication.ComBase.TCP.ConnectionWrapper">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.ConnectionWrapper.#ctor(System.String,System.Net.Sockets.Socket,JPB.Communication.ComBase.TCP.TCPNetworkReceiver,JPB.Communication.ComBase.TCP.TCPNetworkSender)">
+            <summary>
+            
+            </summary>
+            <param name="tcpNetworkSender"></param>
+            <param name="tcpNetworkReceiver"></param>
+            <param name="socket"></param>
+            <param name="ip"></param>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.ConnectionWrapper.Ip">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.ConnectionWrapper.Socket">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.ConnectionWrapper.TCPNetworkReceiver">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.ConnectionWrapper.TCPNetworkSender">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.UnregisterChanged(System.Action{JPB.Communication.ComBase.Messages.MessageBase},System.Object)">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.UnregisterChanged(System.Action{JPB.Communication.ComBase.Messages.MessageBase})">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.RegisterMessageBaseInbound(System.Action{JPB.Communication.ComBase.Messages.MessageBase},System.Object)">
+            <summary>
+            Register a Callback localy that will be used when a new message is inbound that has state in its InfoState
+            </summary>
+            <param name="action">Callback</param>
+            <param name="state">Maybe an Enum?</param>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.RegisterMessageBaseInbound(System.Action{JPB.Communication.ComBase.Messages.Wrapper.LargeMessage},System.Object)">
+            <summary>
+            Register a Callback localy that will be used when a new Large message is inbound that has state in its InfoState
+            </summary>
+            <param name="action">Callback</param>
+            <param name="state">Maybe an Enum?</param>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.RegisterOneTimeMessage(System.Action{JPB.Communication.ComBase.Messages.MessageBase},System.Guid)">
+            <summary>
+            Register a Callback localy that will be used when a message contains a given Guid
+            </summary>
+            <param name="action"></param>
+            <param name="guid"></param>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.RegisterRequstHandler(System.Func{JPB.Communication.ComBase.Messages.RequstMessage,System.Object},System.Object)">
+            <summary>
+            Register a Callback localy that will be used when a Requst is inbound that has state in its InfoState
+            </summary>
+            <param name="action"></param>
+            <param name="state"></param>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.UnRegisterRequstHandler(System.Func{JPB.Communication.ComBase.Messages.RequstMessage,System.Object},System.Object)">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:JPB.Communication.Contracts.INetworkReceiver.UnRegisterRequstHandler(System.Func{JPB.Communication.ComBase.Messages.RequstMessage,System.Object})">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="P:JPB.Communication.Contracts.INetworkReceiver.IncommingMessage">
+            <summary>
+            True if we are Recieving a message
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.Messages.MessageBase">
+            <summary>
+            The Base object that can be transferred
+            To ensure a valid Serliazion every inherited class should impliment its own ISerializable Implimentation
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.MessageBase.Message">
+            <summary>
+            The Content we want to send
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.MessageBase.InfoState">
+            <summary>
+            The Contract to identify this message on the Distent PC
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.MessageBase.Sender">
+            <summary>
+            The information about the Original Sender
+            Is used to identify a Routed message
+            Readonly
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.MessageBase.Reciver">
+            <summary>
+            The information about the Original Sender
+            Is used to identify a Routed message
+            Readonly
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.MessageBase.Id">
+            <summary>
+            The ID of this message
+            Is used to clearly identify this message over the network
+            Readonly
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.MessageBase.RecievedAt">
+            <summary>
+            Readonly
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.MessageBase.SendAt">
+            <summary>
+            Readonly
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.StreamMetaMessage.StreamSize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.Networkbase">
+            <summary>
+            The base class for Multible Network instances
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Networkbase.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.Networkbase.DefaultMessageSerializer">
+            <summary>
+            The default Serializer
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.Networkbase.CompressedDefaultMessageSerializer">
+            <summary>
+            A Standart Serializer that compress the message ( good for large MessageBase objects )
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.Networkbase.SoapSerializer">
+            <summary>
+            A Standart Soap Serializer
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.Networkbase.NetDataSerializer">
+            <summary>
+            A Standart NetData Serializer
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.Networkbase.FullXmlSerializer">
+            <summary>
+            A Full XML Serializer
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Networkbase.RaiseNewLargeItemLoadedSuccess(JPB.Communication.ComBase.Messages.MessageBase,System.Func{System.IO.Stream})">
+            <summary>
+            
+            </summary>
+            <param name="metaData"></param>
+            <param name="contendLoaded"></param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Networkbase.SaveMessageBaseAsContent(JPB.Communication.ComBase.Messages.MessageBase)">
+            <summary>
+            
+            </summary>
+            <param name="A"></param>
+            <returns></returns>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Networkbase.Port">
+            <summary>
+            Defines the Port the Instance is working on
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Networkbase.Serlilizer">
+            <summary>
+            When Serlilizaion is request this Interface will be used
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.TCP.LargeTcpConnection._datarec">
+            <summary>
+            Is used for the Message Content
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.Messages.Wrapper.LargeMessage">
+            <summary>
+            Support for very Large Messages that can not be hold inside an Array
+            This class indicates that the Content should be written to the HDD as soon as availbile
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Messages.Wrapper.LargeMessage.RaiseLoadCompleted">
+            <summary>
+            Raises the OnLoadComplete event and Seek 0
+            </summary>
+        </member>
+        <member name="E:JPB.Communication.ComBase.Messages.Wrapper.LargeMessage.OnLoadCompleted">
+            <summary>
+            Raised when the stream is complted
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.Wrapper.LargeMessage.StreamSize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.Wrapper.LargeMessage.InfoLoaded">
+            <summary>
+            Provieds you a maybe only partial exisiting stream to the Large data
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.Wrapper.LargeMessage.MetaData">
+            <summary>
+            Provieds a Full instance of your MetaData
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.Serializer.BinaryCompressedMessageSerializer">
+            <summary>
+            Uses the Default Serlilizer but compresses the output by using the GZipStream
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Serializer.BinaryCompressedMessageSerializer.Compress(System.Byte[])">
+            <summary>
+            Compresses byte array to new byte array.
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.Serializer.BinaryCompressedMessageSerializer.DeCompress(System.Byte[])">
+            <summary>
+            UnCompresses byte array to new byte array.
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.Serializer.DefaultMessageSerlilizer">
+            <summary>
+            Contains a Mixed Message Serlilizer that Converts the Message as XML and the Content to Binary
+            Is able to work with objects that are in the same namespace but in diferent Assemablys like when using ILMerge
+            After 20 mb of message size the content of the message will be paged to the disc
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.InternalMemoryHolder.MaximumStoreageInMemory">
+            <summary>
+            Maximum bytes in storeage
+            This are 20 Mbit
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.InternalMemoryHolder.Add(System.Byte[],System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="bytes"></param>
+            <param name="adjustLast"></param>
+        </member>
+        <member name="P:JPB.Communication.ComBase.InternalMemoryHolder.ForceSharedMem">
+            <summary>
+            Forceses the usage of FIles
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.RequstMessage.ResponseFor">
+            <summary>
+            The ID of an Requestmessage for this is an Awsner
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.RequstMessage.ExpectedResult">
+            <summary>
+            If set, we defining a Port we expecting an awnser
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.Messages.RequstMessage.NeedMoreTime">
+            <summary>
+            If set and this object is an Awnser to a Requst message,
+            The client will wait time specifiyed
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.MessageDelegate">
+            <summary>
+            Delegate for Incomming or Outging messages
+            </summary>
+            <param name="mess"></param>
+            <param name="port"></param>
+        </member>
+        <member name="T:JPB.Communication.ComBase.LargeMessageDelegate">
+            <summary>
+            Delegate for Incomming or Outging messages
+            </summary>
+            <param name="mess"></param>
+            <param name="port"></param>
+        </member>
+        <member name="T:JPB.Communication.ComBase.NetworkInfoBase">
+            <summary>
+            This class contains informations and Mehtods for IP resolution
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.NetworkInfoBase.ResolveIp(System.String)">
+            <summary>
+            Uses the NetworkInfoBase.ResolveDistantIp to resvoles an IP
+            </summary>
+            <param name="host"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.NetworkInfoBase.GetPublicIp">
+            <summary>
+            Uses IpCheckUrl for IP check
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.NetworkInfoBase.ResolveAddressByMySelf____Again____IfYouNeedSomethingToBeDoneRightDoItByYourSelf(System.Collections.Generic.IEnumerable{System.Net.IPAddress})">
+            <summary>
+            /*No Comment!*/
+            </summary>
+            <param name="addresses"></param>
+            <returns></returns>
+        </member>
+        <member name="P:JPB.Communication.ComBase.NetworkInfoBase.IpAddress">
+            <summary>
+            Easy access to your preferred network Interface 
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.NetworkInfoBase.IpAddressExternal">
+            <summary>
+            Returns the Cached last external IpAddress 
+            </summary>
+        </member>
+        <member name="E:JPB.Communication.ComBase.NetworkInfoBase.ResolveOwnIp">
+            <summary>
+            If your pc is connected via multible network Interfaces you can here resolve your IP
+            </summary>
+        </member>
+        <member name="E:JPB.Communication.ComBase.NetworkInfoBase.ResolveDistantIp">
+            <summary>
+            If a Host is specified, use this event to resolve the IP
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.ConnectionPool">
+            <summary>
+            Stores open Connections
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.ConnectionPool.GetConnections">
+            <summary>
+            Returns a Flat copy of all Connections that are existing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="E:JPB.Communication.ComBase.ConnectionPool.OnConnectionCreated">
+            <summary>
+            Is invoked when a connection is created
+            this can caused by an incomming or a Shared connection from this side
+            </summary>
+        </member>
+        <member name="E:JPB.Communication.ComBase.ConnectionPool.OnConnectionClosed">
+            <summary>
+            Is invoked when a connection is closed from this or Remote side
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.ConnectionPool.Connections">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.StreamBuffer">
+            <summary>
+            Buffers a Chunck in Memory and allows the Adjustment of the bytes that are conent
+            Due the fact that we are init a buffer with a fixed size but the complete size of written bytes are not that high we got some empty space at the end
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.StreamBuffer.Flush(System.Int32)">
+            <summary>
+            Possible Blocking
+            </summary>
+            <param name="adjustContent"></param>
+        </member>
+        <member name="T:JPB.Communication.ComBase.TCP.TCPNetworkReceiver">
+            <summary>
+            A Manged wrapper with callback functions for a Socket
+            It will observe and serlilze the content of incomming data from the Socket
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.TCP.TCPNetworkReceiver._typeCallbacks">
+            <summary>
+            FOR INTERNAL USE ONLY
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.RaiseIncommingMessage">
+            <summary>
+            Is raised when a message is inside the buffer but not fully parsed
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.UnregisterChanged(System.Action{JPB.Communication.ComBase.Messages.MessageBase},System.Object)">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.UnregisterChanged(System.Action{JPB.Communication.ComBase.Messages.MessageBase})">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.RegisterMessageBaseInbound(System.Action{JPB.Communication.ComBase.Messages.MessageBase},System.Object)">
+            <summary>
+            Register a Callback localy that will be used when a new message is inbound that has state in its InfoState
+            </summary>
+            <param name="action">Callback</param>
+            <param name="state">Maybe an Enum?</param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.RegisterMessageBaseInbound(System.Action{JPB.Communication.ComBase.Messages.Wrapper.LargeMessage},System.Object)">
+            <summary>
+            Register a Callback localy that will be used when a new Large message is inbound that has state in its InfoState
+            </summary>
+            <param name="action">Callback</param>
+            <param name="state">Maybe an Enum?</param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.RegisterOneTimeMessage(System.Action{JPB.Communication.ComBase.Messages.MessageBase},System.Guid)">
+            <summary>
+            Register a Callback localy that will be used when a message contains a given Guid
+            </summary>
+            <param name="action"></param>
+            <param name="guid"></param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.RegisterRequstHandler(System.Func{JPB.Communication.ComBase.Messages.RequstMessage,System.Object},System.Object)">
+            <summary>
+            Register a Callback localy that will be used when a Requst is inbound that has state in its InfoState
+            </summary>
+            <param name="action"></param>
+            <param name="state"></param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.UnRegisterRequstHandler(System.Func{JPB.Communication.ComBase.Messages.RequstMessage,System.Object},System.Object)">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.UnRegisterRequstHandler(System.Func{JPB.Communication.ComBase.Messages.RequstMessage,System.Object})">
+            <summary>
+            Removes a delegate from the Handler list
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.GetFirstSharedSenderOrNull(System.String)">
+            <summary>
+            Returns a Sender or null
+            </summary>
+            <param name="ipOrHost"></param>
+            <returns></returns>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.LargeMessageSupport">
+            <summary>
+            If Enabled this Receiver can handle streams and messages
+            
+            </summary>
+        </member>
+        <member name="E:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.OnIncommingMessage">
+            <summary>
+            Is raised when a message is inside the buffer but not fully parsed
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.AutoRespond">
+            <summary>
+            Enables or Disable the Auto Respond for long working Requests
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.IsDisposing">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.SharedConnection">
+            <summary>
+            If enabled a Incomming connection will be kept open and will be used for Outgoing and Incomming Trafic to that host
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkReceiver.IncommingMessage">
+            <summary>
+            True if we are Recieving a message
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.ComBase.TCP.TCPNetworkSender">
+            <summary>
+            A TCP sender
+            </summary>
+        </member>
+        <member name="F:JPB.Communication.ComBase.TCP.TCPNetworkSender.LastException">
+            <summary>
+            Thread static
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendMessage(JPB.Communication.ComBase.Messages.MessageBase,System.String,System.UInt16)">
+            <summary>
+            Sends a message to a Given IP:Port and wait for Deliver
+            </summary>
+            <param name="message">Instance of message</param>
+            <param name="ip">Ip of sock pc</param>
+            <param name="port">Port of sock pc</param>
+            <returns></returns>
+            <exception cref="T:System.TimeoutException"></exception>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendMessageAsync(JPB.Communication.ComBase.Messages.MessageBase,System.String,System.UInt16)">
+            <summary>
+            Sends a message async to a IP:Port
+            </summary>
+            <param name="message">Instance of message</param>
+            <param name="ip">Ip of sock pc</param>
+            <param name="port">Port of sock pc</param>
+            <returns></returns>
+            <exception cref="T:System.TimeoutException"></exception>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendMultiMessageAsync(JPB.Communication.ComBase.Messages.MessageBase,System.String[])">
+            <summary>
+            Sends a message to multible Hosts
+            </summary>
+            <returns>all non reached hosts</returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendMultiMessage(JPB.Communication.ComBase.Messages.MessageBase,System.String[])">
+            <summary>
+            Sends a message to multible Hosts
+            </summary>
+            <returns>all non reached hosts</returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendMessage(JPB.Communication.ComBase.Messages.MessageBase,System.String)">
+            <summary>
+            Sends one message to one sock and wait for deliver
+            </summary>
+            <param name="message">Message object or inherted object</param>
+            <param name="ip">Ip of sock</param>
+            <returns>frue if message was successful delivered otherwise false</returns>
+            <exception cref="T:System.TimeoutException"></exception>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendMessageAsync(JPB.Communication.ComBase.Messages.MessageBase,System.String)">
+            <summary>
+            Sends one message to one sock async
+            </summary>
+            <param name="message">Message object or inherted object</param>
+            <param name="ip">Ip of sock</param>
+            <returns>frue if message was successful delivered otherwise false</returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendRequstMessageAsync``1(JPB.Communication.ComBase.Messages.RequstMessage,System.String)">
+            <summary>
+            Sends a message an awaits a response on the same port from the other side
+            </summary>
+            <param name="mess">Message object or inherted object</param>
+            <param name="ip">Ip of sock</param>
+            <returns>Result from other side or default(T)</returns>
+            <exception cref="T:System.TimeoutException"></exception>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendRequstMessage``1(JPB.Communication.ComBase.Messages.RequstMessage,System.String)">
+            <summary>
+            Sends a message an awaits a response on the same port from the other side
+            </summary>
+            <param name="mess">Message object or inherted object</param>
+            <param name="ip">Ip of sock</param>
+            <returns>Result from other side or default(T)</returns>
+            <exception cref="T:System.TimeoutException"></exception>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendMultiRequestMessage``1(JPB.Communication.ComBase.Messages.RequstMessage,System.String[])">
+            <summary>
+            Sends one message COPY to each ipOrHost and awaits from all a result or nothing
+            </summary>
+            <typeparam name="T">the result we await</typeparam>
+            <param name="mess">Message object or inherted object</param>
+            <param name="ips">Ips of sock</param>
+            <returns>A Dictiornary that contains for each key ( IP ) the result we got</returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.SendStreamDataAsync(System.IO.Stream,JPB.Communication.ComBase.Messages.StreamMetaMessage,System.String,System.Boolean)">
+             <summary>
+            This mehtod will send the content of the given stream to the given ip
+            To Support this the Remote host must set the TCP Reciever property SupportLargeMessages 
+            to true otherwise the message will be ignored
+             </summary>
+             <param name="stream"></param>
+             <param name="mess"></param>
+             <param name="ip"></param>
+            <param name="disposeOnEnd">Close and Dispose the stream after work</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.InitSharedConnection(System.Net.Sockets.Socket)">
+            <summary>
+            Starts the injection of the given socket into the ConnectionPool
+            </summary>
+            <param name="ipOrHost"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.InitSharedConnection(System.String)">
+            <summary>
+            Will create a new Connection from this Pc to the IpOrHost pc
+            When done and Successfull it will return a new Receiver instance that can be used to observe messages from the Remote host
+            </summary>
+            <param name="ipOrHost"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.CreateClientSockAsync(System.Collections.Generic.IEnumerable{System.String},System.UInt16)">
+            <summary>
+            Prepaired mehtod call that uses the Connect mehtod with multible IP addresses
+            
+            Behavior is not tested | Shared connections are not supported
+            WIP
+            </summary>
+            <param name="ip"></param>
+            <param name="port"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.ComBase.TCP.TCPNetworkSender.ConnectionOpen(System.String)">
+            <summary>
+            Checks for an existing connection in the ConnectionPool
+            </summary>
+            <param name="ipOrHost"></param>
+            <returns></returns>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkSender.Timeout">
+            <summary>
+            The timeout for wating on Request messages callback
+            Warning
+            Setting this below 10 will maybe cause in timeout problems
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkSender.SharedConnection">
+            <summary>
+            If set to true all future calls to a Remote host will be keept open and will be stored inside the ConnectionPool
+            </summary>
+        </member>
+        <member name="E:JPB.Communication.ComBase.TCP.TCPNetworkSender.OnCriticalException">
+            <summary>
+            Will be invoked to observe Exceptions
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.ComBase.TCP.TCPNetworkSender.UseExternalIpAsSender">
+            <summary>
+            If set to true the external IP of this host will be used as Sender property
+            </summary>
+        </member>
+        <member name="M:JPB.Communication.NetworkFactory.GetReceivers">
+            <summary>
+            Returns a flat copy of all known tcp Receivers
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.NetworkFactory.GetSenders">
+            <summary>
+            Returns a flat copy of all known tcp senders
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.NetworkFactory.InitCommonSenderAndReciver(System.UInt16,System.UInt16)">
+            <summary>
+            This will set the Sender and Reciever Property
+            </summary>
+            <param name="listeningPort"></param>
+            <param name="sendingPort"></param>
+        </member>
+        <member name="M:JPB.Communication.NetworkFactory.GetSender(System.UInt16)">
+            <summary>
+            Gets or Creates a Network sender for a given port
+            Thread-Save
+            </summary>
+            <param name="port"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.NetworkFactory.GetReceiver(System.UInt16)">
+            <summary>
+            Gets or Creats a network Reciever for a given port
+            Thread-Save
+            </summary>
+            <param name="port"></param>
+            <returns></returns>
+        </member>
+        <member name="P:JPB.Communication.NetworkFactory.Reciever">
+            <summary>
+            The Easy-To-Access Receiver that is created or pulled by InitCommonSenderAndReciver
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.NetworkFactory.Sender">
+            <summary>
+            The Easy-To-Access Sender that is created or pulled by InitCommonSenderAndReciver
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.NetworkFactory.SyncRoot">
+            <summary>
+            Object for sync access
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.Shared.MessageDeliveryQueue">
+            <summary>
+            this queue will manage Multibe message Deliverys
+            The message will be Send in the Order FIFO
+            
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.Shared.NetworkCollectionProtocol">
+            <summary>
+            A static collection of the Network Contracts that are used be the Collection classes
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.Shared.NetworkListControler">
+            <summary>
+            Guid Container
+            </summary>
+        </member>
+        <member name="T:JPB.Communication.Shared.NetworkValueBag`1">
+            <summary>
+            This class holds and Updates unsorted values that will be Synced over the Network
+            On a Pc, only one Network Value bag with the given guid can exists
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.CreateNetworkValueCollection(System.UInt16,System.String)">
+            <summary>
+            Creates a new Instance of the NetworkValueBag
+            </summary>
+            <param name="port"></param>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.RegisterCollecion(System.String)">
+            <summary>
+            Must be called to ensure a Single Usage of an GUID
+            </summary>
+            <param name="guid"></param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.GetCollection(System.String,System.UInt16,System.String)">
+            <summary>
+            Gets a non tracking version of all items that are stored on the server
+            </summary>
+            <param name="host"></param>
+            <param name="port"></param>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.#ctor(System.UInt16,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="port"></param>
+            <param name="guid"></param>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.PullConnectMessage(JPB.Communication.ComBase.Messages.RequstMessage)">
+            <summary>
+            Callback for CollectionGetUsers
+            </summary>
+            <param name="arg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.Connect(System.String)">
+            <summary>
+            Connects this Collection to one Host inside the NetworkCollection
+            After the Connect this instance will get:
+            All Other existing Users
+            A Copy of the Current Network List
+            </summary>
+            <param name="host"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.PullGetCollectionMessage(JPB.Communication.ComBase.Messages.RequstMessage)">
+            <summary>
+            Callback for CollectionGetCollection
+            </summary>
+            <param name="arg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.Contains(System.Object)">
+            <summary>
+            Not thread save
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.IndexOf(System.Object)">
+            <summary>
+            Not thread save
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.Insert(System.Int32,System.Object)">
+            <summary>
+            Not Implemented
+            </summary>
+            <param name="index"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.Insert(System.Int32,`0)">
+            <summary>
+            To be Supported
+            throw new NotImplementedException();
+            </summary>
+            <param name="index"></param>
+            <param name="item"></param>
+        </member>
+        <member name="M:JPB.Communication.Shared.NetworkValueBag`1.RemoveAt(System.Int32)">
+            <summary>
+            To be Supported
+            </summary>
+            <param name="index"></param>
+        </member>
+        <member name="P:JPB.Communication.Shared.NetworkValueBag`1.ConnectedToHost">
+            <summary>
+            if this is not the first Host that Maintains the target Collection we are initly connectet
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.Shared.NetworkValueBag`1.CollectionRecievers">
+            <summary>
+            All other PC's that Contains a NetworkValueBag with the desiered GUID.
+            When Add,Remove,Clear is invoked this PC's will be notifyed to do the same
+            </summary>
+        </member>
+        <member name="P:JPB.Communication.Shared.NetworkValueBag`1.LocalValues">
+            <summary>
+            The Internal collection that contains the values
+            </summary>
+        </member>
+    </members>
+</doc>

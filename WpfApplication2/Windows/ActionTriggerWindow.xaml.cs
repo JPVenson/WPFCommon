@@ -20,7 +20,7 @@ namespace WpfApplication2.Windows
     /// </summary>
     public partial class ActionTriggerWindow : Window
     {
-        public ActionTriggerWindow(BindableNetworkValueCollection<string> networkValueCollection)
+        public ActionTriggerWindow(BindableNetworkValueBag<string> networkValueCollection)
         {
             InitializeComponent();
             this.DataContext = new ActionTriggerViewModel(networkValueCollection);

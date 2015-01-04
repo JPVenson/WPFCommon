@@ -27,16 +27,5 @@ namespace JPB.Extentions.Extensions
             }
             return self == to;
         }
-
-
-        public static T Test<Q, T, R>() where T : new()
-        {
-            return new T();
-        }
-
-        public static T ConverTo<T>(this object value) where T : IConvertible
-        {
-            return (T) Convert.ChangeType(value, typeof (T));
-        }
     }
 }

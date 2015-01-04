@@ -11,9 +11,9 @@ namespace WpfApplication2.Windows
 {
     class ActionTriggerViewModel : AsyncViewModelBase
     {
-        private readonly BindableNetworkValueCollection<string> _networkValueCollection;
+        private readonly BindableNetworkValueBag<string> _networkValueCollection;
 
-        public ActionTriggerViewModel(BindableNetworkValueCollection<string> networkValueCollection)
+        public ActionTriggerViewModel(BindableNetworkValueBag<string> networkValueCollection)
         {
             _networkValueCollection = networkValueCollection;
 

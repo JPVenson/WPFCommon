@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using JPB.Communication;
-using JPB.Communication.ComBase;
-using JPB.Communication.ComBase.Messages;
 using JPB.DynamicInputBox;
 using JPB.DynamicInputBox.InfoWindow;
 using JPB.WPFBase.MVVM.DelegateCommand;
@@ -25,7 +23,7 @@ namespace WpfApplication2
         {
             AddToListCommand = new DelegateCommand(ExecuteAddToList, CanExecuteAddToList);
             RemoveSelectedFromListCommand = new DelegateCommand(ExecuteRemoveSelectedFromList, CanExecuteRemoveSelectedFromList);
-            NetworkValueCollection = new BindableNetworkValueCollection<string>(1337, "test");
+            NetworkValueCollection = new BindableNetworkValueBag<string>(1337, "test");
 
             string showInput = "VS-VIRT1-NATDEV";
 
@@ -94,9 +92,9 @@ namespace WpfApplication2
             }
         }
 
-        private BindableNetworkValueCollection<string> _networkValueCollection;
+        private BindableNetworkValueBag<string> _networkValueCollection;
 
-        public BindableNetworkValueCollection<string> NetworkValueCollection
+        public BindableNetworkValueBag<string> NetworkValueCollection
         {
             get { return _networkValueCollection; }
             set
