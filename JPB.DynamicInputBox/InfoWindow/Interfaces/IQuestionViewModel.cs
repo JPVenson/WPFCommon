@@ -15,7 +15,7 @@ namespace JPB.DynamicInputBox.InfoWindow.Interfaces
         bool IsInit { get; set; }
         Object Question { get; set; }
         Object Input { get; set; }
-        EingabeModus SelectedEingabeModus { get; set; }
+        InputMode SelectedInputMode { get; set; }
         void Init();
     }
 }

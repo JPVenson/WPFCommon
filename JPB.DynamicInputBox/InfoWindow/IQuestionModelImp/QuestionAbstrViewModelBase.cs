@@ -71,7 +71,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
                 SendPropertyChanged(() => Input);
             }
         }
-
+        
         public InputMode SelectedInputMode
         {
             get { return _selectedInputMode; }

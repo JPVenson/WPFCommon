@@ -193,9 +193,11 @@ namespace JPB.Extentions.Extensions
         {
             if (File.Exists(FileName))
             {
-                var fs = new FileStream(FileName, FileMode.Open);
-                var formatter = new BinaryFormatter();
-                return (A)formatter.Deserialize(fs);
+                using (var fs = new FileStream(FileName, FileMode.Open))
+                {
+                    var formatter = new BinaryFormatter();
+                    return (A)formatter.Deserialize(fs);
+                }
             }
             return new A();
         }
@@ -204,9 +206,11 @@ namespace JPB.Extentions.Extensions
         {
             if (File.Exists(FileName))
             {
-                var fs = new FileStream(FileName, FileMode.Open);
-                var formatter = new BinaryFormatter();
-                return formatter.Deserialize(fs);
+                using (var fs = new FileStream(FileName, FileMode.Open))
+                {
+                    var formatter = new BinaryFormatter();
+                    return formatter.Deserialize(fs);
+                }
             }
             return null;
         }
