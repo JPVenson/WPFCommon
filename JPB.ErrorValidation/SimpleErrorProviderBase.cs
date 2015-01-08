@@ -20,25 +20,17 @@ namespace JPB.ErrorValidation
         where TE : class, IErrorInfoProvider<T>, new()
     {
         protected SimpleErrorProviderBase()
-            : base(Dispatcher.FromThread(Thread.CurrentThread))
+            : this(Dispatcher.FromThread(Thread.CurrentThread))
+        {
+
+        }
+
+        protected SimpleErrorProviderBase(Dispatcher dispatcher)
+            : base(dispatcher)
         {
 
         }
 
         public abstract string this[string columnName] { get; }
-    }
-
-    public class DataErrorBase<T, TE> : SimpleErrorProviderBase<T, TE> where T : class where TE : class, IErrorInfoProvider<T>, new()
-    {
-        public override string this[string columnName]
-        {
-            get
-            {
-                var validation = base.GetError(columnName, this as T);
-                if (validation != null)
-                    return validation.ErrorText;
-                return string.Empty;
-            }
-        }
     }
 }

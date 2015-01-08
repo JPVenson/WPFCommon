@@ -7,8 +7,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using JPB.DynamicInputBox.InfoWindow.Interfaces;
 using JPB.DynamicInputBox.InfoWindow.Wrapper;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
@@ -23,7 +25,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 
         public override void Init()
         {
-            //Question = ParsexQuestionText(Question);
+            Question = ParsexQuestionText(Question);
             base.Init();
         }
 
@@ -43,18 +45,17 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 
         #endregion
 
-        //public string ParsexQuestionText(object input)
-        //{
-        //    if (input is IDynamicInputDescriptor)
-        //    {
-        //        var relinput = input as IDynamicInputDescriptor;
-        //        PropertyInfos = input.GetType().GetProperties(BindingFlags.CreateInstance | BindingFlags.Instance).ToList();
-        //        PropertyInfos.AddRange((input as ICustomTypeDescriptor).GetProperties().Cast<PropertyInfo>());
-
-
-        //        return relinput.Text;
-        //    }
-        //}
+        public string ParsexQuestionText(object input)
+        {
+            if (input is IDynamicInputDescriptor)
+            {
+                var relinput = input as IDynamicInputDescriptor;
+                PropertyInfos = input.GetType().GetProperties(BindingFlags.CreateInstance | BindingFlags.Instance).ToList();
+                PropertyInfos.AddRange((input as ICustomTypeDescriptor).GetProperties().Cast<PropertyInfo>());
+                return relinput.Text;
+            }
+            return input.ToString();
+        }
     }
 
     public class QuestionSimpleList : QuestionMultipleChoiceAbstrViewModel
@@ -79,14 +80,14 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             string lowertext = text.ToLower();
             if (!lowertext.Contains("#q"))
                 throw new ArgumentException("Can not parse text!");
-            List<string> allquestions = text.Split(new[] {"#Q", "#q"}, StringSplitOptions.RemoveEmptyEntries).ToList();
+            List<string> allquestions = text.Split(new[] { "#Q", "#q" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             text = allquestions.ElementAt(0);
             allquestions.RemoveAt(0);
             PossibleInput =
                 new ObservableCollection<IListBoxItemWrapper>(
                     allquestions.Select(
                         allquestion =>
-                            new ListBoxItemWrapper {Text = allquestion, Index = allquestions.IndexOf(allquestion)}));
+                            new ListBoxItemWrapper { Text = allquestion, Index = allquestions.IndexOf(allquestion) }));
             return text;
         }
     }

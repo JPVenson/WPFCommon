@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncErrorProviderBase.cs" />
+    <Compile Include="DataErrorBase.cs" />
     <Compile Include="ErrorObserver.cs" />
     <Compile Include="SimpleErrorProviderBase.cs" />
     <Compile Include="ErrorProviderBaseBase.cs" />

@@ -1,6 +1,12 @@
 ﻿<UserControl x:Class="JPB.DynamicInputBox.InfoWindow.Controls.QuestionUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:wrapper="clr-namespace:JPB.DynamicInputBox.InfoWindow.Wrapper"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:iQuestionModelImp="clr-namespace:JPB.DynamicInputBox.InfoWindow.IQuestionModelImp"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance iQuestionModelImp:IQuestionAbstrViewModelBase}">
 
     <UserControl.Resources>
         <Style x:Key="ProgressBarStyle" TargetType="ProgressBar">
@@ -26,12 +32,12 @@
         <Style x:Key="SelectedInputStyle" TargetType="ContentControl">
             <Style.Triggers>
 
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="ListView">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="ListView">
                     <Setter Property="Content">
                         <Setter.Value>
                             <ItemsControl Height="125" ItemsSource="{Binding Output}">
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="wrapper2:ListBoxItemWrapper">
+                                    <DataTemplate DataType="wrapper:ListBoxItemWrapper">
                                         <DataGrid ItemsSource="{Binding Question}" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -40,7 +46,7 @@
                     </Setter>
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="MultiInput">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="MultiInput">
                     <Setter Property="Content">
                         <Setter.Value>
                             <ListBox Height="125" ItemsSource="{Binding Output}">
@@ -57,7 +63,7 @@
                                     </ContextMenu>
                                 </ListBox.ContextMenu>
                                 <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="wrapper2:ListBoxItemWrapper">
+                                    <DataTemplate DataType="wrapper:ListBoxItemWrapper">
                                         <TextBox HorizontalAlignment="Stretch" Margin="5" Text="{Binding Text}" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -66,13 +72,13 @@
                     </Setter>
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="CheckBox">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="CheckBox">
                     <Setter Property="Content">
                         <Setter.Value>
                             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemsSource="{Binding PossibleInput}">
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="wrapper2:ListBoxItemWrapper">
+                                        <DataTemplate DataType="wrapper:ListBoxItemWrapper">
                                             <CheckBox Margin="5"
                                                       IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}"
                                                       Content="{Binding Text}" />
@@ -83,7 +89,7 @@
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="Number">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="Number">
                     <Setter Property="Content">
                         <Setter.Value>
                             <TextBox Margin="5"
@@ -92,7 +98,7 @@
                     </Setter>
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="Date">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="Date">
                     <Setter Property="Content">
                         <Setter.Value>
                             <DatePicker Margin="5"
@@ -101,7 +107,7 @@
                     </Setter>
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="RichText">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="RichText">
                     <Setter Property="Content">
                         <Setter.Value>
                             <TextBox Margin="5" Height="150"
@@ -111,7 +117,7 @@
                     </Setter>
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="ShowProgress">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="ShowProgress">
                     <Setter Property="Content">
                         <Setter.Value>
                             <DockPanel>
@@ -130,13 +136,13 @@
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding SelectedEingabeModus }" Value="RadioBox">
+                <DataTrigger Binding="{Binding SelectedInputMode }" Value="RadioBox">
                     <Setter Property="Content">
                         <Setter.Value>
                             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemsSource="{Binding PossibleInput}">
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="wrapper2:ListBoxItemWrapper">
+                                        <DataTemplate DataType="wrapper:ListBoxItemWrapper">
                                             <RadioButton Margin="5" GroupName="SelectedWayGroub"
                                                          IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}"
                                                          Content="{Binding Text}" />
@@ -148,7 +154,7 @@
                     </Setter>
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding SelectedEingabeModus}" Value="Text">
+                <DataTrigger Binding="{Binding SelectedInputMode}" Value="Text">
                     <Setter Property="Content">
                         <Setter.Value>
                             <TextBox Margin="5"
