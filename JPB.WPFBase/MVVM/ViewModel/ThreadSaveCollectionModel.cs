@@ -120,7 +120,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 base.BeginThreadSaveAction(SendPropChanged);
         }
 
-        //public static explicit operator ThreadSaveCollectionModel<T,TE> (T source)
+        //public static explicit operator ThreadSaveCollectionModel<T, TE>(T source)
         //{
         //    //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
         //    return new ThreadSaveCollectionModel<T, TE>() { Collection = source };

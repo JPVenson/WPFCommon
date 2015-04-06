@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,6 +41,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         #endregion
 
         protected Task CurrentTask;
+        private const string AnonymousTask = "(A59E0AB1-AAC9-4774-A6C1-F13620AF5832)";
 
         protected AsyncViewModelBase(Dispatcher disp)
             : base(disp)
@@ -51,7 +53,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (CurrentTask != null)
             {
-                CurrentTask.Wait(TimeSpan.FromSeconds(1));
+                CurrentTask.Wait(TimeSpan.FromMilliseconds(1));
                 if (CurrentTask.Status == TaskStatus.Running)
                 {
                     CurrentTask.Dispose();
@@ -61,7 +63,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         protected AsyncViewModelBase()
         {
-            
+            _namedTasks = new Dictionary<string, Task>();
         }
 
         public TaskAwaiter GetAwaiter()
@@ -88,95 +90,108 @@ namespace JPB.WPFBase.MVVM.ViewModel
             return false;
         }
 
-        protected void SimpleWorkWithSyncContinue<T>(Func<T> delegatetask, Action<T> continueWith, bool setWorking)
+        private readonly Dictionary<string, Task> _namedTasks;
+
+        protected bool this[string index]
+        {
+            get { return _namedTasks.ContainsKey(index); }
+        }
+
+        protected void SimpleWorkWithSyncContinue<T>(Func<T> delegatetask, Action<T> continueWith, bool setWorking, [CallerMemberName]string taskName = AnonymousTask)
         {
             if (delegatetask != null)
             {
                 var task = new Task<T>(delegatetask.Invoke);
-                SimpleWork(task, new Action<Task<T>>(s =>
-                    base.ThreadSaveAction(() => continueWith(s.Result))), setWorking);
+                SimpleWorkInternal(task, new Action<Task<T>>(s =>
+                    base.ThreadSaveAction(() => continueWith(s.Result))), taskName, setWorking);
             }
         }
 
-        public void SimpleWorkWithSyncContinue<T>(Func<T> delegatetask, Action<T> continueWith)
+        public void SimpleWorkWithSyncContinue<T>(Func<T> delegatetask, Action<T> continueWith, [CallerMemberName]string taskName = AnonymousTask)
         {
-            SimpleWorkWithSyncContinue(delegatetask, continueWith, true);
+            if (delegatetask != null)
+            {
+                var task = new Task<T>(delegatetask.Invoke);
+                SimpleWorkInternal(task, new Action<Task<T>>(s =>
+                    base.ThreadSaveAction(() => continueWith(s.Result))), taskName, true);
+            }
         }
 
-        public void BackgroundSimpleWork(Action delegatetask)
+        public void BackgroundSimpleWork(Action delegatetask, [CallerMemberName]string taskName = AnonymousTask)
         {
             if (delegatetask != null)
             {
                 var task = new Task(delegatetask.Invoke);
-                SimpleWork(task, false);
+                SimpleWorkInternal(task, null, taskName, false);
             }
         }
 
-        public void BackgroundSimpleWork<T>(Func<T> delegatetask, Action<T> continueWith)
+        public void BackgroundSimpleWork<T>(Func<T> delegatetask, Action<T> continueWith, [CallerMemberName]string taskName = AnonymousTask)
         {
             if (delegatetask != null)
             {
                 var task = new Task<T>(delegatetask.Invoke);
-                SimpleWork(task, continueWith, false);
+                SimpleWorkInternal(task, continueWith, taskName, false);
             }
         }
 
-        public void SimpleWork(Action delegatetask)
+        public void SimpleWork(Action delegatetask, [CallerMemberName]string taskName = AnonymousTask)
         {
             if (delegatetask != null)
             {
                 var task = new Task(delegatetask.Invoke);
-                SimpleWork(task);
+                SimpleWorkInternal(task, null, taskName, true);
             }
         }
 
-        public void SimpleWork<T>(Func<T> delegatetask, Action<T> continueWith)
+        public void SimpleWork<T>(Func<T> delegatetask, Action<T> continueWith, [CallerMemberName]string taskName = AnonymousTask)
         {
             if (delegatetask != null)
             {
                 var task = new Task<T>(delegatetask.Invoke);
-                SimpleWork(task, new Action<Task<T>>(s => continueWith(s.Result)));
+                SimpleWorkInternal(task, new Action<Task<T>>(s => continueWith(s.Result)), taskName, true);
             }
         }
 
-        public void SimpleWork(Delegate delegatetask, Delegate continueWith)
+        public void SimpleWork(Delegate delegatetask, Delegate continueWith, [CallerMemberName]string taskName = AnonymousTask)
         {
             if (delegatetask != null)
             {
                 var task = new Task(() => delegatetask.DynamicInvoke());
-                SimpleWork(task, continueWith);
+                SimpleWorkInternal(task, continueWith);
             }
         }
 
-        public void SimpleWork(Delegate delegatetask)
+        public void SimpleWork(Delegate delegatetask, [CallerMemberName]string taskName = AnonymousTask)
         {
-            SimpleWork(new Task(() => delegatetask.DynamicInvoke()));
+            SimpleWorkInternal(new Task(() => delegatetask.DynamicInvoke()), null, taskName, true);
         }
 
-        public void SimpleWork(Task task, Delegate continueWith, bool setWOrking = true)
+        public void SimpleWork(Task task, Delegate continueWith, [CallerMemberName]string taskName = AnonymousTask, bool setWorking = true)
+        {
+            SimpleWorkInternal(task, continueWith, taskName, setWorking);
+        }
+
+        private void SimpleWorkInternal(Task task, Delegate continueWith, string taskName = AnonymousTask, bool setWorking = true)
         {
             if (task != null)
             {
-                if (setWOrking)
+                _namedTasks.Add(taskName, task);
+                if (setWorking)
                     StartWork();
-                task.ContinueWith(s => CreateContinue(s, continueWith, setWOrking)());
-                if (setWOrking)
+                task.ContinueWith(s => CreateContinue(s, continueWith, taskName, setWorking)());
+                if (setWorking)
                     CurrentTask = task;
                 BackgroundSimpleWork(task);
             }
         }
 
-        private Action CreateContinue(Task s)
+        private Action CreateContinue(Task s, bool setWorking, string taskName)
         {
-            return CreateContinue(s, null);
+            return CreateContinue(s, null, taskName, setWorking);
         }
 
-        private Action CreateContinue(Task s, bool setWorking)
-        {
-            return CreateContinue(s, null, setWorking);
-        }
-
-        private Action CreateContinue(Task s, Delegate continueWith, bool setWOrking = true)
+        private Action CreateContinue(Task s, Delegate continueWith, string taskName, bool setWOrking = true)
         {
             Action contuine = () =>
             {
@@ -196,6 +211,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 {
                     if (setWOrking)
                         EndWork();
+
+                    this._namedTasks.Remove(taskName);
                 }
             };
 
@@ -208,14 +225,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 task.Start();
         }
 
-        public void SimpleWork(Task task)
+        public void SimpleWork(Task task, [CallerMemberName]string taskName = AnonymousTask)
         {
-            SimpleWork(task, true);
+            SimpleWorkInternal(task, null, taskName, true);
         }
 
-        public void SimpleWork(Task task, bool setWorking)
+        public void SimpleWork(Task task, bool setWorking, [CallerMemberName]string taskName = AnonymousTask)
         {
-            SimpleWork(task, null, setWorking);
+            SimpleWorkInternal(task, null, taskName, setWorking);
         }
     }
 }

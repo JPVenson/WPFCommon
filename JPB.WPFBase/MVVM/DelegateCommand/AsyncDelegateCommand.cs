@@ -204,7 +204,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
                 return true;
             }
         }
-
+        
         /// <summary>
         ///     Executes the delegate backing this DelegateCommand
         /// </summary>

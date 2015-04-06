@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -13,14 +14,18 @@ namespace JPB.WPFBase.MVVM.ViewModel
 {
     [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
     public class ThreadSaveObservableCollection<T> :
-        Collection<T>,
+        ICollection<T>,
+        IList<T>,
         INotifyCollectionChanged,
         INotifyPropertyChanged
     {
         private readonly object LockObject = new object();
         private readonly ThreadSaveViewModelActor actorHelper;
 
+        private readonly Collection<T> _base;
+
         private ThreadSaveObservableCollection(IEnumerable<T> collection, bool copy)
+            : this((Dispatcher)null)
         {
             if (collection == null)
                 throw new ArgumentNullException("collection");
@@ -35,21 +40,16 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
         }
 
-        public ThreadSaveObservableCollection(List<T> list)
-            : base((list != null) ? new List<T>(list.Count) : list)
-        {
-            CopyFrom(list);
-            actorHelper = new ThreadSaveViewModelBase();
-        }
-
         public ThreadSaveObservableCollection()
+            : this((Dispatcher)null)
         {
-            actorHelper = new ThreadSaveViewModelBase();
+
         }
 
         public ThreadSaveObservableCollection(Dispatcher fromThread)
         {
             actorHelper = new ThreadSaveViewModelBase(fromThread);
+            _base = new Collection<T>();
         }
 
         #region INotifyCollectionChanged Members
@@ -77,70 +77,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 handler(this, e);
         }
 
-        protected override void InsertItem(int index, T item)
-        {
-            T tempitem = item;
-            lock (LockObject)
-            {
-                base.InsertItem(index, tempitem);
-                SendPropertyChanged("Count");
-                SendPropertyChanged("Item[]");
-                actorHelper.ThreadSaveAction(
-                    () => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem, index)));
-            }
-        }
-
-        public void AddRange(IEnumerable<T> item)
-        {
-            IEnumerable<T> tempitem = item;
-            T[] enumerable = tempitem as T[] ?? tempitem.ToArray();
-            foreach (T variable in enumerable)
-                base.Add(variable);
-            if (enumerable.Any())
-            {
-                actorHelper.ThreadSaveAction(
-                    () =>
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable.Last())));
-            }
-        }
-
-        protected override void ClearItems()
-        {
-            lock (LockObject)
-            {
-                base.ClearItems();
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                    });
-            }
-        }
-
-        protected virtual void MoveItem(int oldIndex, int newIndex)
-        {
-            T item;
-            lock (LockObject)
-            {
-                if (oldIndex + 1 > this.Count)
-                    return;
-                item = base[oldIndex];
-                base.RemoveItem(oldIndex);
-                base.InsertItem(newIndex, item);
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-                            NotifyCollectionChangedAction.Move, item,
-                            newIndex, oldIndex));
-                    });
-            }
-
-        }
-
         private void CopyFrom(IEnumerable<T> collection, bool copyRef = false)
         {
             lock (LockObject)
@@ -150,7 +86,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 }
                 else
                 {
-                    IList<T> items = base.Items;
+                    IList<T> items = _base;
                     if ((collection != null) && (items != null))
                     {
                         using (IEnumerator<T> enumerator = collection.GetEnumerator())
@@ -161,53 +97,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
                     }
                 }
             }
-        }
-
-        protected override void RemoveItem(int index)
-        {
-            T item;
-            lock (LockObject)
-            {
-                if (index + 1 > this.Count)
-                    return;
-
-                item = base[index];
-                base.RemoveItem(index);
-
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(
-                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
-                                index));
-                    });
-            }
-        }
-
-        protected override void SetItem(int index, T item)
-        {
-            T oldItem;
-            lock (LockObject)
-            {
-                //count is not Null based
-                if (index + 1 > base.Count)
-                    return;
-
-                oldItem = base[index];
-                base.SetItem(index, item);
-
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(
-                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
-                                oldItem, item, index));
-                    });
-            }
-
         }
 
         #region INotifyPropertyChanged
@@ -253,5 +142,200 @@ namespace JPB.WPFBase.MVVM.ViewModel
         }
 
         #endregion
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _base.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)_base).GetEnumerator();
+        }
+
+        public void Add(T item)
+        {
+            lock (LockObject)
+            {
+                T tempitem = item;
+                _base.Add(tempitem);
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem));
+                    });
+            }
+        }
+
+        public void AddRange(IEnumerable<T> item)
+        {
+            lock (LockObject)
+            {
+                IEnumerable<T> tempitem = item;
+                T[] enumerable = tempitem as T[] ?? tempitem.ToArray();
+                foreach (T variable in enumerable)
+                {
+                    _base.Add(variable);
+                    SendPropertyChanged("Count");
+                    SendPropertyChanged("Item[]");
+                }
+                if (enumerable.Any())
+                {
+                    actorHelper.ThreadSaveAction(
+                        () =>
+                            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable.Last())));
+                }
+            }
+        }
+
+        public void Clear()
+        {
+            lock (LockObject)
+            {
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        _base.Clear();
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    });
+            }
+        }
+
+        public void Move(int oldIndex, int newIndex)
+        {
+            T item;
+            lock (LockObject)
+            {
+
+                //if (oldIndex + 1 > this.Count)
+                //    return;
+                //item = base[oldIndex];
+                //_base.Remove(oldIndex);
+                //base.InsertItem(newIndex, item);
+                //actorHelper.ThreadSaveAction(
+                //    () =>
+                //    {
+                //        SendPropertyChanged("Count");
+                //        SendPropertyChanged("Item[]");
+                //        OnCollectionChanged(new NotifyCollectionChangedEventArgs(
+                //            NotifyCollectionChangedAction.Move, item,
+                //            newIndex, oldIndex));
+                //    });
+            }
+        }
+
+        public bool Contains(T item)
+        {
+            return _base.Contains(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            _base.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(T item)
+        {
+            T item2;
+            lock (LockObject)
+            {
+                item2 = item;
+                var index = IndexOf(item2);
+                var result = _base.Remove(item2);
+
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(
+                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
+                                index));
+                    });
+                return result;
+            }
+        }
+
+        public int Count
+        {
+            get { return _base.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public int IndexOf(T item)
+        {
+            lock (LockObject)
+            {
+                return _base.IndexOf(item);
+            }
+        }
+
+        public void Insert(int index, T item)
+        {
+            T tempitem = item;
+            lock (LockObject)
+            {
+                _base.Insert(index, tempitem);
+                SendPropertyChanged("Count");
+                SendPropertyChanged("Item[]");
+                actorHelper.ThreadSaveAction(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem, index)));
+            }
+        }
+
+        public void SetItem(int index, T newItem)
+        {
+            T oldItem;
+            lock (LockObject)
+            {
+                //count is not Null based
+                if (index + 1 > Count)
+                    return;
+
+                oldItem = _base[index];
+                _base.RemoveAt(index);
+                _base.Insert(index, newItem);
+
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(
+                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
+                                oldItem, newItem, index));
+                    });
+            }
+        }
+
+        public void RemoveAt(int index)
+        {
+            lock (LockObject)
+            {
+                var old = _base[index];
+                _base.RemoveAt(index);
+                actorHelper.ThreadSaveAction(
+                 () =>
+                 {
+                     SendPropertyChanged("Count");
+                     SendPropertyChanged("Item[]");
+                     OnCollectionChanged(
+                         new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, old, index));
+                 });
+            }
+        }
+
+        public T this[int index]
+        {
+            get { return _base.ElementAt(index); }
+            set { throw new NotImplementedException(); }
+        }
     }
 }
