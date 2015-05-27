@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -14,10 +15,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 {
     [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
     public class ThreadSaveObservableCollection<T> :
+        AsyncViewModelBase,
         ICollection<T>,
+        IEnumerable<T>,
         IList<T>,
-        INotifyCollectionChanged,
-        INotifyPropertyChanged
+        IList,
+        INotifyCollectionChanged
     {
         private readonly object LockObject = new object();
         private readonly ThreadSaveViewModelActor actorHelper;
@@ -185,7 +188,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 {
                     actorHelper.ThreadSaveAction(
                         () =>
-                            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable.Last())));
+                            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)enumerable)));
                 }
             }
         }
@@ -202,29 +205,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
                         SendPropertyChanged("Item[]");
                         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                     });
-            }
-        }
-
-        public void Move(int oldIndex, int newIndex)
-        {
-            T item;
-            lock (LockObject)
-            {
-
-                //if (oldIndex + 1 > this.Count)
-                //    return;
-                //item = base[oldIndex];
-                //_base.Remove(oldIndex);
-                //base.InsertItem(newIndex, item);
-                //actorHelper.ThreadSaveAction(
-                //    () =>
-                //    {
-                //        SendPropertyChanged("Count");
-                //        SendPropertyChanged("Item[]");
-                //        OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-                //            NotifyCollectionChangedAction.Move, item,
-                //            newIndex, oldIndex));
-                //    });
             }
         }
 
@@ -331,6 +311,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
                  });
             }
         }
+
+
 
         public T this[int index]
         {

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Linq;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
@@ -47,23 +50,31 @@ namespace JPB.WPFBase.MVVM.ViewModel
             : base(disp)
         {
             disp.ShutdownFinished += disp_ShutdownStarted;
+            _namedTasks = new List<Tuple<string, Task>>();
         }
 
         void disp_ShutdownStarted(object sender, EventArgs e)
         {
             if (CurrentTask != null)
             {
-                CurrentTask.Wait(TimeSpan.FromMilliseconds(1));
-                if (CurrentTask.Status == TaskStatus.Running)
+                try
                 {
-                    CurrentTask.Dispose();
+                    CurrentTask.Wait(TimeSpan.FromMilliseconds(1));
+                    if (CurrentTask.Status == TaskStatus.Running)
+                    {
+                        CurrentTask.Dispose();
+                    }
+                }
+                catch (Exception)
+                {
+                    Trace.Write("Error due cleanup of tasks");
                 }
             }
         }
 
         protected AsyncViewModelBase()
         {
-            _namedTasks = new Dictionary<string, Task>();
+            _namedTasks = new List<Tuple<string, Task>>();
         }
 
         public TaskAwaiter GetAwaiter()
@@ -74,6 +85,27 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
             return new TaskAwaiter();
         }
+
+        /// <summary>
+        /// Allows you to check for a Condtion if the calling method is named after the mehtod you would like to check but starts with "Can"
+        /// </summary>
+        /// <param name="taskName"></param>
+        /// <returns></returns>
+        public bool CheckCanExecuteCondition([CallerMemberName]string taskName = AnonymousTask)
+        {
+            if (taskName == AnonymousTask)
+            {
+                return this[taskName];
+            }
+
+            if (!taskName.StartsWith("Can"))
+            {
+                return this[taskName];
+            }
+
+            return this[taskName.Remove(0, 3)];
+        }
+
 
         private void StartWork()
         {
@@ -90,11 +122,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
             return false;
         }
 
-        private readonly Dictionary<string, Task> _namedTasks;
+        private readonly List<Tuple<string, Task>> _namedTasks;
 
         protected bool this[string index]
         {
-            get { return _namedTasks.ContainsKey(index); }
+            get { return _namedTasks.All(s => s.Item1 != index); }
         }
 
         protected void SimpleWorkWithSyncContinue<T>(Func<T> delegatetask, Action<T> continueWith, bool setWorking, [CallerMemberName]string taskName = AnonymousTask)
@@ -176,7 +208,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (task != null)
             {
-                _namedTasks.Add(taskName, task);
+                _namedTasks.Add(new Tuple<string, Task>(taskName, task));
                 if (setWorking)
                     StartWork();
                 task.ContinueWith(s => CreateContinue(s, continueWith, taskName, setWorking)());
@@ -211,8 +243,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 {
                     if (setWOrking)
                         EndWork();
-
-                    this._namedTasks.Remove(taskName);
+                    var fod = _namedTasks.FirstOrDefault(e => e.Item1 == taskName);
+                    this._namedTasks.Remove(fod);
                 }
             };
 
