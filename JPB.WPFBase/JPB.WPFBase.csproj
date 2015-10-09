@@ -75,6 +75,7 @@
     <Compile Include="Converter\VisibilityBooleanConverter.cs" />
     <Compile Include="MVVM\DelegateCommand\AsyncDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\DelegateCommand.cs" />
+    <Compile Include="MVVM\ViewModel\AsyncThreadSaveObservableCollection.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveCollectionModel.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveObservableCollection.cs" />

@@ -14,7 +14,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         /// </summary>
         Complete,
         /// <summary>
-        /// Only the IsWorking flag will be used
+        /// Only the IsWorking flag will be used. Way more performance
         /// </summary>
         WorkingOnly
     }
@@ -37,9 +37,10 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         /// </summary>
         public List<Tuple<AsyncDelegateCommand, DependLevel>> DependsOn { get; private set; }
 
-        public void AddDependency(AsyncDelegateCommand command, DependLevel level)
+        public AsyncDelegateCommand AddDependency(AsyncDelegateCommand command, DependLevel level)
         {
             DependsOn.Add(new Tuple<AsyncDelegateCommand, DependLevel>(command, level));
+            return this;
         }
 
         /// <summary>
@@ -88,8 +89,11 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
             get { return _asyncCanExecute; }
             set
             {
-                _asyncCanExecute = value;
-                SendPropertyChanged(() => AsyncCanExecute);
+                lock (Lock)
+                {
+                    _asyncCanExecute = value;
+                    SendPropertyChanged(() => AsyncCanExecute);
+                }
             }
         }
 
@@ -131,82 +135,84 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         /// <returns>True if command is valid for execution</returns>
         public bool CanExecute(object parameter)
         {
-            lock (Lock)
+            if (!AsyncCanExecute)
             {
-                if (StateOfCanExecute == CheckState.BeforeExecutionInProgress || StateOfCanExecute == CheckState.AsyncExecutionScheduled)
-                {
-                    return false;
-                }
-
-                if (AsyncCanExecute && _asyncCanExResult.HasValue && StateOfCanExecute == CheckState.AsyncExecutionDone)
-                {
-                    var val = _asyncCanExResult.Value;
-                    return val;
-                }
-
-                if (StateOfCanExecute == CheckState.BeforeExecution)
-                {
-                    StateOfCanExecute = CheckState.BeforeExecutionInProgress;
-                }
-                else
-                {
-                    StateOfCanExecute = new StackTrace().GetFrame(1).GetMethod().Name.Contains("CanExecuteCommandSource") ? CheckState.UIFired : CheckState.Unknown;
-
-                    if (IsWorking)
-                        return false;
-                }
-
-                if (AsyncCanExecute && _canExecutePredicate != null && StateOfCanExecute != CheckState.BeforeExecutionInProgress)
-                {
-                    StateOfCanExecute = CheckState.AsyncExecutionScheduled;
-                    base.SimpleWork(() => _canExecutePredicate(parameter), s =>
-                    {
-                        _asyncCanExResult = s;
-                        StateOfCanExecute = CheckState.AsyncExecutionDone;
-                        CommandManager.InvalidateRequerySuggested();
-                    });
-
-                    return false;
-                }
-
                 if (_canExecutePredicate != null)
                 {
-                    if (!_canExecutePredicate(parameter))
-                        return false;
+                    return _canExecutePredicate(parameter);
                 }
-
-                foreach (var s in DependsOn)
+                return true;
+            }
+            else
+            {
+                lock (Lock)
                 {
-                    if (s.Item2 == DependLevel.WorkingOnly)
+                    if (StateOfCanExecute == CheckState.BeforeExecutionInProgress || StateOfCanExecute == CheckState.AsyncExecutionScheduled)
                     {
-                        bool canExecute = s.Item1.IsWorking;
+                        return false;
+                    }
+
+                    if (_asyncCanExResult.HasValue && StateOfCanExecute == CheckState.AsyncExecutionDone)
+                    {
+                        return _asyncCanExResult.Value;
+                    }
+
+                    if (StateOfCanExecute == CheckState.BeforeExecution)
+                    {
+                        StateOfCanExecute = CheckState.BeforeExecutionInProgress;
+                    }
+                    else
+                    {
+                        StateOfCanExecute = new StackTrace().GetFrame(1).GetMethod().Name.Contains("CanExecuteCommandSource") ? CheckState.UIFired : CheckState.Unknown;
+
+                        if (IsWorking)
+                            return false;
+                    }
+
+                    if (_canExecutePredicate != null && StateOfCanExecute != CheckState.BeforeExecutionInProgress)
+                    {
+                        StateOfCanExecute = CheckState.AsyncExecutionScheduled;
+                        base.SimpleWork(() => _canExecutePredicate(parameter), s =>
+                        {
+                            _asyncCanExResult = s;
+                            StateOfCanExecute = CheckState.AsyncExecutionDone;
+                            CommandManager.InvalidateRequerySuggested();
+                        });
+
+                        return false;
+                    }
+
+                    foreach (var s in DependsOn)
+                    {
+                        bool canExecute = false;
+                        if (s.Item2 == DependLevel.WorkingOnly)
+                        {
+                            canExecute = s.Item1.IsWorking;
+                        }
+
+                        if (s.Item2 == DependLevel.Complete)
+                        {
+                            canExecute = s.Item1.CanExecute(parameter);
+                        }
+
                         if (canExecute)
                         {
                             return false;
                         }
                     }
 
-                    if (s.Item2 == DependLevel.Complete)
+                    if (StateOfCanExecute == CheckState.BeforeExecutionInProgress)
                     {
-                        bool canExecute = s.Item1.CanExecute(parameter);
-                        if (!canExecute)
-                        {
-                            return false;
-                        }
+                        StateOfCanExecute = CheckState.AfterExecutionInProgress;
                     }
-                }
 
-                if (StateOfCanExecute == CheckState.BeforeExecutionInProgress)
-                {
-                    StateOfCanExecute = CheckState.AfterExecutionInProgress;
+                    return true;
                 }
-
-                return true;
             }
         }
-        
+
         /// <summary>
-        ///     Executes the delegate backing this DelegateCommand
+        ///     
         /// </summary>
         /// <param name="parameter">parameter to pass to delegate</param>
         /// <exception cref="InvalidOperationException">Thrown if CanExecute returns false</exception>

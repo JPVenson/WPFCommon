@@ -21,7 +21,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
         protected Dispatcher Dispatcher { get; set; }
 
         public object Lock { get; set; }
-        public bool IsLocked { get; set; }
+
+        public bool IsLocked { get; protected set; }
 
         public void ThreadSaveAction(Action action)
         {

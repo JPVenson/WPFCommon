@@ -35,6 +35,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 
         public void Add(Action action, object key)
         {
+            //nested usage is not allowed
             if (_thread == Thread.CurrentThread)
                 return;
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DynamicInputBox", "JPB.DynamicInputBox\JPB.DynamicInputBox.csproj", "{7D032140-B57A-4EFE-B6FA-C83E01AECC93}"
 EndProject
@@ -15,9 +15,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFBase", "JPB.WPFBase\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApplication1", "WpfApplication1\WpfApplication1.csproj", "{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApplication2", "WpfApplication2\WpfApplication2.csproj", "{0D8FC4C1-A490-43D2-A243-771D467DAB2F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFNetworkIntigration", "JPB.WPFNetworkIntigration\JPB.WPFNetworkIntigration.csproj", "{C7FA6C12-319F-45B2-8428-02DBA2586569}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFToolsAwsome", "JPB.WPFToolsAwsome\JPB.WPFToolsAwsome.csproj", "{75CDAED2-AFD5-45C1-9E44-C1719490A513}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicInputBoxTest", "DynamicInputBoxTest\DynamicInputBoxTest.csproj", "{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,14 +77,6 @@ Global
 		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Server|Any CPU.ActiveCfg = Release|Any CPU
 		{94AC27EA-E502-4EB9-AA1B-F2B4D439B4C0}.Server|Any CPU.Build.0 = Release|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.ExternalRelease|Any CPU.Build.0 = Release|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Server|Any CPU.ActiveCfg = Release|Any CPU
-		{0D8FC4C1-A490-43D2-A243-771D467DAB2F}.Server|Any CPU.Build.0 = Release|Any CPU
 		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7FA6C12-319F-45B2-8428-02DBA2586569}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,6 +85,22 @@ Global
 		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Server|Any CPU.ActiveCfg = Release|Any CPU
 		{C7FA6C12-319F-45B2-8428-02DBA2586569}.Server|Any CPU.Build.0 = Release|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.ExternalRelease|Any CPU.Build.0 = Release|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Server|Any CPU.ActiveCfg = Release|Any CPU
+		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Server|Any CPU.Build.0 = Release|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.ExternalRelease|Any CPU.Build.0 = Release|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.Server|Any CPU.ActiveCfg = Release|Any CPU
+		{AD1990CA-EB23-43AC-8D2A-03DEE7190D4D}.Server|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,8 +18,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
         AsyncViewModelBase,
         ICollection<T>,
         IEnumerable<T>,
-        IList<T>,
+        IReadOnlyList<T>,
+        IReadOnlyCollection<T>,
         IList,
+        IList<T>,
         INotifyCollectionChanged
     {
         private readonly object LockObject = new object();
@@ -62,12 +64,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #endregion
 
-        #region INotifyPropertyChanged Members
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
         public static ThreadSaveObservableCollection<T> Wrap<T>(ObservableCollection<T> batchServers)
         {
             return new ThreadSaveObservableCollection<T>(batchServers, true);
@@ -102,50 +98,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
         }
 
-        #region INotifyPropertyChanged
-
-        /// <summary>
-        ///     Raised when a property on this object has a new value
-        /// </summary>
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanged event
-        /// </summary>
-        /// <param name="propertyName">Name of the property that has a new value</param>
-        public void SendPropertyChanged(string propertyName)
-        {
-            SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
-
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanged event
-        /// </summary>
-        /// <param name="e">Arguments detailing the change</param>
-        protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
-        {
-            var lambda = (LambdaExpression)property;
-
-            MemberExpression memberExpression;
-            var body = lambda.Body as UnaryExpression;
-
-            if (body != null)
-            {
-                UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression)unaryExpression.Operand;
-            }
-            else
-                memberExpression = (MemberExpression)lambda.Body;
-            SendPropertyChanged(memberExpression.Member.Name);
-        }
-
-        #endregion
-
         public IEnumerator<T> GetEnumerator()
         {
             return _base.GetEnumerator();
@@ -158,18 +110,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void Add(T item)
         {
-            lock (LockObject)
-            {
-                T tempitem = item;
-                _base.Add(tempitem);
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem));
-                    });
-            }
+            this.Add(item as object);
         }
 
         public void AddRange(IEnumerable<T> item)
@@ -193,6 +134,36 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
         }
 
+        private void CheckType(object value)
+        {
+            if (!(value is T))
+                throw new InvalidOperationException("object is not type of T");
+        }
+
+        public int Add(object value)
+        {
+            CheckType(value);
+
+            lock (LockObject)
+            {
+                T tempitem = (T)value;
+                var indexOf = ((IList)_base).Add(tempitem);
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem));
+                    });
+                return indexOf;
+            }
+        }
+
+        public bool Contains(object value)
+        {
+            return ((IList)_base).Contains(value);
+        }
+
         public void Clear()
         {
             lock (LockObject)
@@ -206,6 +177,23 @@ namespace JPB.WPFBase.MVVM.ViewModel
                         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                     });
             }
+        }
+
+        public int IndexOf(object value)
+        {
+            return ((IList)_base).IndexOf(value);
+        }
+
+        public void Insert(int index, object value)
+        {
+            CheckType(value);
+            this.Insert(index, (T)value);
+        }
+
+        public void Remove(object value)
+        {
+            CheckType(value);
+            this.Remove((T)value);
         }
 
         public bool Contains(T item)
@@ -240,12 +228,26 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
         }
 
+        public void CopyTo(Array array, int index)
+        {
+            ((ICollection)_base).CopyTo(array, index);
+        }
+
         public int Count
         {
             get { return _base.Count; }
         }
 
+        public object SyncRoot { get { return LockObject; } }
+
+        public bool IsSynchronized { get; private set; }
+
         public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public bool IsFixedSize
         {
             get { return false; }
         }
@@ -275,7 +277,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
             T oldItem;
             lock (LockObject)
             {
-                //count is not Null based
+                //count is not 0 based
                 if (index + 1 > Count)
                     return;
 
@@ -312,12 +314,21 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
         }
 
+        object IList.this[int index]
+        {
+            get { return _base[index]; }
+            set { _base[index] = (T)value; }
+        }
 
+        T IList<T>.this[int index]
+        {
+            get { return _base[index]; }
+            set { _base[index] = value; }
+        }
 
         public T this[int index]
         {
-            get { return _base.ElementAt(index); }
-            set { throw new NotImplementedException(); }
+            get { return _base[index]; }
         }
     }
 }

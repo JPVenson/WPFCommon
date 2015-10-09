@@ -37,6 +37,8 @@ namespace JPB.ErrorValidation
             }
         }
 
+
+        private SingelSeriellTaskFactory _errorFactory = new SingelSeriellTaskFactory();
         private bool _isValidating;
 
         public bool IsValidating
@@ -48,8 +50,6 @@ namespace JPB.ErrorValidation
                 base.ThreadSaveAction(() => SendPropertyChanged(() => IsValidating));
             }
         }
-
-        private SingelSeriellTaskFactory _errorFactory = new SingelSeriellTaskFactory();
 
         void AsyncErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

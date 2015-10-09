@@ -30,9 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="JPB.Communication, Version=2.0.5482.36686, Culture=neutral, PublicKeyToken=992dae45481c2b80, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>3Th Party\JPB.Communication.dll</HintPath>
+    <Reference Include="JPB.Communication.WinRT, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\JPB.Communication.1.0.1\lib\JPB.Communication.WinRT.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,11 +55,8 @@
       <Name>JPB.WPFBase</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="3Th Party\JPB.Communication.dll" />
-    <Content Include="3Th Party\JPB.Communication.pdb" />
-    <Content Include="3Th Party\JPB.Communication.XML" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

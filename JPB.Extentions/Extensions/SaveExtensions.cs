@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace JPB.Extentions.Extensions
 {
     public static class SaveExtensions
     {
-        public static T LoadGenericEx<T>([In, Out] this string Filename) where T : ITypContainer, new()
+        public static T LoadGenericEx<T>(this string Filename) where T : ITypContainer, new()
         {
             if (File.Exists(Filename))
             {
@@ -42,34 +43,49 @@ namespace JPB.Extentions.Extensions
             return new T();
         }
 
+        private static void EnumerateTypes(List<Type> source, object validator)
+        {
+            var type = validator.GetType();
+            if (source.Contains(type) || type.IsPrimitive || type.IsValueType || type == typeof(string))
+                return;
+
+            foreach (var propType in type.GetType().GetProperties().Select(s => s.DeclaringType).ToArray())
+            {
+                source.AddHelper(propType);
+                EnumerateTypes(source, propType);
+            }
+
+            if (typeof(IEnumerable).IsAssignableFrom(type))
+                foreach (var enumerable in type as IEnumerable)
+                {
+                    EnumerateTypes(source, enumerable);
+
+                    //var interfaces = enumerable.GetInterfaces();
+                    //foreach (var @interface in interfaces)
+                    //{
+                    //    source.AddHelper(@interface);
+                    //    EnumerateTypes(source, @interface);
+                    //}
+
+                    //if (enumerable.ContainsGenericParameters)
+                    //{
+                    //    foreach (var @generic in enumerable.GetGenericArguments())
+                    //    {
+                    //        source.AddHelper(@generic);
+                    //        EnumerateTypes(source, @generic);
+                    //    }
+                    //}
+                }
+        }
+
         public static void SaveGeneric<T>(this T Class, string Filename)
         {
             var ts = new TypeStore();
             var types = new List<Type>();
-            foreach (var propType in Class.GetType().GetProperties().Select(s => s.DeclaringType).ToArray())
-            {
-                types.AddHelper(propType);
-            }
-
-            foreach (var enumerable in types.Where(s => s.GetInterface("IEnumerable") != null))
-            {
-                var interfaces = enumerable.GetInterfaces();
-                foreach (var @interface in interfaces)
-                {
-                    types.AddHelper(@interface);
-                }
-
-                if (enumerable.ContainsGenericParameters)
-                {
-                    foreach (var @generic in enumerable.GetGenericArguments())
-                    {
-                        types.AddHelper(@generic);
-                    }
-                }
-            }
+            EnumerateTypes(types, Class);
 
             ts.Typen = types.ToArray();
-            ts.SaveAsBinary(Filename + ".typestoren");
+            ts.SaveAsBinary(Filename + ".typestore");
             Class.SaveAsXML(Filename, ts.Typen.ToArray());
         }
 
@@ -128,7 +144,7 @@ namespace JPB.Extentions.Extensions
             return new T();
         }
 
-        public static Stream SaveAsXML(this Object A)
+        public static Stream SaveAsXML(this object A)
         {
             var serializer = new XmlSerializer(A.GetType());
             using (var stream = new MemoryStream())

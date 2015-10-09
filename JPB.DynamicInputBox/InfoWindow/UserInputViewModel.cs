@@ -31,7 +31,7 @@ namespace JPB.DynamicInputBox.InfoWindow
             {"Quit", "OK"},
         };
 
-        public UserInputViewModel(List<object> inputQuestions, Func<List<object>> returnlist, Action abort, IEnumerable<InputMode> inputmode, Dispatcher fromThread)
+        public UserInputViewModel(List<object> inputQuestions, Func<ObservableCollection<object>> returnlist, Action abort, IEnumerable<InputMode> inputmode, Dispatcher fromThread)
             : base(fromThread)
         {
             Inputmode = inputmode;
@@ -125,9 +125,9 @@ namespace JPB.DynamicInputBox.InfoWindow
 
         #region Returnlist property
 
-        private Func<List<object>> _returnlist;
+        private Func<ObservableCollection<object>> _returnlist;
 
-        public Func<List<object>> Returnlist
+        public Func<ObservableCollection<object>> Returnlist
         {
             get { return _returnlist; }
             set

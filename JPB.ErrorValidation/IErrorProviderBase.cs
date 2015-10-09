@@ -10,7 +10,7 @@ namespace JPB.ErrorValidation
         string Error { get; set; }
         bool Validate { get; set; }
         bool HasError { get; }
-        bool AddTypeToText { get; set; }
+        string MessageFormat { get; set; }
         bool HasErrors { get; }
         void Init();
         void ForceRefresh();
@@ -20,7 +20,7 @@ namespace JPB.ErrorValidation
         INotifyPropertyChanged where T : class
     {
         bool HasError { get; }
-        bool AddTypeToText { get; set; }
+        string MessageFormat { get; set; }
         IErrorInfoProvider<T> ErrorInfoProviderSimpleAccessAdapter { get; }
 
         void ForceRefresh();

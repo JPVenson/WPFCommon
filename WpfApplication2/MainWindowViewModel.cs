@@ -25,7 +25,7 @@ namespace WpfApplication2
             RemoveSelectedFromListCommand = new DelegateCommand(ExecuteRemoveSelectedFromList, CanExecuteRemoveSelectedFromList);
             NetworkValueCollection = new BindableNetworkValueBag<string>(1337, "test");
 
-            string showInput = "VS-VIRT1-NATDEV";
+            string showInput = "192.168.1.1";
 
             //IPAddress buffOutput;
             //do
@@ -38,7 +38,7 @@ namespace WpfApplication2
             //        showInput = firstOrDefault.ToString();
             //} while (!IPAddress.TryParse(showInput, out buffOutput));
 
-            NetworkValueCollection.Connect("192.168.0.222");
+            NetworkValueCollection.Connect("192.168.1.1");
 
             new TCPIP().Show();
             new ActionTriggerWindow(NetworkValueCollection).Show();

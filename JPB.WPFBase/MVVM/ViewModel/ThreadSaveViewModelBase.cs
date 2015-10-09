@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 
 namespace JPB.WPFBase.MVVM.ViewModel
@@ -8,21 +9,21 @@ namespace JPB.WPFBase.MVVM.ViewModel
     public class ThreadSaveViewModelBase : ThreadSaveViewModelActor, INotifyPropertyChanged, INotifyPropertyChanging
     {
         public ThreadSaveViewModelBase(Dispatcher fromThread)
-            :base(fromThread)
+            : base(fromThread)
         {
 
         }
 
         public ThreadSaveViewModelBase()
         {
-            
+
         }
 
         /// <summary>
         ///     Raises this ViewModels PropertyChanged event
         /// </summary>
         /// <param name="propertyName">Name of the property that has a new value</param>
-        public void SendPropertyChanged(string propertyName)
+        public void SendPropertyChanged([CallerMemberName]string propertyName = null)
         {
             SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
@@ -92,7 +93,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
             SendPropertyChanged(memberExpression.Member.Name);
         }
 
-        public event PropertyChangingEventHandler PropertyChanging;      
+        public event PropertyChangingEventHandler PropertyChanging;
         /// <summary>
         ///     Raised when a property on this object has a new value
         /// </summary>

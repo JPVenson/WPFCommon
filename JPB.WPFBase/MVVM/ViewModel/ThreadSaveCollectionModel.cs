@@ -10,12 +10,12 @@ using System.Collections.Generic;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    public class ThreadSaveCollectionModel<T, TE> : ThreadSaveViewModelBase, IEnumerable<TE>
-        where T : IEnumerable<TE>, new()
+    public class ThreadSaveCollectionModel<CollectionType, CollectionGenerica> : ThreadSaveViewModelBase, IEnumerable<CollectionGenerica>
+        where CollectionType : IEnumerable<CollectionGenerica>, new()
     {
         public ThreadSaveCollectionModel()
         {
-            Collection = new T();
+            this.Collection = new CollectionType();
             CreateFromSingelItem = s => new[] { s };
         }
 
@@ -25,25 +25,25 @@ namespace JPB.WPFBase.MVVM.ViewModel
             SendPropChanged = sendPropChanged;
         }
 
-        public ThreadSaveCollectionModel(Action sendPropChanged, Func<TE, IEnumerable<TE>> createFromSingelItem)
+        public ThreadSaveCollectionModel(Action sendPropChanged, Func<CollectionGenerica, IEnumerable<CollectionGenerica>> createFromSingelItem)
             : this(sendPropChanged)
         {
             CreateFromSingelItem = createFromSingelItem;
         }
 
-        public ThreadSaveCollectionModel(Func<TE, IEnumerable<TE>> createFromSingelItem)
+        public ThreadSaveCollectionModel(Func<CollectionGenerica, IEnumerable<CollectionGenerica>> createFromSingelItem)
             : this(null, createFromSingelItem)
         {
         }
 
         public Action SendPropChanged { get; set; }
-        public Func<TE, IEnumerable<TE>> CreateFromSingelItem { get; set; }
+        public Func<CollectionGenerica, IEnumerable<CollectionGenerica>> CreateFromSingelItem { get; set; }
 
         #region Collection property
 
-        private T _collection;
+        private CollectionType _collection;
 
-        public T Collection
+        public CollectionType Collection
         {
             get { return _collection; }
             set
@@ -57,9 +57,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #region SelectedItems property
 
-        private IEnumerable<TE> _selectedItems = default(IEnumerable<TE>);
+        private IEnumerable<CollectionGenerica> _selectedItems = default(IEnumerable<CollectionGenerica>);
 
-        public IEnumerable<TE> SelectedItems
+        public IEnumerable<CollectionGenerica> SelectedItems
         {
             get { return _selectedItems; }
             set
@@ -73,9 +73,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #region SelectedItem property
 
-        private TE _selectedItem;
+        private CollectionGenerica _selectedItem;
 
-        public TE SelectedItem
+        public CollectionGenerica SelectedItem
         {
             get
             {
@@ -91,9 +91,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #endregion
 
-        public IEnumerator<TE> GetEnumerator()
+        public IEnumerator<CollectionGenerica> GetEnumerator()
         {
-            return Collection.GetEnumerator();
+            return this.Collection.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -103,7 +103,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void SendCollectionChanged()
         {
-            base.BeginThreadSaveAction(() => SendPropertyChanged(() => Collection));
+            base.BeginThreadSaveAction(() => SendPropertyChanged(() => this.Collection));
         }
 
         public void SendSelectedItemsChanged()
@@ -126,10 +126,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
         //    return new ThreadSaveCollectionModel<T, TE>() { Collection = source };
         //}
 
-        public static implicit operator ThreadSaveCollectionModel<T, TE>(T source)
+        public static implicit operator ThreadSaveCollectionModel<CollectionType, CollectionGenerica>(CollectionType source)
         {
             //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
-            return new ThreadSaveCollectionModel<T, TE> { Collection = source };
+            return new ThreadSaveCollectionModel<CollectionType, CollectionGenerica> { Collection = source };
         }
     }
 }

@@ -25,7 +25,7 @@ namespace JPB.ErrorValidation
             }
             set
             {
-                if(value == _error)
+                if (value == _error)
                     return;
 
                 _error = value;
@@ -52,15 +52,15 @@ namespace JPB.ErrorValidation
         {
             if (ErrorObserver<T>.Instance.GetProviderViaType() == null)
                 ErrorObserver<T>.Instance.RegisterErrorProvider(new TE());
-            //TODO add async validation
-            //ErrorInfoProviderSimpleAccessAdapter.Errors.CollectionChanged += ErrorsOnCollectionChanged;
 
-            AddTypeToText = true;
+            MessageFormat = "{0} - {1}";
             Validation = ValidationLogic.BreakAtFirstFail;
             Validate = true;
         }
 
         public bool Validate { get; set; }
+
+        [XmlIgnore]
         protected ValidationLogic Validation { get; set; }
 
         [XmlIgnore]
@@ -69,13 +69,16 @@ namespace JPB.ErrorValidation
             get { return ErrorObserver<T>.Instance.GetProviderViaType(); }
         }
 
+        [XmlIgnore]
         public bool HasError
         {
             get { return ErrorInfoProviderSimpleAccessAdapter.HasError; }
         }
 
-        public bool AddTypeToText { get; set; }
+        public string MessageFormat { get; set; }
 
+        [XmlIgnore]
+        [Obsolete]
         public bool HasErrors { get { return HasError; } }
 
         public enum ValidationLogic
@@ -109,16 +112,16 @@ namespace JPB.ErrorValidation
                 return err;
             }
 
-            var refference = ErrorObserver<T>.Instance.GetProviderViaType().Errors;
+            var refference = ErrorInfoProviderSimpleAccessAdapter.Errors;
 
-            var listOfErrors =
-                ErrorObserver<T>.Instance.GetProviderViaType()
+            var errTemplates =
+                ErrorInfoProviderSimpleAccessAdapter
                     .Where(s => s.ErrorIndicator.Contains(errorIndicator) || !s.ErrorIndicator.Any()).ToArray();
 
             switch (Validation)
             {
                 case ValidationLogic.RunThroghAll:
-                    foreach (var error in listOfErrors)
+                    foreach (var error in errTemplates)
                     {
                         if (ManageValidationRule(obj, error))
                         {
@@ -127,7 +130,7 @@ namespace JPB.ErrorValidation
                     }
                     break;
                 case ValidationLogic.BreakAtFirstFail:
-                    foreach (var item in listOfErrors)
+                    foreach (var item in errTemplates)
                     {
                         if (ManageValidationRule(obj, item))
                         {
@@ -137,14 +140,13 @@ namespace JPB.ErrorValidation
                     }
                     break;
                 case ValidationLogic.BreakAtFirstFailButRunAllWarnings:
-                    var ofErrors = listOfErrors as IValidation<T>[] ?? listOfErrors.ToArray();
 
-                    foreach (var warning in listOfErrors.Where(s => s is Warning<T>))
+                    foreach (var warning in errTemplates.Where(s => s is Warning<T>))
                     {
                         ManageValidationRule(obj, warning);
                     }
 
-                    foreach (var item in ofErrors.Where(s => s is Error<T>))
+                    foreach (var item in errTemplates.Where(s => s is Error<T>))
                     {
                         var isFailed = ManageValidationRule(obj, item);
                         if (isFailed)
@@ -182,16 +184,11 @@ namespace JPB.ErrorValidation
             // Bedingung ist wahr und error ist nicht in der liste der angezeigten errors
             if (conditionresult && !ErrorInfoProviderSimpleAccessAdapter.Errors.Contains(item))
             {
-                if (AddTypeToText)
-                {
-                    if (item.ErrorText.StartsWith(item.ErrorType))
-                        item.ErrorText = string.Format("{0} : {1}", item.ErrorType, item.ErrorText);
-                }
                 ErrorInfoProviderSimpleAccessAdapter.Errors.Add(item);
-                Error = item.ErrorText;
+                Error = string.Format(MessageFormat, item.ErrorType, item.ErrorText);
             }
 
-            // Bedingung ist flasch und error ist in der liste der angezeigten errors
+            // Bedingung ist falsch und error ist in der liste der angezeigten errors
             if (!conditionresult && ErrorInfoProviderSimpleAccessAdapter.Errors.Contains(item))
                 ErrorInfoProviderSimpleAccessAdapter.Errors.Remove(item);
             else if (ErrorInfoProviderSimpleAccessAdapter.Errors.Contains(item))

@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using JPB.DynamicInputBox.InfoWindow;
 using JPB.DynamicInputBox.InfoWindow.Controls;
 using JPB.DynamicInputBox.InfoWindow.Wrapper;
+using System.Collections.ObjectModel;
 
 namespace JPB.DynamicInputBox
 {
@@ -42,7 +43,7 @@ namespace JPB.DynamicInputBox
 
         public static object ShowInput<T>(IWaiterWrapper<T> inputQuestion)
         {
-            var returns = new List<object>();
+            var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns,
                 new List<InputMode> { InputMode.ShowProgress }))
                 return returns.FirstOrDefault();
@@ -51,7 +52,7 @@ namespace JPB.DynamicInputBox
 
         public static object ShowInput(Func<object> inputQuestion)
         {
-            var returns = new List<object>();
+            var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns,
                 new List<InputMode> { InputMode.ShowProgress }))
                 return returns.FirstOrDefault();
@@ -60,7 +61,7 @@ namespace JPB.DynamicInputBox
 
         public static string ShowInput(string inputQuestion)
         {
-            var returns = new List<object>();
+            var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns, new List<InputMode> { InputMode.Text }))
                 return returns.FirstOrDefault() as string;
             return null;
@@ -114,13 +115,13 @@ namespace JPB.DynamicInputBox
 
         public static object ShowInput(string inputQuestion, InputMode modus)
         {
-            var returns = new List<object>();
+            var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns, new List<InputMode> { modus }))
                 return returns.FirstOrDefault();
             return null;
         }
 
-        public static bool ShowInput(Func<List<object>> updateDelegate, List<object> inputQuestions,
+        public static bool ShowInput(Func<ObservableCollection<object>> updateDelegate, List<object> inputQuestions,
             List<InputMode> eingabeModi)
         {
             return WindowThread(inputQuestions, updateDelegate, eingabeModi);
@@ -128,19 +129,19 @@ namespace JPB.DynamicInputBox
 
         public static IEnumerable<object> ShowInput(List<object> inputQuestions, List<InputMode> eingabeModi)
         {
-            var returns = new List<object>();
+            var returns = new ObservableCollection<object>();
             WindowThread(inputQuestions, () => returns, eingabeModi);
             return returns;
         }
 
         public static IEnumerable<object> ShowInput(List<object> inputQuestions)
         {
-            var returns = new List<object>();
+            var returns = new ObservableCollection<object>();
             WindowThread(inputQuestions, () => returns, returns.Select(retursn => InputMode.Text));
             return returns;
         }
 
-        private static bool WindowThread(List<object> inputQuestions, Func<List<object>> returnlist,
+        private static bool WindowThread(List<object> inputQuestions, Func<ObservableCollection<object>> returnlist,
             IEnumerable<InputMode> eingabeModi)
         {
             bool? ret = false;
