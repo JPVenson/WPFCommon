@@ -15,7 +15,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
     {
         #region IsWorking property
 
-        private bool _isWorking = default(bool);
+        private volatile bool _isWorking = default(bool);
 
         public bool IsWorking
         {
@@ -43,7 +43,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #endregion
 
-        protected Task CurrentTask;
+        protected volatile Task CurrentTask;
         private const string AnonymousTask = "(A59E0AB1-AAC9-4774-A6C1-F13620AF5832)";
 
         protected AsyncViewModelBase(Dispatcher disp)

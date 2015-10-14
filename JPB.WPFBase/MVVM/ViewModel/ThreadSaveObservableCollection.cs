@@ -4,27 +4,28 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
+using System.Threading;
 using System.Windows.Threading;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    [Serializable, DebuggerDisplay("Count = {Count}"), ComVisible(false)]
+    [Serializable, DebuggerDisplay("Count = {Count}")]
     public class ThreadSaveObservableCollection<T> :
         AsyncViewModelBase,
         ICollection<T>,
         IEnumerable<T>,
         IReadOnlyList<T>,
         IReadOnlyCollection<T>,
+        IProducerConsumerCollection<T>,
         IList,
         IList<T>,
         INotifyCollectionChanged
     {
-        private readonly object LockObject = new object();
         private readonly ThreadSaveViewModelActor actorHelper;
 
         private readonly Collection<T> _base;
@@ -63,8 +64,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         #endregion
-
-        public static ThreadSaveObservableCollection<T> Wrap<T>(ObservableCollection<T> batchServers)
+        public static ThreadSaveObservableCollection<T> Wrap(ObservableCollection<T> batchServers)
         {
             return new ThreadSaveObservableCollection<T>(batchServers, true);
         }
@@ -78,7 +78,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         private void CopyFrom(IEnumerable<T> collection, bool copyRef = false)
         {
-            lock (LockObject)
+            lock (Lock)
             {
                 if (copyRef)
                 {
@@ -115,7 +115,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void AddRange(IEnumerable<T> item)
         {
-            lock (LockObject)
+            if (!this.CheckThrowReadOnlyException())
+                return;
+            lock (Lock)
             {
                 IEnumerable<T> tempitem = item;
                 T[] enumerable = tempitem as T[] ?? tempitem.ToArray();
@@ -129,7 +131,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 {
                     actorHelper.ThreadSaveAction(
                         () =>
-                            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)enumerable)));
+                            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable)));
                 }
             }
         }
@@ -143,10 +145,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public int Add(object value)
         {
             CheckType(value);
+            if (!this.CheckThrowReadOnlyException())
+                return 0;
 
-            lock (LockObject)
+            lock (Lock)
             {
-                T tempitem = (T)value;
+                var tempitem = (T)value;
                 var indexOf = ((IList)_base).Add(tempitem);
                 actorHelper.ThreadSaveAction(
                     () =>
@@ -166,7 +170,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void Clear()
         {
-            lock (LockObject)
+            if (!this.CheckThrowReadOnlyException())
+                return;
+            lock (Lock)
             {
                 actorHelper.ThreadSaveAction(
                     () =>
@@ -208,8 +214,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public bool Remove(T item)
         {
+            if (!this.CheckThrowReadOnlyException())
+                return false;
             T item2;
-            lock (LockObject)
+            lock (Lock)
             {
                 item2 = item;
                 var index = IndexOf(item2);
@@ -238,13 +246,20 @@ namespace JPB.WPFBase.MVVM.ViewModel
             get { return _base.Count; }
         }
 
-        public object SyncRoot { get { return LockObject; } }
+        public object SyncRoot { get { return Lock; } }
 
         public bool IsSynchronized { get; private set; }
 
         public bool IsReadOnly
         {
-            get { return false; }
+            get;
+            set;
+        }
+
+        public bool IsReadOnlyOptimistic
+        {
+            get;
+            set;
         }
 
         public bool IsFixedSize
@@ -254,7 +269,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public int IndexOf(T item)
         {
-            lock (LockObject)
+            lock (Lock)
             {
                 return _base.IndexOf(item);
             }
@@ -262,8 +277,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void Insert(int index, T item)
         {
+            if (!this.CheckThrowReadOnlyException())
+                return;
+
             T tempitem = item;
-            lock (LockObject)
+            lock (Lock)
             {
                 _base.Insert(index, tempitem);
                 SendPropertyChanged("Count");
@@ -272,10 +290,22 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
         }
 
+        private bool CheckThrowReadOnlyException()
+        {
+            if (IsReadOnlyOptimistic)
+                return false;
+
+            if (IsReadOnly)
+                throw new NotSupportedException("This Collection was set to ReadOnly");
+            return true;
+        }
+
         public void SetItem(int index, T newItem)
         {
+            if (!this.CheckThrowReadOnlyException())
+                return;
             T oldItem;
-            lock (LockObject)
+            lock (Lock)
             {
                 //count is not 0 based
                 if (index + 1 > Count)
@@ -299,7 +329,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public void RemoveAt(int index)
         {
-            lock (LockObject)
+            if (!this.CheckThrowReadOnlyException())
+                return;
+            lock (Lock)
             {
                 var old = _base[index];
                 _base.RemoveAt(index);
@@ -314,16 +346,58 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
         }
 
+        public bool TryAdd(T item)
+        {
+            if(Monitor.IsEntered(this.Lock))
+            {
+                return false;
+            }
+            Add(item);
+            return true;
+        }
+
+        public bool TryTake(out T item)
+        {
+            item = default(T);
+            if (!Monitor.IsEntered(this.Lock))
+            {
+                lock (this.Lock)
+                {
+                    item = this[Count - 1];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public T[] ToArray()
+        {
+            lock (this.Lock)
+            {
+                return _base.ToArray();
+            }
+        }
+        
         object IList.this[int index]
         {
             get { return _base[index]; }
-            set { _base[index] = (T)value; }
+            set
+            {
+                if (!this.CheckThrowReadOnlyException())
+                    return;
+                _base[index] = (T)value;
+            }
         }
 
         T IList<T>.this[int index]
         {
             get { return _base[index]; }
-            set { _base[index] = value; }
+            set
+            {
+                if (!this.CheckThrowReadOnlyException())
+                    return;
+                _base[index] = value;
+            }
         }
 
         public T this[int index]

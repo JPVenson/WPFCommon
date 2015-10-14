@@ -10,7 +10,8 @@ using System.Collections.Generic;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    public class ThreadSaveCollectionModel<CollectionType, CollectionGenerica> : ThreadSaveViewModelBase, IEnumerable<CollectionGenerica>
+    public class ThreadSaveCollectionModel<CollectionType, CollectionGenerica> : ThreadSaveViewModelBase, 
+        IEnumerable<CollectionGenerica>
         where CollectionType : IEnumerable<CollectionGenerica>, new()
     {
         public ThreadSaveCollectionModel()
