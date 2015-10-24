@@ -24,11 +24,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
         IProducerConsumerCollection<T>,
         IList,
         IList<T>,
-        INotifyCollectionChanged
+        INotifyCollectionChanged,
+        ICloneable,
+        IDisposable
     {
         private readonly ThreadSaveViewModelActor actorHelper;
 
         private readonly Collection<T> _base;
+
+        private bool _batchCommit;
 
         private ThreadSaveObservableCollection(IEnumerable<T> collection, bool copy)
             : this((Dispatcher)null)
@@ -58,6 +62,77 @@ namespace JPB.WPFBase.MVVM.ViewModel
             _base = new Collection<T>();
         }
 
+
+        private void StartBatchCommit()
+        {
+            _batchCommit = true;
+        }
+
+        private void EndBatchCommit()
+        {
+            _batchCommit = false;
+            this.SendPropertyChanged(string.Empty);
+        }
+
+        /// <summary>
+        /// Batches commands into a single statement that will run when the delegate will retun true. Lock is optional but recommand
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="withLock"></param>
+        /// <param name="batchCommit"></param>
+        public void InTransaction(Func<ThreadSaveObservableCollection<T>, bool> action, 
+            bool withLock = true)
+        {
+            try
+            {
+                if (withLock)
+                    Monitor.Enter(this.Lock);
+
+                var cpy = Clone() as ThreadSaveObservableCollection<T>;
+                var events = new List<NotifyCollectionChangedEventArgs>();
+                cpy._batchCommit = true;
+                cpy.CollectionChanged += (e,f) =>
+                {
+                    events.Add(f);
+                };
+
+                var commit = action(cpy);
+                if(commit)
+                {
+                    foreach (var item in events)
+                    {
+                        switch (item.Action)
+                        {
+                            case NotifyCollectionChangedAction.Add:
+                                this.Add(item.NewItems[0]);
+                                break;
+                            case NotifyCollectionChangedAction.Remove:
+                                this.Remove(item.NewItems[0]);
+                                break;
+                            case NotifyCollectionChangedAction.Replace:
+                                this.SetItem(item.NewStartingIndex, (T)item.NewItems[0]);
+                                break;
+                            case NotifyCollectionChangedAction.Move:
+                                
+                                break;
+                            case NotifyCollectionChangedAction.Reset:
+                                this.Clear();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                cpy.Dispose();
+            }
+            finally
+            {
+                if (withLock)
+                    Monitor.Exit(this.Lock);
+            }       
+        }
+
         #region INotifyCollectionChanged Members
 
         [field: NonSerialized]
@@ -71,28 +146,25 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
+            if (_batchCommit)
+                return;
+
             NotifyCollectionChangedEventHandler handler = CollectionChanged;
             if (handler != null)
                 handler(this, e);
         }
 
-        private void CopyFrom(IEnumerable<T> collection, bool copyRef = false)
+        private void CopyFrom(IEnumerable<T> collection)
         {
             lock (Lock)
             {
-                if (copyRef)
+                IList<T> items = _base;
+                if ((collection != null) && (items != null))
                 {
-                }
-                else
-                {
-                    IList<T> items = _base;
-                    if ((collection != null) && (items != null))
+                    using (IEnumerator<T> enumerator = collection.GetEnumerator())
                     {
-                        using (IEnumerator<T> enumerator = collection.GetEnumerator())
-                        {
-                            while (enumerator.MoveNext())
-                                items.Add(enumerator.Current);
-                        }
+                        while (enumerator.MoveNext())
+                            items.Add(enumerator.Current);
                     }
                 }
             }
@@ -304,6 +376,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (!this.CheckThrowReadOnlyException())
                 return;
+
             T oldItem;
             lock (Lock)
             {
@@ -377,7 +450,24 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 return _base.ToArray();
             }
         }
-        
+
+        public object Clone()
+        {
+            lock (this.Lock)
+            {
+                var newCollection = new ThreadSaveObservableCollection<T>(this);
+                return newCollection;
+            }
+        }
+
+        public void Dispose()
+        {
+            lock (this.Lock)
+            {
+                _base.Clear();
+            }
+        }
+
         object IList.this[int index]
         {
             get { return _base[index]; }
