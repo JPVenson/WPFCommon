@@ -6,9 +6,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
 using System.Threading;
 using System.Windows.Threading;
 
@@ -28,10 +25,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
         ICloneable,
         IDisposable
     {
+        [NonSerialized]
         private readonly ThreadSaveViewModelActor actorHelper;
-
+        
         private readonly Collection<T> _base;
 
+        [NonSerialized]
         private bool _batchCommit;
 
         private ThreadSaveObservableCollection(IEnumerable<T> collection, bool copy)
@@ -71,32 +70,31 @@ namespace JPB.WPFBase.MVVM.ViewModel
         private void EndBatchCommit()
         {
             _batchCommit = false;
-            this.SendPropertyChanged(string.Empty);
-        }
+        }        
 
         /// <summary>
         /// Batches commands into a single statement that will run when the delegate will retun true. Lock is optional but recommand
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="withLock"></param>
-        /// <param name="batchCommit"></param>
+        /// <param name="action">You can Query against this collection. Its a copy and only collection actions as Add, Remove or else will be in Transaction</param>
+        /// <param name="withLock">When True the Source collection will be locked as long as the Transaction is running</param>
         public void InTransaction(Func<ThreadSaveObservableCollection<T>, bool> action, 
             bool withLock = true)
         {
+            var cpy = Clone() as ThreadSaveObservableCollection<T>;
             try
             {
                 if (withLock)
                     Monitor.Enter(this.Lock);
 
-                var cpy = Clone() as ThreadSaveObservableCollection<T>;
                 var events = new List<NotifyCollectionChangedEventArgs>();
-                cpy._batchCommit = true;
+                cpy.StartBatchCommit();
                 cpy.CollectionChanged += (e,f) =>
                 {
                     events.Add(f);
                 };
 
                 var commit = action(cpy);
+                cpy.EndBatchCommit();
                 if(commit)
                 {
                     foreach (var item in events)
@@ -104,10 +102,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
                         switch (item.Action)
                         {
                             case NotifyCollectionChangedAction.Add:
-                                this.Add(item.NewItems[0]);
+                                this.AddRange(item.NewItems.Cast<T>());
                                 break;
                             case NotifyCollectionChangedAction.Remove:
-                                this.Remove(item.NewItems[0]);
+                                foreach (T innerItem in item.NewItems)                                
+                                    this.Remove(innerItem);                                
                                 break;
                             case NotifyCollectionChangedAction.Replace:
                                 this.SetItem(item.NewStartingIndex, (T)item.NewItems[0]);
@@ -123,13 +122,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
                         }
                     }
                 }
-
-                cpy.Dispose();
             }
             finally
             {
                 if (withLock)
                     Monitor.Exit(this.Lock);
+                cpy.Dispose();
             }       
         }
 
@@ -146,9 +144,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (_batchCommit)
-                return;
-
             NotifyCollectionChangedEventHandler handler = CollectionChanged;
             if (handler != null)
                 handler(this, e);
@@ -172,12 +167,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _base.GetEnumerator();
+            lock (this.Lock)
+            {
+                return _base.GetEnumerator();
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)_base).GetEnumerator();
+            return this.GetEnumerator();
         }
 
         public void Add(T item)
@@ -202,8 +200,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 if (enumerable.Any())
                 {
                     actorHelper.ThreadSaveAction(
-                        () =>
-                            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable)));
+                        () => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, enumerable)));
                 }
             }
         }
@@ -223,10 +220,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
             lock (Lock)
             {
                 var tempitem = (T)value;
-                var indexOf = ((IList)_base).Add(tempitem);
+                int indexOf = -1;
                 actorHelper.ThreadSaveAction(
                     () =>
                     {
+                        indexOf = ((IList)_base).Add(tempitem);
                         SendPropertyChanged("Count");
                         SendPropertyChanged("Item[]");
                         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, tempitem));
@@ -292,12 +290,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
             lock (Lock)
             {
                 item2 = item;
-                var index = IndexOf(item2);
-                var result = _base.Remove(item2);
-
+                var result = false;
                 actorHelper.ThreadSaveAction(
                     () =>
                     {
+                        var index = IndexOf(item2);
+                        result = _base.Remove(item2);
                         SendPropertyChanged("Count");
                         SendPropertyChanged("Item[]");
                         OnCollectionChanged(
@@ -317,9 +315,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             get { return _base.Count; }
         }
-
+        
         public object SyncRoot { get { return Lock; } }
-
+        
         public bool IsSynchronized { get; private set; }
 
         public bool IsReadOnly
@@ -336,7 +334,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public bool IsFixedSize
         {
-            get { return false; }
+            get { return IsReadOnly; }
         }
 
         public int IndexOf(T item)
@@ -384,13 +382,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 if (index + 1 > Count)
                     return;
 
-                oldItem = _base[index];
-                _base.RemoveAt(index);
-                _base.Insert(index, newItem);
-
                 actorHelper.ThreadSaveAction(
                     () =>
                     {
+                        oldItem = _base[index];
+                        _base.RemoveAt(index);
+                        _base.Insert(index, newItem);
                         SendPropertyChanged("Count");
                         SendPropertyChanged("Item[]");
                         OnCollectionChanged(
@@ -406,11 +403,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 return;
             lock (Lock)
             {
-                var old = _base[index];
-                _base.RemoveAt(index);
                 actorHelper.ThreadSaveAction(
                  () =>
                  {
+                     var old = _base[index];
+                     _base.RemoveAt(index);
                      SendPropertyChanged("Count");
                      SendPropertyChanged("Item[]");
                      OnCollectionChanged(

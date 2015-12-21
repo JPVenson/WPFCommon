@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
@@ -20,7 +21,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         ///     Raises this ViewModels PropertyChanged event
         /// </summary>
         /// <param name="propertyName">Name of the property that has a new value</param>
-        public void SendPropertyChanged(string propertyName)
+        public void SendPropertyChanged([CallerMemberName]string propertyName = null)
         {
             SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
