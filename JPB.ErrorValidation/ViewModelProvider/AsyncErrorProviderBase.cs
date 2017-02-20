@@ -40,16 +40,11 @@ namespace JPB.ErrorValidation.ViewModelProvider
         }
 
         private readonly SingelSeriellTaskFactory _errorFactory = new SingelSeriellTaskFactory();
-        private bool _isValidating;
+        private int _workerCount = 0;
 
         public bool IsValidating
         {
-            get { return _isValidating; }
-            set
-            {
-                _isValidating = value;
-                base.ThreadSaveAction(() => SendPropertyChanged(() => IsValidating));
-            }
+            get { return _workerCount > 0; }
         }
 
         void AsyncErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -114,15 +109,29 @@ namespace JPB.ErrorValidation.ViewModelProvider
         {
             _errorFactory.Add(() =>
             {
-                List<IValidation> errorJob = null;
-                ErrorMapper.TryGetValue(propertyName, out errorJob);
-                var failed = base.GetError(propertyName, this);
-
-                if (errorJob != null)
+                try
                 {
-                    errorJob.Clear();
-                    errorJob.AddRange(failed);
+                    _workerCount++;
+                    base.ThreadSaveAction(() => SendPropertyChanged(() => IsValidating));
+                    List<IValidation> errorJob = null;
+                    ErrorMapper.TryGetValue(propertyName, out errorJob);
+                    var failed = base.GetError(propertyName, this);
+
+                    if (errorJob != null)
+                    {
+                        base.BeginThreadSaveAction(() =>
+                        {
+                            errorJob.Clear();
+                            errorJob.AddRange(failed);
+                        });
+                    }
                 }
+                finally
+                {
+                    _workerCount--;
+                    base.ThreadSaveAction(() => SendPropertyChanged(() => IsValidating));
+                }
+
             }, propertyName);
         }
 

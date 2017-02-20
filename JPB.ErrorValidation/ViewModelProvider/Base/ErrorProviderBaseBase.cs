@@ -30,10 +30,9 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
                 if (value == _error)
                     return;
 
-                _error = value;
-
                 base.ThreadSaveAction(() =>
                 {
+                    _error = value;
                     SendPropertyChanged();
                 });
             }
@@ -53,7 +52,8 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
         public void Init()
         {
             UserErrors = new T();
-            ActiveValidationCases = new ObservableCollection<IValidation>();
+            var active = new ThreadSaveObservableCollection<IValidation>();
+            ActiveValidationCases = active;
             MessageFormat = "{0} - {1}";
             Validation = ValidationLogic.RunThroughAll;
             Validate = true;
@@ -246,7 +246,26 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
             return conditionresult;
         }
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add
+            {
+                var changed = ActiveValidationCases as INotifyCollectionChanged;
+                if (changed != null)
+                {
+                    changed.CollectionChanged += value;
+                }
+            }
+            remove
+            {
+                var changed = ActiveValidationCases as INotifyCollectionChanged;
+                if (changed != null)
+                {
+                    changed.CollectionChanged -= value;
+                }
+            }
+        }
+
         public bool WarningAsFailure { get; set; }
 
         public virtual Type RetrunT()

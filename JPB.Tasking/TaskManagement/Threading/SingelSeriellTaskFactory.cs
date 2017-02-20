@@ -37,7 +37,10 @@ namespace JPB.Tasking.TaskManagement.Threading
         {
             //nested usage is not allowed
             if (_thread == Thread.CurrentThread)
+            {
+                action();
                 return;
+            }
 
             if (key != null && ConcurrentQueue.Any(s => s.Item2 == key))
             {

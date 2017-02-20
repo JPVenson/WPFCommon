@@ -81,10 +81,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public IEnumerator<T> GetEnumerator()
         {
-            lock (Lock)
-            {
-                return _base.GetEnumerator();
-            }
+            return _base.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

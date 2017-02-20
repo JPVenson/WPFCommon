@@ -59,6 +59,28 @@ namespace JPB.ErrorValidation.ValidationTyps
             };
         }
 
+        /// <summary>
+        /// Appends an Error if this Condition was True
+        /// </summary>
+        /// <param name="error"></param>
+        /// <returns></returns>
+        public List<IValidation<T>> AndNot(Error<T> error)
+        {
+            var oldCondition = error.Condition;
+            error.Condition = (obj) =>
+            {
+                if (!Condition(obj))
+                {
+                    return oldCondition(obj);
+                }
+                return false;
+            };
+            return new List<IValidation<T>>()
+            {
+                this, error
+            };
+        }
+
         #region IValidation<T> Members
 
         public string[] ErrorIndicator { get; set; }
