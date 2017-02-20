@@ -15,11 +15,12 @@ using JPB.DynamicInputBox.InfoWindow.Controls;
 using JPB.DynamicInputBox.InfoWindow.IQuestionModelImp;
 using JPB.ErrorValidation;
 using JPB.ErrorValidation.ValidationRules;
+using JPB.ErrorValidation.ViewModelProvider.Base;
 using JPB.WPFBase.MVVM.DelegateCommand;
 
 namespace JPB.DynamicInputBox.InfoWindow
 {
-    public class UserInputViewModel : ErrorProviderBase<UserInputViewModel, UserInputViewModelValidation>, IEnumerator
+    public class UserInputViewModel : ErrorProviderBase<UserInputViewModelValidation>, IEnumerator
     {
         private readonly Action _abort;
 
@@ -184,7 +185,7 @@ namespace JPB.DynamicInputBox.InfoWindow
         private bool CanNextStep(object sender)
         {
             //return !string.IsNullOrEmpty((Steps.DataContext as QuestionViewModel).Input);
-            return !(SelectedStep.DataContext as IErrorProviderBase).HasError;
+            return (SelectedStep.DataContext is IErrorValidatorBase) && (SelectedStep.DataContext as IErrorValidatorBase).HasError;
         }
 
         #endregion
@@ -198,7 +199,7 @@ namespace JPB.DynamicInputBox.InfoWindow
         /// <param name="sender">The transferparameter</param>
         private void PreviousStep(object sender)
         {
-            var vm = ((IQuestionAbstrViewModelBase) SelectedStep.DataContext);
+            var vm = ((IQuestionAbstrViewModelBase)SelectedStep.DataContext);
             if (Returnlist.Invoke().Count > Index)
                 Returnlist.Invoke()[Index] = (vm.Input);
             else
@@ -332,7 +333,7 @@ namespace JPB.DynamicInputBox.InfoWindow
                 object question = InputQuestions.ElementAt(i);
                 InputMode eingabemodi = GetInput(i);
                 var vm = SwitchTypes(eingabemodi, question);
-                Steps.Add(new QuestionUserControl {DataContext = vm});
+                Steps.Add(new QuestionUserControl { DataContext = vm });
             }
 
             SelectedStep = Steps.ElementAt(0);
@@ -368,8 +369,12 @@ namespace JPB.DynamicInputBox.InfoWindow
         #endregion
     }
 
-    public class UserInputViewModelValidation : ValidationRuleBase<UserInputViewModel>
+    public class UserInputViewModelValidation : ErrorCollection<UserInputViewModel>
     {
+        public UserInputViewModelValidation()
+        {
+
+        }
     }
 }
 

@@ -17,7 +17,7 @@ namespace JPB.WPFNetworkIntigration
         public BindableNetworkValueBag(ushort port, string guid)
             : base(port, guid)
         {
-            WpfSyncHelper = new ThreadSaveViewModelBase();
+            WpfSyncHelper = new ViewModelBase();
             LocalValues = new ThreadSaveObservableCollection<T>();
         }
 
@@ -25,7 +25,7 @@ namespace JPB.WPFNetworkIntigration
         {
             WpfSyncHelper.ThreadSaveAction(() =>
             {
-                base.OnCollectionChanged(e);                
+                base.OnCollectionChanged(e);
             });
         }
 

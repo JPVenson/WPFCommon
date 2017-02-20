@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Input;
 using JPB.WPFBase.MVVM.ViewModel;
 
@@ -109,7 +108,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
             }
         }
 
-        public override bool OnTaskException(Exception exception)
+        protected override bool OnTaskException(Exception exception)
         {
             _asyncCanExResult = false;
             return base.OnTaskException(exception);
@@ -212,7 +211,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         }
 
         /// <summary>
-        ///     
+        ///
         /// </summary>
         /// <param name="parameter">parameter to pass to delegate</param>
         /// <exception cref="InvalidOperationException">Thrown if CanExecute returns false</exception>

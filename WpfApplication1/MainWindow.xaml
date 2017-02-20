@@ -6,7 +6,8 @@
         xmlns:wpfApplication1="clr-namespace:WpfApplication1"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
+        Title="MainWindow" Height="350" Width="525"
+        d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
 
     <Window.Resources>
         <Style x:Key="targetStyle" TargetType="TextBox">
@@ -22,26 +23,26 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <ContentControl 
+                            <ContentControl
                                 Grid.Row="0"
                                 Grid.Column="0">
                                 <ContentControl.Style>
                                     <Style TargetType="ContentControl">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding }"></DataTrigger>
+                                            <DataTrigger Binding="{Binding }" />
                                         </Style.Triggers>
                                     </Style>
                                 </ContentControl.Style>
                             </ContentControl>
 
                             <TextBox x:Name="PlaceholderTextContentPresenter"
-                                  Grid.Row="0"
-                                  Grid.Column="1"
-                                  Margin="{TemplateBinding BorderThickness}"
-                                  Padding="{TemplateBinding Padding}"
-                                  IsTabStop="False"
-                                  Text="{Binding Text,RelativeSource={RelativeSource TemplatedParent}}" 
-                                  IsHitTestVisible="False"/>
+                                     Grid.Row="0"
+                                     Grid.Column="1"
+                                     Margin="{TemplateBinding BorderThickness}"
+                                     Padding="{TemplateBinding Padding}"
+                                     IsTabStop="False"
+                                     Text="{Binding Text,RelativeSource={RelativeSource TemplatedParent}}"
+                                     IsHitTestVisible="False" />
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -50,45 +51,37 @@
     </Window.Resources>
 
     <DockPanel>
-        <Button Command="{Binding TaskACommand}">TaskA</Button>
-        <Button Command="{Binding TaskBCommand}">TaskB</Button>
-        <TextBox DockPanel.Dock="Top"  
-                 Text="{Binding ToValidationString, Mode=TwoWay, NotifyOnValidationError=True,ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
+        <Button DockPanel.Dock="Top" Command="{Binding TaskACommand}">TaskA</Button>
+        <Button DockPanel.Dock="Top" Command="{Binding TaskBCommand}">TaskB</Button>
+        <TextBox DockPanel.Dock="Top"
+                 Text="{Binding ToValidationString, Mode=TwoWay,
+                 ValidatesOnDataErrors=True,
+                 UpdateSourceTrigger=PropertyChanged}"
                  Height="25">
+            <!--NotifyOnValidationError=True,ValidatesOnNotifyDataErrors=True,-->
             <Validation.ValidationAdornerSiteFor>
-                <Label Content="X"></Label>
+                <Label Content="X" />
             </Validation.ValidationAdornerSiteFor>
             <Validation.ErrorTemplate>
                 <ControlTemplate>
                     <StackPanel>
                         <!-- Placeholder for the TextBox itself -->
-                        <Border>
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding }">
-                                            
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                        </Border>
-                        <AdornedElementPlaceholder x:Name="textBox"/>
-                        <ItemsControl ItemsSource="{Binding}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding ErrorContent.ErrorText}" Foreground="Red"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <AdornedElementPlaceholder x:Name="textBox" />
                     </StackPanel>
                 </ControlTemplate>
             </Validation.ErrorTemplate>
         </TextBox>
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ActiveValidationCases}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ErrorText}" Foreground="Red" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
-        <!--<TextBox 
+        <!--<TextBox
             Style="{StaticResource {x:Type TextBox}}"
-            DockPanel.Dock="Top" 
+            DockPanel.Dock="Top"
                  Text="{Binding ToValidationString, ValidatesOnNotifyDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBox DockPanel.Dock="Top" Text="{Binding ToValidationString, UpdateSourceTrigger=PropertyChanged}"/>

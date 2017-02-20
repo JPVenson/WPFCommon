@@ -11,7 +11,7 @@ using JPB.ErrorValidation.ValidationRules;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
-    public class QuestionViewModel : QuestionAbstrViewModelBase<QuestionViewModel, QuestionViewModelValidation>
+    public class QuestionViewModel : QuestionAbstrViewModelBase<QuestionViewModelValidation>
     {
         public QuestionViewModel(object question, InputMode inputMode)
             : base(question, inputMode)
@@ -20,7 +20,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         }
     }
 
-    public class QuestionViewModelValidation : ValidationRuleBase<QuestionViewModel>
+    public class QuestionViewModelValidation : ErrorCollection<QuestionViewModel>
     {
     }
 }

@@ -12,7 +12,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         public QuestionMutliOrSingelInputViewModel(object question, InputMode inputMode)
             : base(question, inputMode)
         {
-           
+
         }
 
         public string ParsexQuestionText(object input)
@@ -30,7 +30,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             {
                 if (!(input is string))
                     throw new ArgumentException("Can not parse text!");
-                
+
                 string lowertext = text.ToLower();
                 if (!lowertext.Contains("#q"))
                     throw new ArgumentException("Can not parse text!");
@@ -42,7 +42,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
                         allquestions.Select(
                             allquestion =>
                                 new ListBoxItemWrapper { Text = allquestion, Index = allquestions.IndexOf(allquestion) }));
-            }          
+            }
 
             foreach (ListBoxItemWrapper item in PossibleInput)
             {

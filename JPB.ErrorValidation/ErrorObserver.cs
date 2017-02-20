@@ -1,38 +1,21 @@
-﻿namespace JPB.ErrorValidation
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+
+namespace JPB.ErrorValidation
 {
-    public class ErrorObserver<T>
-    {
-        #region SINGELTON for ever
+    //public class ErrorValidationController
+    //{
+    //    private static IDictionary<Type, IErrorProviderBase> InfoProvider { get; set; } = new ConcurrentDictionary<Type, IErrorProviderBase>();
 
-        private static ErrorObserver<T> _instance;
+    //    public static void RegisterErrorProvider(IErrorProviderBase infoProvider)
+    //    {
+    //        InfoProvider.Add(infoProvider.RetrunT(), infoProvider);
+    //    }
 
-        private ErrorObserver()
-        {
-        }
-
-        public static ErrorObserver<T> Instance
-        {
-            get { return _instance ?? (_instance = new ErrorObserver<T>()); }
-            set { _instance = value; }
-        }
-
-        #endregion
-
-        private IErrorInfoProvider<T> InfoProvider { get; set; }
-
-        public void RegisterErrorProvider(IErrorInfoProvider<T> infoProvider)
-        {
-            InfoProvider = (infoProvider);
-        }
-
-        public void UnregistErrorProvider(IErrorInfoProvider<T> infoProvider)
-        {
-            InfoProvider = null;
-        }
-
-        public IErrorInfoProvider<T> GetProviderViaType()
-        {
-            return InfoProvider;
-        }
-    }
+    //    public static IErrorProviderBase GetProviderViaType(Type type)
+    //    {
+    //        return InfoProvider[type];
+    //    }
+    //}
 }

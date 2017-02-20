@@ -5,46 +5,54 @@
 #endregion
 
 using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Data;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    public class ThreadSaveCollectionModel<CollectionType, CollectionGenerica> : ThreadSaveViewModelBase, 
-        IEnumerable<CollectionGenerica>
-        where CollectionType : IEnumerable<CollectionGenerica>, new()
+    public class ThreadSaveCollectionModel<T, TC> : ViewModelBase,
+        IEnumerable<TC>
+        where T : IEnumerable<TC>, new()
     {
         public ThreadSaveCollectionModel()
         {
-            this.Collection = new CollectionType();
-            CreateFromSingelItem = s => new[] { s };
+            this.Collection = new T();
+            FilterView = CollectionViewSource.GetDefaultView(this.Collection);
+            if (CreateFromSingelItem != null)
+                CreateFromSingelItem = s => new[] { s };
         }
 
         public ThreadSaveCollectionModel(Action sendPropChanged)
             : this()
         {
+            if (sendPropChanged == null) throw new ArgumentNullException(nameof(sendPropChanged));
             SendPropChanged = sendPropChanged;
         }
 
-        public ThreadSaveCollectionModel(Action sendPropChanged, Func<CollectionGenerica, IEnumerable<CollectionGenerica>> createFromSingelItem)
+        public ThreadSaveCollectionModel(Action sendPropChanged, Func<TC, IEnumerable<TC>> createFromSingelItem)
             : this(sendPropChanged)
         {
+            if (createFromSingelItem == null) throw new ArgumentNullException(nameof(createFromSingelItem));
             CreateFromSingelItem = createFromSingelItem;
         }
 
-        public ThreadSaveCollectionModel(Func<CollectionGenerica, IEnumerable<CollectionGenerica>> createFromSingelItem)
+        public ThreadSaveCollectionModel(Func<TC, IEnumerable<TC>> createFromSingelItem)
             : this(null, createFromSingelItem)
         {
         }
 
+        public ICollectionView FilterView { get; set; }
         public Action SendPropChanged { get; set; }
-        public Func<CollectionGenerica, IEnumerable<CollectionGenerica>> CreateFromSingelItem { get; set; }
+        public Func<TC, IEnumerable<TC>> CreateFromSingelItem { get; set; }
 
         #region Collection property
 
-        private CollectionType _collection;
+        private T _collection;
 
-        public CollectionType Collection
+        public T Collection
         {
             get { return _collection; }
             set
@@ -58,9 +66,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #region SelectedItems property
 
-        private IEnumerable<CollectionGenerica> _selectedItems = default(IEnumerable<CollectionGenerica>);
+        private IEnumerable<TC> _selectedItems = default(IEnumerable<TC>);
 
-        public IEnumerable<CollectionGenerica> SelectedItems
+        public IEnumerable<TC> SelectedItems
         {
             get { return _selectedItems; }
             set
@@ -74,9 +82,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #region SelectedItem property
 
-        private CollectionGenerica _selectedItem;
+        private TC _selectedItem;
 
-        public CollectionGenerica SelectedItem
+        public TC SelectedItem
         {
             get
             {
@@ -92,7 +100,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         #endregion
 
-        public IEnumerator<CollectionGenerica> GetEnumerator()
+        public IEnumerator<TC> GetEnumerator()
         {
             return this.Collection.GetEnumerator();
         }
@@ -127,10 +135,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
         //    return new ThreadSaveCollectionModel<T, TE>() { Collection = source };
         //}
 
-        public static implicit operator ThreadSaveCollectionModel<CollectionType, CollectionGenerica>(CollectionType source)
-        {
-            //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
-            return new ThreadSaveCollectionModel<CollectionType, CollectionGenerica> { Collection = source };
-        }
+        //public static implicit operator ThreadSaveCollectionModel<T, TC>(T source)
+        //{
+        //    //return new ThreadSaveCollectionModel<ThreadSaveObservableCollection<TE>, TE>() { Collection = source };
+        //    return new ThreadSaveCollectionModel<T, TC> { Collection = source };
+        //}
     }
 }

@@ -10,23 +10,21 @@ using JPB.DynamicInputBox.InfoWindow.Interfaces;
 using JPB.ErrorValidation;
 using JPB.ErrorValidation.ValidationRules;
 using JPB.ErrorValidation.ValidationTyps;
+using JPB.ErrorValidation.ViewModelProvider.Base;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
-    public interface IQuestionAbstrViewModelBase : IErrorProviderBase
+    public interface IQuestionAbstrViewModelBase : IErrorValidatorBase
     {
         bool IsInit { get; set; }
         object Question { get; set; }
         object Input { get; set; }
         InputMode SelectedInputMode { get; set; }
-        new void Init();
     }
 
-    public abstract class QuestionAbstrViewModelBase<T, TE> : ErrorProviderBase<T, TE>,
+    public abstract class QuestionAbstrViewModelBase<T> : ErrorProviderBase<T>,
         IQuestionViewModel<T>,
-        IQuestionAbstrViewModelBase
-        where T : class
-        where TE : class, IErrorInfoProvider<T>, new()
+        IQuestionAbstrViewModelBase where T : class, IErrorCollectionBase, new()
     {
         private object _input;
         private bool _isInit;
@@ -71,7 +69,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
                 SendPropertyChanged(() => Input);
             }
         }
-        
+
         public InputMode SelectedInputMode
         {
             get { return _selectedInputMode; }
@@ -90,23 +88,13 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         }
 
         #endregion
-
-        string IErrorProviderBase<T>.GetError(string columnName, T obj)
-        {
-            var validation = base.GetError(columnName, obj);
-            if (validation != null)
-                return validation.ErrorText;
-            return string.Empty;
-        }
     }
 
-    public class QuestionAbstrViewModelBaseValidation<T, TE> : ValidationRuleBase<QuestionAbstrViewModelBase<T, TE>>
-        where T : class, new()
-        where TE : class, IErrorInfoProvider<T>, new()
+    public class QuestionAbstrViewModelBaseValidation<T> : ErrorCollection<QuestionAbstrViewModelBase<T>> where T : class, IErrorCollectionBase, new()
     {
         public QuestionAbstrViewModelBaseValidation()
         {
-            Add(new Error<QuestionAbstrViewModelBase<T, TE>>("Bitte gebe etwas in das Eingabefeld ein", "Input",
+            Add(new Error<QuestionAbstrViewModelBase<T>>("Bitte gebe etwas in das Eingabefeld ein", "Input",
                 s => s.Input == null));
         }
     }

@@ -9,7 +9,7 @@ using JPB.ErrorValidation;
 
 namespace JPB.DynamicInputBox.InfoWindow.Interfaces
 {
-    public interface IQuestionViewModel<T> : IErrorProviderBase<T>
+    public interface IQuestionViewModel<T>
         where T : class
     {
         bool IsInit { get; set; }

@@ -141,7 +141,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
             if (collection == null)
                 throw new ArgumentNullException("collection");
 
-            actorHelper = new ThreadSaveViewModelBase();
+            actorHelper = new ViewModelBase();
         }
 
         public AsyncThreadSaveCollection(IEnumerable<T> collection)
@@ -157,7 +157,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public AsyncThreadSaveCollection(Dispatcher fromThread)
         {
-            actorHelper = new ThreadSaveViewModelBase(fromThread);
+            actorHelper = new ViewModelBase(fromThread);
             _base = new Collection<T>();
         }
 

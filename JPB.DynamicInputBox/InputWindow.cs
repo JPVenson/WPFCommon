@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,8 +11,32 @@ using System.Collections.ObjectModel;
 
 namespace JPB.DynamicInputBox
 {
+    public class Localisation
+    {
+        public Localisation()
+        {
+            Resources = new ConcurrentDictionary<string, string>();
+        }
+
+        public IDictionary<string, string> Resources { get; set; }
+    }
+
     public static class InputWindow
     {
+        static InputWindow()
+        {
+            Localisations = new ConcurrentDictionary<string, Localisation>();
+        }
+
+        private static void CreateDe()
+        {
+            var deLoc = new Localisation();
+            deLoc.Resources.Add("EMPTY", "Leer");
+        }
+
+        public static Localisation CurrentLocalisation { get; set; }
+        public static IDictionary<string, Localisation> Localisations { get; set; }
+
         public static T ReparseList<T>(IEnumerable<T> input, IListBoxItemWrapper selected) where T : class
         {
             return input.ElementAt(selected.Index);
@@ -104,10 +129,10 @@ namespace JPB.DynamicInputBox
 
         public static T ShowActionInput<T>(string header, Func<T> values)
         {
-            IWaiterWrapper<T> wrapper = new WaiterWrapperImpl<T>(values,header);
+            IWaiterWrapper<T> wrapper = new WaiterWrapperImpl<T>(values, header);
             var showInput = ShowInput<T>(wrapper);
             if (showInput is T)
-                return (T) showInput;
+                return (T)showInput;
             return default(T);
         }
 

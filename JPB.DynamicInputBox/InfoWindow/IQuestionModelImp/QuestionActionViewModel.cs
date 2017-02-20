@@ -21,15 +21,17 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             : base(question, inputMode)
         {
             if (CultureInfo.CurrentCulture.Equals(new CultureInfo("DE")))
-                base.ErrorInfoProviderSimpleAccessAdapter.Add(
+            {
+                base.UserErrors.Add(
                     new Error<QuestionViewModel>("Bitte warten bis die Action abgelaufen ist", "Input", s => IsRuning));
+            }
             else
             {
-                base.ErrorInfoProviderSimpleAccessAdapter.Add(
+                base.UserErrors.Add(
                     new Error<QuestionViewModel>("Please wait", "Input", s => IsRuning));
             }
 
-                RunActionCommand = new DelegateCommand(RunAction, CanRunAction);
+            RunActionCommand = new DelegateCommand(RunAction, CanRunAction);
 
             if (!(Question is IWaiterWrapper<object>))
             {

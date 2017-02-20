@@ -14,7 +14,7 @@ using JPB.ErrorValidation.ValidationTyps;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
 {
-    public abstract class QuestionMultipleChoiceAbstrViewModel : QuestionAbstrViewModelBase<QuestionMultipleChoiceAbstrViewModel, QuestionMultiChoiceViewModelValid>
+    public abstract class QuestionMultipleChoiceAbstrViewModel : QuestionAbstrViewModelBase<QuestionMultiChoiceViewModelValid>
     {
         protected QuestionMultipleChoiceAbstrViewModel(object question, InputMode inputMode)
             : base(question, inputMode)
@@ -53,7 +53,7 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         #endregion
     }
 
-    public class QuestionMultiChoiceViewModelValid : ValidationRuleBase<QuestionMultipleChoiceAbstrViewModel>
+    public class QuestionMultiChoiceViewModelValid : ErrorCollection<QuestionMultipleChoiceAbstrViewModel>
     {
         public QuestionMultiChoiceViewModelValid()
         {

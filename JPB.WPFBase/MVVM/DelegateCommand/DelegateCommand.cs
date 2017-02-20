@@ -8,12 +8,12 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         /// <summary>
         ///     Predicate to determine if the command is valid for execution
         /// </summary>
-        private readonly Predicate<object> _canExecutePredicate;
+        internal Func<object, bool> CanExecutePredicate;
 
         /// <summary>
         ///     Action to be performed when this command is executed
         /// </summary>
-        private readonly Action<object> _executionAction;
+        internal Action<object> ExecutionAction;
 
         /// <summary>
         ///     Initializes a new instance of the DelegateCommand class.
@@ -30,13 +30,13 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         /// </summary>
         /// <param name="execute">The delegate to call on execution</param>
         /// <param name="canExecute">The predicate to determine if command is valid for execution</param>
-        public DelegateCommand(Action<object> execute, Predicate<object> canExecute)
+        public DelegateCommand(Action<object> execute, Func<object, bool> canExecute)
         {
             if (execute == null)
                 throw new ArgumentNullException("execute");
 
-            _executionAction = execute;
-            _canExecutePredicate = canExecute;
+            ExecutionAction = execute;
+            CanExecutePredicate = canExecute;
         }
 
         #region ICommand Members
@@ -57,7 +57,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         /// <returns>True if command is valid for execution</returns>
         public bool CanExecute(object parameter)
         {
-            return _canExecutePredicate == null || _canExecutePredicate(parameter);
+            return CanExecutePredicate == null || CanExecutePredicate(parameter);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
                     "The command is not valid for execution, check the CanExecute method before attempting to execute.");
             }
 
-            _executionAction(parameter);
+            ExecutionAction(parameter);
         }
 
         #endregion

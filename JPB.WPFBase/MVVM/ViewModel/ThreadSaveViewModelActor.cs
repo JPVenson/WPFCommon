@@ -2,19 +2,33 @@
 using System.Windows;
 using System.Windows.Threading;
 
+#if WINDOWS_UWP
+using Windows.UI.Xaml;
+using Dispatcher = Windows.UI.Core.CoreDispatcher;
+#endif
+
 namespace JPB.WPFBase.MVVM.ViewModel
 {
     public abstract class ThreadSaveViewModelActor
     {
         protected ThreadSaveViewModelActor()
+#if WINDOWS_UWP
+			: this(Window.Current.Dispatcher)
+#else
             : this(Application.Current.Dispatcher)
+#endif
         {
-            
         }
 
         protected ThreadSaveViewModelActor(Dispatcher targetDispatcher)
         {
-            Dispatcher = targetDispatcher ?? Application.Current.Dispatcher;
+            Dispatcher = targetDispatcher ??
+#if WINDOWS_UWP
+			Window.Current.Dispatcher
+#else
+            Application.Current.Dispatcher
+#endif
+                ;
             Lock = new object();
         }
 

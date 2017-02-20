@@ -7,15 +7,25 @@ using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation
 {
-    public interface IErrorInfoProvider<T> : ICollection<IValidation<T>>, INotifyCollectionChanged
+    public interface IErrorCollectionBase : ICollection<IValidation>
     {
+        IEnumerable<IValidation> ReturnErrors(string columnName);
+    }
+
+    public interface IErrorValidatorBase
+    {
+        string Error { get; set; }
+        bool Validate { get; set; }
+        string MessageFormat { get; set; }
         bool HasError { get; }
-        bool WarningAsFailure { get; set; }
-
-        ICollection<IValidation<T>> Errors { get; }
-        IEnumerable<IValidation<T>> Warnings { get; }
-
         Type RetrunT();
-        IEnumerable<IValidation<T>> RetrunErrors(string columnName);
+        void Init();
+        void ForceRefresh();
+        IValidation[] GetError(string columnName, object obj);
+    }
+
+    public interface IErrorValidatorBase<out T> : IErrorValidatorBase, INotifyCollectionChanged where T : IErrorCollectionBase
+    {
+        T UserErrors { get; }
     }
 }
