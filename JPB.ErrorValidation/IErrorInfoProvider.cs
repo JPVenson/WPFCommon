@@ -22,6 +22,7 @@ namespace JPB.ErrorValidation
         void Init();
         void ForceRefresh();
         IValidation[] GetError(string columnName, object obj);
+        ICollection<IValidation> ActiveValidationCases { get; }
     }
 
     public interface IErrorValidatorBase<out T> : IErrorValidatorBase, INotifyCollectionChanged where T : IErrorCollectionBase

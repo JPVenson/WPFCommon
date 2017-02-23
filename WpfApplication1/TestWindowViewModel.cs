@@ -7,7 +7,7 @@ using JPB.WPFBase.MVVM.DelegateCommand;
 
 namespace WpfApplication1
 {
-    public class TestWindowViewModel : AsyncErrorProviderBase<TestWindowViewModelRules>
+    public class TestWindowViewModel : DataErrorBase<TestWindowViewModelRules>
     {
         public TestWindowViewModel()
         {
@@ -69,12 +69,12 @@ namespace WpfApplication1
             Add(new Error<TestWindowViewModel>("Is too big", "ToValidationString",
                 s => s.ToValidationString != null && s.ToValidationString.Length > 5));
             Add(new Error<TestWindowViewModel>("Must be Int", "ToValidationString", s => !int.TryParse(s.ToValidationString, out vc_attributes)));
-            Add(new Error<TestWindowViewModel>("Wait", "ToValidationString", s =>
-            {
-                Thread.Sleep(1000);
-                run++;
-                return run % 2 == 1;
-            }));
+            //Add(new Error<TestWindowViewModel>("Wait", "ToValidationString", s =>
+            //{
+            //    Thread.Sleep(1000);
+            //    run++;
+            //    return run % 2 == 1;
+            //}));
         }
     }
 }

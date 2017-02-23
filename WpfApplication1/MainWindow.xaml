@@ -56,7 +56,7 @@
         <Label DockPanel.Dock="Top" Content="{Binding IsValidating}" />
         <TextBox DockPanel.Dock="Top"
                  Text="{Binding ToValidationString, Mode=TwoWay,
-                 ValidatesOnNotifyDataErrors=True,
+                 ValidatesOnDataErrors=True,
                  UpdateSourceTrigger=PropertyChanged}"
                  Height="25">
             <!--NotifyOnValidationError=True,ValidatesOnNotifyDataErrors=True,-->
@@ -65,10 +65,12 @@
             </Validation.ValidationAdornerSiteFor>
             <Validation.ErrorTemplate>
                 <ControlTemplate>
-                    <StackPanel>
-                        <!-- Placeholder for the TextBox itself -->
-                        <AdornedElementPlaceholder x:Name="textBox" />
-                    </StackPanel>
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" Foreground="Red" FontSize="20" FontFamily="Segoe UI" Margin="3,0,0,0">!</TextBlock>
+                        <Border DockPanel.Dock="Right" BorderBrush="Red" BorderThickness="1">
+                            <AdornedElementPlaceholder x:Name="controlWithError"/>
+                        </Border>
+                    </DockPanel>
                 </ControlTemplate>
             </Validation.ErrorTemplate>
         </TextBox>

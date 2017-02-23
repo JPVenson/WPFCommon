@@ -18,7 +18,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
         protected SimpleErrorProviderBase(Dispatcher dispatcher)
             : base(dispatcher)
         {
-            AggregateMultiError = (s, s1) => s + Environment.NewLine + s1;
+            //AggregateMultiError = (s, s1) => s + Environment.NewLine + s1;
         }
 
         public new abstract string this[string columnName] { get; }

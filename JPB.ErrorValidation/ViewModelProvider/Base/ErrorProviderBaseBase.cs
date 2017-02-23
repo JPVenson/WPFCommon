@@ -54,7 +54,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
             UserErrors = new T();
             var active = new ThreadSaveObservableCollection<IValidation>();
             ActiveValidationCases = active;
-            MessageFormat = "{0} - {1}";
+            MessageFormat = "{1}";
             Validation = ValidationLogic.RunThroughAll;
             Validate = true;
             AlwaysCheckFailedInNextRun = true;
@@ -134,6 +134,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
             {
                 if (ActiveValidationCases.Any())
                     ActiveValidationCases.Clear();
+                SendPropertyChanged(() => HasError);
                 Error = string.Empty;
                 return errorsOfThisRun.ToArray();
             }
@@ -228,6 +229,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
             if (conditionresult && !ActiveValidationCases.Contains(item))
             {
                 ActiveValidationCases.Add(item);
+                SendPropertyChanged(() => HasError);
                 return true;
             }
             //Error is Kown
@@ -236,6 +238,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
                 if (!conditionresult)
                 {
                     ActiveValidationCases.Remove(item);
+                    SendPropertyChanged(() => HasError);
                 }
                 else
                 {

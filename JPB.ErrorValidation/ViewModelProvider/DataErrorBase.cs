@@ -1,4 +1,5 @@
-﻿using System.Windows.Threading;
+﻿using System.Linq;
+using System.Windows.Threading;
 using JPB.ErrorValidation.ViewModelProvider.Base;
 
 namespace JPB.ErrorValidation.ViewModelProvider
@@ -31,7 +32,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
             get
             {
                 var validation = base.GetError(columnName, this);
-                if (validation != null)
+                if (validation.Any())
                     return Error;
                 return string.Empty;
             }
