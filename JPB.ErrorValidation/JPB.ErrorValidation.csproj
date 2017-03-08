@@ -53,11 +53,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ValidationRules\ThreadSaveValidationRuleBase.cs" />
+    <Compile Include="ValidationTyps\AsyncState.cs" />
+    <Compile Include="ValidationTyps\AsyncValidationOption.cs" />
+    <Compile Include="ValidationTyps\ErrorExtentions.cs" />
+    <Compile Include="ValidationTyps\IAsyncValidation.cs" />
+    <Compile Include="ValidationTyps\IAsyncValidationOption.cs" />
     <Compile Include="ViewModelProvider\AsyncErrorProviderBase.cs" />
     <Compile Include="ViewModelProvider\DataErrorBase.cs" />
     <Compile Include="ErrorObserver.cs" />
     <Compile Include="ViewModelProvider\Base\SimpleErrorProviderBase.cs" />
-    <Compile Include="ViewModelProvider\Base\ErrorProviderBaseBase.cs" />
+    <Compile Include="ViewModelProvider\Base\ErrorProviderBase.cs" />
     <Compile Include="IErrorInfoProvider.cs" />
     <Compile Include="IErrorProviderBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -43,6 +43,9 @@ namespace JPB.WPFBase.Converter
         /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
         public override TE Convert(T value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (!(parameter is Parm))
+                return default(TE);
+
             return Convert(value, targetType, (Parm) parameter, culture);
         }
 
@@ -58,6 +61,9 @@ namespace JPB.WPFBase.Converter
         /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
         public override T ConvertBack(TE value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (!(parameter is Parm))
+                return default(T);
+
             return ConvertBack(value, targetType, (Parm) parameter, culture);
         }
 

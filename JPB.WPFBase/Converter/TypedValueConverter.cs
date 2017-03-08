@@ -48,6 +48,11 @@ namespace JPB.WPFBase.Converter
         /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (!(value is T))
+            {
+                return null;
+            }
+
             return Convert((T) value, targetType, parameter, culture);
         }
 
@@ -63,6 +68,11 @@ namespace JPB.WPFBase.Converter
         /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (!(value is E))
+            {
+                return null;
+            }
+
             return ConvertBack((E) value, targetType, parameter, culture);
         }
 

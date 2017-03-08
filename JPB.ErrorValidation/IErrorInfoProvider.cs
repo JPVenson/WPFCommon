@@ -19,7 +19,6 @@ namespace JPB.ErrorValidation
         string MessageFormat { get; set; }
         bool HasError { get; }
         Type RetrunT();
-        void Init();
         void ForceRefresh();
         IValidation[] GetError(string columnName, object obj);
         ICollection<IValidation> ActiveValidationCases { get; }

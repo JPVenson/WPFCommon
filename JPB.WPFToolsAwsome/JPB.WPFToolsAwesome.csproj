@@ -126,8 +126,23 @@
     <Compile Include="..\JPB.ErrorValidation\ValidationRules\ThreadSaveValidationRuleBase.cs">
       <Link>Error\ValidationRules\ThreadSaveValidationRuleBase.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\AsyncState.cs">
+      <Link>Error\ValidationTyps\AsyncState.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\AsyncValidationOption.cs">
+      <Link>Error\ValidationTyps\AsyncValidationOption.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.ErrorValidation\ValidationTyps\Error.cs">
       <Link>Error\ValidationTyps\Error.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\ErrorExtentions.cs">
+      <Link>Error\ValidationTyps\ErrorExtentions.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\IAsyncValidation.cs">
+      <Link>Error\ValidationTyps\IAsyncValidation.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\IAsyncValidationOption.cs">
+      <Link>Error\ValidationTyps\IAsyncValidationOption.cs</Link>
     </Compile>
     <Compile Include="..\JPB.ErrorValidation\ValidationTyps\IValidation.cs">
       <Link>Error\ValidationTyps\IValidation.cs</Link>
@@ -141,8 +156,8 @@
     <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\AsyncErrorProviderBase.cs">
       <Link>Error\ViewModelProvider\AsyncErrorProviderBase.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\ErrorProviderBaseBase.cs">
-      <Link>Error\ViewModelProvider\Base\ErrorProviderBaseBase.cs</Link>
+    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\ErrorProviderBase.cs">
+      <Link>Error\ViewModelProvider\Base\ErrorProviderBase.cs</Link>
     </Compile>
     <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\SimpleErrorProviderBase.cs">
       <Link>Error\ViewModelProvider\Base\SimpleErrorProviderBase.cs</Link>

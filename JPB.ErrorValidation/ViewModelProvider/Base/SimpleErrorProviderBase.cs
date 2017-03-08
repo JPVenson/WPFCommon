@@ -6,19 +6,33 @@ using System.Windows.Threading;
 namespace JPB.ErrorValidation.ViewModelProvider.Base
 {
     public abstract class SimpleErrorProviderBase<T> :
-        ErrorProviderBase<T>,
-        IDataErrorInfo where T : class, IErrorCollectionBase, new()
+        SimpleErrorProviderBase where T : class, IErrorCollectionBase, new()
     {
         protected SimpleErrorProviderBase()
-            : this(Dispatcher.FromThread(Thread.CurrentThread))
+            : this(Dispatcher.FromThread(Thread.CurrentThread), new T())
         {
 
         }
 
-        protected SimpleErrorProviderBase(Dispatcher dispatcher)
-            : base(dispatcher)
+        protected SimpleErrorProviderBase(Dispatcher dispatcher, T errors)
+            : base(dispatcher, errors)
         {
-            //AggregateMultiError = (s, s1) => s + Environment.NewLine + s1;
+
+        }
+    }
+
+    public abstract class SimpleErrorProviderBase :
+       ErrorProviderBase, IDataErrorInfo
+    {
+        protected SimpleErrorProviderBase(IErrorCollectionBase errors)
+            : this(Dispatcher.FromThread(Thread.CurrentThread), errors)
+        {
+
+        }
+
+        protected SimpleErrorProviderBase(Dispatcher dispatcher, IErrorCollectionBase errors)
+            : base(dispatcher, errors)
+        {
         }
 
         public new abstract string this[string columnName] { get; }

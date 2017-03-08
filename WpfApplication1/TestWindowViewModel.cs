@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using JPB.ErrorValidation;
 using JPB.ErrorValidation.ValidationRules;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.ErrorValidation.ViewModelProvider;
@@ -7,8 +6,10 @@ using JPB.WPFBase.MVVM.DelegateCommand;
 
 namespace WpfApplication1
 {
-    public class TestWindowViewModel : DataErrorBase<TestWindowViewModelRules>
+    public class TestWindowViewModel : AsyncErrorProviderBase<TestWindowViewModelRules>
     {
+        private string _toValidationString;
+
         public TestWindowViewModel()
         {
             TaskACommand = new AsyncDelegateCommand(ExecuteTaskA, CanExecuteTaskA);
@@ -19,8 +20,6 @@ namespace WpfApplication1
             TaskACommand.AddDependency(TaskBCommand, DependLevel.Complete);
             TaskBCommand.AddDependency(TaskACommand, DependLevel.WorkingOnly);
         }
-
-        private string _toValidationString;
 
         public string ToValidationString
         {
@@ -34,6 +33,8 @@ namespace WpfApplication1
 
         public AsyncDelegateCommand TaskBCommand { get; private set; }
 
+        public AsyncDelegateCommand TaskACommand { get; private set; }
+
         public void ExecuteTaskB(object sender)
         {
             Thread.CurrentThread.Join(10000);
@@ -45,8 +46,6 @@ namespace WpfApplication1
             Thread.CurrentThread.Join(2000);
             return true;
         }
-
-        public AsyncDelegateCommand TaskACommand { get; private set; }
 
         public void ExecuteTaskA(object sender)
         {
@@ -65,16 +64,22 @@ namespace WpfApplication1
         {
             var run = 0;
             var vc_attributes = 0;
-            Add(new Error<TestWindowViewModel>("Is null or empty", "ToValidationString", s => string.IsNullOrEmpty(s.ToValidationString)));
-            Add(new Error<TestWindowViewModel>("Is too big", "ToValidationString",
-                s => s.ToValidationString != null && s.ToValidationString.Length > 5));
-            Add(new Error<TestWindowViewModel>("Must be Int", "ToValidationString", s => !int.TryParse(s.ToValidationString, out vc_attributes)));
-            //Add(new Error<TestWindowViewModel>("Wait", "ToValidationString", s =>
-            //{
-            //    Thread.Sleep(1000);
-            //    run++;
-            //    return run % 2 == 1;
-            //}));
+            Add(new Error<TestWindowViewModel>("Is null or empty", "ToValidationString",
+                    s => string.IsNullOrEmpty(s.ToValidationString))
+                .And(new Error<TestWindowViewModel>("Is too big", "ToValidationString",
+                    s => s.ToValidationString != null && s.ToValidationString.Length > 5)));
+            Add(new Error<TestWindowViewModel>("Must be Int", "ToValidationString",
+                s => !int.TryParse(s.ToValidationString, out vc_attributes)));
+            Add(new AsyncError<TestWindowViewModel>("Wait", "ToValidationString", s =>
+            {
+                Thread.Sleep(1000);
+                run++;
+                return run % 2 == 1;
+            })
+            {
+	            AsyncState = AsyncState.Async,
+				RunState = AsyncRunState.CurrentPlusOne
+            });
         }
     }
 }

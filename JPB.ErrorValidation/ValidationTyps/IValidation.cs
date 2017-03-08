@@ -19,14 +19,18 @@ namespace JPB.ErrorValidation.ValidationTyps
         /// <summary>
         /// The Condition that indicates an Error. True error, False NoError
         /// </summary>
-        Func<object, bool> Condition { get; }
+        Func<object, bool> Condition { get; set; }
+        /// <summary>
+        /// Set this to true to simulate a Virutal call the the underlying Error provider
+        /// </summary>
+        bool Unbound { get; set; }
     }
 
-    public interface IValidation<in T> : IValidation
+    public interface IValidation<T> : IValidation
     {
         /// <summary>
         /// The Condition that indicates an Error. True error, False NoError
         /// </summary>
-        new Func<T, bool> Condition { get; }
+        new Func<T, bool> Condition { get; set; }
     }
 }

@@ -56,8 +56,8 @@ namespace JPB.DynamicInputBox.InfoWindow
                 if (value != null && !Equals(SelectedStep, value))
                 {
                     var vm = value.DataContext as IQuestionAbstrViewModelBase;
-                    if (!vm.IsInit)
-                        vm.Init();
+                    //if (!vm.IsInit)
+                    //    vm.Init();
                     vm.ForceRefresh();
 
                     _selectedStep = value;

@@ -10,8 +10,9 @@ namespace JPB.Tasking.TaskManagement.Threading
     {
         private bool _isDisposing;
         private Thread _thread;
-
+        private readonly int _maxRunPerKey;
         private bool _working;
+        private readonly object _lock = new object();
 
         #region Implementation of IDisposable
 
@@ -26,47 +27,61 @@ namespace JPB.Tasking.TaskManagement.Threading
 
         #endregion
 
-        public SingelSeriellTaskFactory()
+        public SingelSeriellTaskFactory(int maxRunPerKey = 1)
         {
+            _maxRunPerKey = maxRunPerKey;
             ConcurrentQueue = new ConcurrentQueue<Tuple<Action, object>>();
         }
 
         public ConcurrentQueue<Tuple<Action, object>> ConcurrentQueue { get; set; }
 
-        public void Add(Action action, object key)
+        public bool Add(Action action, object key)
+        {
+            return Add(action, key, _maxRunPerKey);
+        }
+
+
+        public bool Add(Action action, object key, int max)
         {
             //nested usage is not allowed
             if (_thread == Thread.CurrentThread)
             {
                 action();
-                return;
+                return true;
             }
 
-            if (key != null && ConcurrentQueue.Any(s => s.Item2 == key))
+            if (key != null && ConcurrentQueue.Count(s => s.Item2.Equals(key)) > max)
             {
-                var task = new Task(() =>
-                {
-                    if (ConcurrentQueue.Any(s => s.Item2 == key))
-                        return;
-                    ConcurrentQueue.Enqueue(new Tuple<Action, object>(action, key));
-                    StartScheduler();
-                });
-                task.Start();
-                return;
+                //var task = new Task(() =>
+                //{
+                //    if (ConcurrentQueue.Any(s => s.Item2 == key))
+                //        return;
+                //    ConcurrentQueue.Enqueue(new Tuple<Action, object>(action, key));
+                //    StartScheduler();
+                //});
+                //task.Start();
+                return false;
             }
 
             ConcurrentQueue.Enqueue(new Tuple<Action, object>(action, key));
             StartScheduler();
+            return true;
         }
 
         private void StartScheduler()
         {
             if (_working)
                 return;
-            _working = true;
-            _thread = new Thread(Worker);
-            _thread.SetApartmentState(ApartmentState.MTA);
-            _thread.Start();
+            lock (_lock)
+            {
+                if (_working)
+                    return;
+                _working = true;
+                _thread = new Thread(Worker);
+                _thread.Name = "SSTF_" + GetHashCode();
+                _thread.SetApartmentState(ApartmentState.MTA);
+                _thread.Start();
+            }
         }
 
         internal void Worker()

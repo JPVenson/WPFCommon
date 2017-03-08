@@ -8,27 +8,28 @@ using JPB.ErrorValidation.ValidationTyps;
 
 namespace JPB.ErrorValidation.ValidationRules
 {
-    public abstract class ErrorCollection : IErrorCollectionBase
+    public abstract class ErrorCollectionWrapper : IErrorCollectionBase
     {
-        private readonly Type _validationType;
-        protected readonly ICollection<IValidation> _vallidationErrors;
+        protected abstract ICollection<IValidation> Errors { get; }
 
-        protected ErrorCollection(Type validationType)
+        private readonly Type _validationType;
+
+        protected ErrorCollectionWrapper(Type validationType)
         {
+            if (validationType == null) throw new ArgumentNullException(nameof(validationType));
             _validationType = validationType;
-            _vallidationErrors = new ObservableCollection<IValidation>();
         }
 
         #region IErrorInfoProvider Members
 
         public int Count
         {
-            get { return _vallidationErrors.Count; }
+            get { return Errors.Count; }
         }
 
         public bool IsReadOnly
         {
-            get { return _vallidationErrors.IsReadOnly; }
+            get { return Errors.IsReadOnly; }
         }
 
         public Type RetrunT()
@@ -38,55 +39,65 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public IEnumerable<IValidation> ReturnErrors(string columnName)
         {
-            return _vallidationErrors.Where(s => s.ErrorIndicator.Contains(columnName));
+            return Errors.Where(s => s.ErrorIndicator.Contains(columnName));
         }
 
         public void Add(IValidation item)
         {
-            _vallidationErrors.Add(item);
+            Errors.Add(item);
         }
 
         public void Add(IEnumerable<IValidation> item)
         {
             foreach (var validation in item)
             {
-                _vallidationErrors.Add(validation);
+                Errors.Add(validation);
             }
         }
 
         public void Clear()
         {
-            _vallidationErrors.Clear();
+            Errors.Clear();
         }
 
         public bool Contains(IValidation item)
         {
-            return _vallidationErrors.Contains(item);
+            return Errors.Contains(item);
         }
 
         public void CopyTo(IValidation[] array, int arrayIndex)
         {
-            _vallidationErrors.CopyTo(array, arrayIndex);
+            Errors.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(IValidation item)
         {
-            if (_vallidationErrors.Contains(item))
-                return _vallidationErrors.Remove(item);
+            if (Errors.Contains(item))
+                return Errors.Remove(item);
             return false;
         }
 
         public IEnumerator<IValidation> GetEnumerator()
         {
-            return _vallidationErrors.GetEnumerator();
+            return Errors.GetEnumerator();
         }
 
         #endregion
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)_vallidationErrors).GetEnumerator();
+            return ((IEnumerable)Errors).GetEnumerator();
         }
+    }
+
+    public class ErrorCollection : ErrorCollectionWrapper
+    {
+        protected ErrorCollection(Type validationType) : base(validationType)
+        {
+            Errors = new List<IValidation>();
+        }
+
+        protected override ICollection<IValidation> Errors { get; }
     }
 
     public abstract class ErrorCollection<T> : ErrorCollection
@@ -97,17 +108,21 @@ namespace JPB.ErrorValidation.ValidationRules
         }
     }
 
-    //public abstract class ValidationRuleBase : ValidationRuleBaseElement<IValidation>
-    //{
-    //    protected ValidationRuleBase(Type validationType) : base(validationType)
-    //    {
-    //    }
-    //}
+    public abstract class ErrorHashSet : ErrorCollectionWrapper
+    {
+        public ErrorHashSet(Type validationType) : base(validationType)
+        {
+            Errors = new HashSet<IValidation>();
+        }
 
-    //public abstract class ValidationRuleBase<T> : ValidationRuleBaseElement<IValidation<T>>
-    //{
-    //    protected ValidationRuleBase() : base(typeof(T))
-    //    {
-    //    }
-    //}
+        protected override ICollection<IValidation> Errors { get; }
+    }
+
+    public abstract class ErrorHashSet<T> : ErrorHashSet
+    {
+        public ErrorHashSet()
+            : base(typeof(T))
+        {
+        }
+    }
 }

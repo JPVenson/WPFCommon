@@ -11,10 +11,12 @@ using System.Windows.Threading;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
+
 #if !WINDOWS_UWP
     [Serializable]
     [DebuggerDisplay("Count = {Count}")]
 #endif
+
     public class ThreadSaveObservableCollection<T> :
         AsyncViewModelBase,
         ICollection<T>,
