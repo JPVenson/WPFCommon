@@ -73,8 +73,7 @@ namespace WpfApplication1
             Add(new AsyncError<TestWindowViewModel>("Wait", "ToValidationString", s =>
             {
                 Thread.Sleep(1000);
-                run++;
-                return run % 2 == 1;
+	            return false;
             })
             {
 	            AsyncState = AsyncState.Async,

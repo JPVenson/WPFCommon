@@ -23,6 +23,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 	{
 		private readonly SingelSeriellTaskFactory _errorFactory = new SingelSeriellTaskFactory(2);
 		private int _workerCount;
+		private readonly object _lockRoot = new object();
 
 		protected AsyncErrorProviderBase()
 		{
@@ -37,9 +38,11 @@ namespace JPB.ErrorValidation.ViewModelProvider
 				foreach (var validationKey in validation.ErrorIndicator)
 					ErrorMapper.GetOrAdd(validationKey, errorList);
 			}
-			AsyncValidationOption = new AsyncValidationOption();
-			AsyncValidationOption.AsyncState = AsyncState.AsyncSharedPerCall;
-			AsyncValidationOption.RunState = AsyncRunState.CurrentPlusOne;
+			AsyncValidationOption = new AsyncValidationOption
+			{
+				AsyncState = AsyncState.AsyncSharedPerCall,
+				RunState = AsyncRunState.CurrentPlusOne
+			};
 		}
 
 		protected Func<IValidation, object> ValidationToUiError { get; set; }
@@ -71,11 +74,8 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		/// <returns></returns>
 		public IEnumerable GetErrors(string propertyName)
 		{
-			HashSet<IValidation> errorJob = null;
-			ErrorMapper.TryGetValue(propertyName, out errorJob);
-			if (errorJob != null)
-				return errorJob.Select(f => ValidationToUiError == null ? f : ValidationToUiError(f));
-			return null;
+			ErrorMapper.TryGetValue(propertyName, out HashSet<IValidation> errorJob);
+			return errorJob?.Select(f => ValidationToUiError == null ? f : ValidationToUiError(f));
 		}
 
 		/// <summary>
@@ -94,8 +94,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 
 		protected virtual void OnErrorsChanged(DataErrorsChangedEventArgs e)
 		{
-			var handler = ErrorsChanged;
-			if (handler != null) handler(this, e);
+			ErrorsChanged?.Invoke(this, e);
 		}
 
 		private void RunAsyncTask(Func<IValidation[]> toExection, AsyncRunState validation2Key, Action<IValidation[]> then,
@@ -125,7 +124,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			}
 		}
 
-		private void HandleErrors(HashSet<IValidation> source, IValidation[] newErrors, IEnumerable<IValidation> processed)
+		private void HandleErrors(HashSet<IValidation> source, IValidation[] newErrors, IValidation[] processed)
 		{
 			foreach (var validation in newErrors)
 			{
@@ -133,118 +132,118 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			}
 
 			source.RemoveWhere(f => processed.Contains(f) && !newErrors.Contains(f));
-			//var oldErrors = source.Intersect(newErrors);
-		}
 
-		private void RunAsyncSharedPerCall(IEnumerable<IValidation> validation, HashSet<IValidation> errorJob,
-			AsyncRunState validation2Key)
-		{
-			var enumerable = validation as IValidation[] ?? validation.ToArray();
-			RunAsyncTask(() => ObManage(enumerable, this), validation2Key, validations =>
+			for (var i = 0; i < processed.Count(); i++)
+			{
+				lock (_lockRoot)
 				{
-					for (int i = 0; i < enumerable.Count(); i++)
-					{
-						Interlocked.Decrement(ref _workerCount);
-					}
-					HandleErrors(errorJob, validations, enumerable);
-					//foreach (var validation1 in validations)
-					//{
-					//	errorJob.Add(validation1);
-					//}
-					BeginThreadSaveAction(() =>
-					{
-						SendPropertyChanged(() => IsValidating);
-						foreach (var listOfValidator in validations.SelectMany(f => f.ErrorIndicator).Distinct())
-							OnErrorsChanged(new DataErrorsChangedEventArgs(listOfValidator));
-					});
-				},
-				enumerable.Select(f => f.GetHashCode().ToString()).Aggregate((e, f) => e + f));
-		}
+					_workerCount -= _workerCount;
+				}
+			}
 
-		private void RunSync(IEnumerable<IValidation> validation, HashSet<IValidation> errorJob, AsyncRunState validation2Key)
-		{
-			var errorsForField = validation as IValidation[] ?? validation.ToArray();
-
-			HandleErrors(errorJob, ObManage(errorsForField, this), errorsForField);
-			//foreach (var validation1 in ObManage(errorsForField, this))
-			//	errorJob.Add(validation1);
-			for (var i = 0; i < errorsForField.Count(); i++)
-				Interlocked.Decrement(ref _workerCount);
 			BeginThreadSaveAction(() =>
 			{
 				SendPropertyChanged(() => IsValidating);
-				foreach (var listOfValidator in errorsForField.SelectMany(f => f.ErrorIndicator).Distinct())
+				foreach (var listOfValidator in processed.SelectMany(f => f.ErrorIndicator).Distinct())
 					OnErrorsChanged(new DataErrorsChangedEventArgs(listOfValidator));
 			});
 		}
 
-		private void RunSyncToDispatcher(IEnumerable<IValidation> validation, HashSet<IValidation> errorJob,
+		private void RunAsyncSharedPerCall(IValidation[] validation, HashSet<IValidation> errorJob,
 			AsyncRunState validation2Key)
 		{
-			BeginThreadSaveAction(() => { RunSync(validation, errorJob, validation2Key); });
+			RunAsyncTask(() => ObManage(validation, this), validation2Key, validations =>
+				{
+					HandleErrors(errorJob, validations, validation);
+				},
+				validation.Select(f => f.GetHashCode().ToString()).Aggregate((e, f) => e + f));
 		}
 
-		private void RunAuto(IEnumerable<IValidation> validation, HashSet<IValidation> errorJob, AsyncRunState validation2Key)
+		private void RunSync(IValidation[] validation, HashSet<IValidation> errorJob)
+		{
+			HandleErrors(errorJob, ObManage(validation, this), validation);
+		}
+
+		private void RunSyncToDispatcher(IValidation[] validation, HashSet<IValidation> errorJob)
+		{
+			BeginThreadSaveAction(() => { RunSync(validation, errorJob); });
+		}
+
+		private void RunAuto(IValidation[] validation, HashSet<IValidation> errorJob, AsyncRunState validation2Key)
 		{
 			if (Thread.CurrentThread == Dispatcher.Thread)
+			{
 				RunAsyncSharedPerCall(validation, errorJob, validation2Key);
+			}
 			else
-				RunSync(validation, errorJob, validation2Key);
+			{
+				RunSync(validation, errorJob);
+			}
+		}
+
+		private void HandleErrorEnumeration(IEnumerable<IValidation> elements, HashSet<IValidation> errorJob, AsyncState asyncState, AsyncRunState asyncRunState)
+		{
+			switch (asyncState)
+			{
+				case AsyncState.AsyncSharedPerCall:
+					{
+						RunAsyncSharedPerCall(elements.ToArray(), errorJob, asyncRunState);
+						break;
+					}
+				case AsyncState.Sync:
+					{
+						RunSync(elements.ToArray(), errorJob);
+						break;
+					}
+				case AsyncState.SyncToDispatcher:
+					{
+						RunSyncToDispatcher(elements.ToArray(), errorJob);
+						break;
+					}
+				case AsyncState.NoPreference:
+					{
+						RunAuto(elements.ToArray(), errorJob, asyncRunState);
+						break;
+					}
+				case AsyncState.Async:
+					{
+						foreach (var runIndipendendAsync in elements)
+						{
+							RunAsyncSharedPerCall(new IValidation[] { runIndipendendAsync }, errorJob, asyncRunState);
+						}
+						break;
+					}
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		private void ValidateAsync(string propertyName)
 		{
-			HashSet<IValidation> errorJob = null;
-			if (!ErrorMapper.TryGetValue(propertyName, out errorJob))
+			if (!ErrorMapper.TryGetValue(propertyName, out HashSet<IValidation> errorJob))
+			{
 				return;
+			}
 			errorJob.Clear();
 
 			var errors = ProduceErrors(propertyName).ToList();
-
-			Interlocked.Add(ref _workerCount, errors.Count);
+			lock (_lockRoot)
+			{
+				_workerCount += errors.Count;
+			}
 			BeginThreadSaveAction(() => SendPropertyChanged(() => IsValidating));
 
 			var nonAsync = errors.Where(f => !(f is IAsyncValidation)).ToArray();
 			if (nonAsync.Any())
-				RunAsyncSharedPerCall(nonAsync, errorJob, AsyncValidationOption.RunState);
+			{
+				HandleErrorEnumeration(nonAsync, errorJob, AsyncValidationOption.AsyncState, AsyncValidationOption.RunState);
+			}
 
 			foreach (var validation in errors.Where(f => f is IAsyncValidation).Cast<IAsyncValidation>().GroupBy(f => f.AsyncState))
 			{
 				foreach (var validation2 in validation.GroupBy(f => f.RunState))
 				{
-					switch (validation.Key)
-					{
-						case AsyncState.AsyncSharedPerCall:
-							{
-								RunAsyncSharedPerCall(validation2, errorJob, validation2.Key);
-								break;
-							}
-						case AsyncState.Sync:
-							{
-								RunSync(validation2, errorJob, validation2.Key);
-								break;
-							}
-						case AsyncState.SyncToDispatcher:
-							{
-								RunSyncToDispatcher(validation2, errorJob, validation2.Key);
-								break;
-							}
-						case AsyncState.NoPreference:
-							{
-								RunAuto(validation2, errorJob, validation2.Key);
-								break;
-							}
-						case AsyncState.Async:
-							{
-								foreach (var runIndipendendAsync in validation2)
-								{
-									RunAsyncSharedPerCall(new IValidation[]{ runIndipendendAsync }, errorJob, validation2.Key);
-								}
-								break;
-							}
-						default:
-							throw new ArgumentOutOfRangeException();
-					}
+					HandleErrorEnumeration(validation2, errorJob, validation.Key, validation2.Key);
 				}
 			}
 		}
