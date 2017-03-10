@@ -14,7 +14,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 #if !WINDOWS_UWP
     [Serializable]
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("TSOC - Count = {" + nameof(Count) + "}")]
 #endif
 
     public class ThreadSaveObservableCollection<T> :
@@ -100,17 +100,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (!CheckThrowReadOnlyException())
                 return;
-            lock (Lock)
-            {
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        _base.Clear();
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                    });
-            }
+            actorHelper.ThreadSaveAction(
+                       () =>
+                       {
+                           _base.Clear();
+                           SendPropertyChanged("Count");
+                           SendPropertyChanged("Item[]");
+                           OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                       });
         }
 
         public bool Contains(T item)
@@ -128,23 +125,20 @@ namespace JPB.WPFBase.MVVM.ViewModel
             if (!CheckThrowReadOnlyException())
                 return false;
             T item2;
-            lock (Lock)
-            {
-                item2 = item;
-                var result = false;
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        var index = IndexOf(item2);
-                        result = _base.Remove(item2);
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(
-                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
-                                index));
-                    });
-                return result;
-            }
+            item2 = item;
+            var result = false;
+            actorHelper.ThreadSaveAction(
+                () =>
+                {
+                    var index = IndexOf(item2);
+                    result = _base.Remove(item2);
+                    SendPropertyChanged("Count");
+                    SendPropertyChanged("Item[]");
+                    OnCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
+                            index));
+                });
+            return result;
         }
 
         public int Count
@@ -168,21 +162,18 @@ namespace JPB.WPFBase.MVVM.ViewModel
             if (!CheckThrowReadOnlyException())
                 return 0;
 
-            lock (Lock)
-            {
-                var tempitem = (T)value;
-                var indexOf = -1;
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        indexOf = ((IList)_base).Add(tempitem);
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
-                            tempitem));
-                    });
-                return indexOf;
-            }
+            var tempitem = (T)value;
+            var indexOf = -1;
+            actorHelper.ThreadSaveAction(
+                () =>
+                {
+                    indexOf = ((IList)_base).Add(tempitem);
+                    SendPropertyChanged("Count");
+                    SendPropertyChanged("Item[]");
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
+                        tempitem));
+                });
+            return indexOf;
         }
 
         public bool Contains(object value)
@@ -216,19 +207,16 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (!CheckThrowReadOnlyException())
                 return;
-            lock (Lock)
-            {
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        var old = _base[index];
-                        _base.RemoveAt(index);
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(
-                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, old, index));
-                    });
-            }
+            actorHelper.ThreadSaveAction(
+                   () =>
+                   {
+                       var old = _base[index];
+                       _base.RemoveAt(index);
+                       SendPropertyChanged("Count");
+                       SendPropertyChanged("Item[]");
+                       OnCollectionChanged(
+                           new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, old, index));
+                   });
         }
 
         object IList.this[int index]
@@ -253,16 +241,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 return;
 
             var tempitem = item;
-            lock (Lock)
-            {
-                _base.Insert(index, tempitem);
-                SendPropertyChanged("Count");
-                SendPropertyChanged("Item[]");
-                actorHelper.ThreadSaveAction(
-                    () =>
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
-                            tempitem, index)));
-            }
+            actorHelper.ThreadSaveAction(
+                   () =>
+                   {
+                       _base.Insert(index, tempitem);
+                       SendPropertyChanged("Count");
+                       SendPropertyChanged("Item[]");
+                       OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
+                           tempitem, index));
+                   });
         }
 
         T IList<T>.this[int index]
@@ -296,6 +283,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         }
 
         public bool IsSynchronized { get; private set; }
+
 
         public bool TryAdd(T item)
         {
@@ -400,7 +388,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
             {
                 if (withLock)
                     Monitor.Exit(Lock);
-                cpy.Dispose();
+                if (cpy != null) cpy.Dispose();
             }
         }
 
@@ -434,24 +422,23 @@ namespace JPB.WPFBase.MVVM.ViewModel
         {
             if (!CheckThrowReadOnlyException())
                 return;
-            lock (Lock)
-            {
-                var tempitem = item;
-                var enumerable = tempitem as T[] ?? tempitem.ToArray();
+            var tempitem = item;
+            var enumerable = tempitem as T[] ?? tempitem.ToArray();
 
-                if (enumerable.Any())
-                    actorHelper.ThreadSaveAction(
-                        () =>
+            if (enumerable.Any())
+            {
+                actorHelper.ThreadSaveAction(
+                    () =>
+                    {
+                        foreach (var variable in enumerable)
                         {
-                            foreach (var variable in enumerable)
-                            {
-                                _base.Add(variable);
-                                SendPropertyChanged("Count");
-                                SendPropertyChanged("Item[]");
-                            }
-                            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
-                                enumerable));
-                        });
+                            _base.Add(variable);
+                            SendPropertyChanged("Count");
+                            SendPropertyChanged("Item[]");
+                        }
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
+                            enumerable));
+                    });
             }
         }
 
@@ -477,25 +464,21 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 return;
 
             T oldItem;
-            lock (Lock)
-            {
-                //count is not 0 based
-                if (index + 1 > Count)
-                    return;
+            actorHelper.ThreadSaveAction(
+                () =>
+                {
+                    if (index + 1 > Count)
+                        return;
 
-                actorHelper.ThreadSaveAction(
-                    () =>
-                    {
-                        oldItem = _base[index];
-                        _base.RemoveAt(index);
-                        _base.Insert(index, newItem);
-                        SendPropertyChanged("Count");
-                        SendPropertyChanged("Item[]");
-                        OnCollectionChanged(
-                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
-                                oldItem, newItem, index));
-                    });
-            }
+                    oldItem = _base[index];
+                    _base.RemoveAt(index);
+                    _base.Insert(index, newItem);
+                    SendPropertyChanged("Count");
+                    SendPropertyChanged("Item[]");
+                    OnCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
+                            oldItem, newItem, index));
+                });
         }
     }
 }

@@ -74,7 +74,8 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		/// <returns></returns>
 		public IEnumerable GetErrors(string propertyName)
 		{
-			ErrorMapper.TryGetValue(propertyName, out HashSet<IValidation> errorJob);
+		    HashSet<IValidation> errorJob;
+            ErrorMapper.TryGetValue(propertyName, out errorJob);
 			return errorJob?.Select(f => ValidationToUiError == null ? f : ValidationToUiError(f));
 		}
 
@@ -219,8 +220,10 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		}
 
 		private void ValidateAsync(string propertyName)
-		{
-			if (!ErrorMapper.TryGetValue(propertyName, out HashSet<IValidation> errorJob))
+        {
+            HashSet<IValidation> errorJob;
+
+            if (!ErrorMapper.TryGetValue(propertyName, out errorJob))
 			{
 				return;
 			}
