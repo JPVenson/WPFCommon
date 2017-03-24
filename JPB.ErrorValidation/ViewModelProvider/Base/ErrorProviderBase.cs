@@ -200,10 +200,12 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		{
 			if (!Validate)
 			{
-				if (ActiveValidationCases.Any())
-					ActiveValidationCases.Clear();
-				SendPropertyChanged(() => HasError);
-				Error = string.Empty;
+			    if (ActiveValidationCases.Any())
+			    {
+			        ActiveValidationCases.Clear();
+                    Error = string.Empty;
+                    SendPropertyChanged(() => HasError);
+                }
 				return new IValidation[0];
 			}
 

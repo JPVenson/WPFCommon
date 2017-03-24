@@ -31,12 +31,9 @@ namespace JPB.ErrorValidation.ViewModelProvider
 
 			PropertyChanged += AsyncErrorProviderBase_PropertyChanged;
 
-			foreach (var validation in UserErrors)
+			foreach (var validation in UserErrors.SelectMany(f => f.ErrorIndicator).Distinct())
 			{
-				var errorList = new HashSet<IValidation>();
-
-				foreach (var validationKey in validation.ErrorIndicator)
-					ErrorMapper.GetOrAdd(validationKey, errorList);
+                ErrorMapper.GetOrAdd(validation, new HashSet<IValidation>());
 			}
 			AsyncValidationOption = new AsyncValidationOption
 			{

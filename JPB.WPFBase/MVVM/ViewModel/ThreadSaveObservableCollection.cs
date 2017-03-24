@@ -132,11 +132,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
                 {
                     var index = IndexOf(item2);
                     result = _base.Remove(item2);
-                    SendPropertyChanged("Count");
-                    SendPropertyChanged("Item[]");
-                    OnCollectionChanged(
-                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
-                            index));
+                    if (result)
+                    {
+                        SendPropertyChanged("Count");
+                        SendPropertyChanged("Item[]");
+                        OnCollectionChanged(
+                            new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item,
+                                index));
+                    }
                 });
             return result;
         }
