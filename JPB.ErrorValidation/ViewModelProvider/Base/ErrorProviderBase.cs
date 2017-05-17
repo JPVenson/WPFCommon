@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using JPB.ErrorValidation.ValidationTyps;
@@ -17,10 +18,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 	{
 		private string _error;
 		private IErrorCollectionBase _userErrors;
-
-		/// <summary>
-		/// The general Error string for this Object
-		/// </summary>
+        ///<inheritdoc />
 		public string Error
 		{
 			get
@@ -56,7 +54,9 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		private void InitErrorProvider(IErrorCollectionBase errors)
 		{
 			ActiveValidationCases = new ThreadSaveObservableCollection<IValidation>();
-			UserErrors = errors;
+		   
+
+            UserErrors = errors;
 			PropertyChanged += ErrorProviderBase_PropertyChanged;
 			MessageFormat = "{1}";
 			Validation = ValidationLogic.RunThroughAll;
@@ -74,10 +74,8 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			ObManage(UserErrors.Where(f => f.Unbound && (string.IsNullOrWhiteSpace(propName) || f.ErrorIndicator.Contains(propName))), this);
 		}
 
-		/// <summary>
-		/// The Errors that are used for validation
-		/// </summary>
-		public virtual IErrorCollectionBase UserErrors
+        /// <inheritdoc />
+        public virtual IErrorCollectionBase UserErrors
 		{
 			get { return _userErrors; }
 			set
@@ -87,11 +85,9 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				ForceRefresh();
 			}
 		}
-
-		/// <summary>
-		/// Enabled/Disable all validation
-		/// </summary>
-		[Browsable(false)]
+        
+        /// <inheritdoc />
+        [Browsable(false)]
 		public bool Validate { get; set; }
 
 		/// <summary>
@@ -101,25 +97,26 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		[XmlIgnore]
 		protected ValidationLogic Validation { get; set; }
 
-		/// <summary>
-		/// The list of all Active Errors
-		/// </summary>
-		[XmlIgnore]
-		public ICollection<IValidation> ActiveValidationCases { get; set; }
+        /// <inheritdoc />
+        [XmlIgnore]
+        public ICollection<IValidation> ActiveValidationCases { get; set; }
 
-		/// <summary>
-		/// Are any Errors known?
-		/// </summary>
-		[XmlIgnore]
+        /// <summary>
+        /// The list of all Active Errors
+        /// </summary>
+        //[XmlIgnore]
+        //public ICollectionView ActiveValidationCasesView { get; set; }
+
+
+        /// <inheritdoc />
+        [XmlIgnore]
 		public bool HasError
 		{
 			get { return ActiveValidationCases.Any(); }
 		}
 
-		/// <summary>
-		/// if and how messages should be formatted
-		/// </summary>
-		[Browsable(false)]
+        /// <inheritdoc />
+        [Browsable(false)]
 		public string MessageFormat { get; set; }
 
 		/// <summary>
@@ -138,15 +135,18 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		public enum ValidationLogic
 		{
 			BreakAtFirstFail,
+            [Obsolete("The concept of Warnings is Obsolete and will be removed")]
 			BreakAtFirstFailButRunAllWarnings,
 			RunThroughAll,
+            /// <summary>
+            /// Do not use a specifc logic but use the ValidateErrors function to enumerate the Errors
+            /// </summary>
 			ValidateSelf,
 		}
 
-		/// <summary>
-		/// Refresh the Errors
-		/// </summary>
-		[Browsable(false)]
+
+	    /// <inheritdoc />
+	    [Browsable(false)]
 		public void ForceRefresh()
 		{
 			if (Validate)
@@ -178,12 +178,18 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		[Browsable(false)]
 		protected virtual IEnumerable<IValidation> ValidateErrors(IEnumerable<IValidation> errorsForField)
 		{
-			throw new NotImplementedException("Please create your Owin Validation");
+			throw new NotImplementedException("Please create your own Validation");
 		}
 
+        /// <summary>
+        /// The main function for Starting an Validation Cycle
+        /// </summary>
+        /// <param name="errorIndicator"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
 		protected IValidation[] ObManage(string errorIndicator, object obj)
 		{
-		   return ObManage(ProduceErrors(errorIndicator), obj);
+		   return ObManage(ProduceValidations(errorIndicator), obj);
 		}
 
 		/// <summary>
@@ -191,11 +197,17 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		/// </summary>
 		/// <param name="errorIndicator"></param>
 		/// <returns></returns>
-		protected virtual IEnumerable<IValidation> ProduceErrors(string errorIndicator)
+		protected virtual IEnumerable<IValidation> ProduceValidations(string errorIndicator)
 		{
-			return UserErrors.Where(s => s.ErrorIndicator.Contains(errorIndicator) || !s.ErrorIndicator.Any());
+			return UserErrors.ReturnErrors(errorIndicator);
 		}
 
+        /// <summary>
+        /// The main Validation logic that handels all errors base on the current Validation flag
+        /// </summary>
+        /// <param name="errorsForField"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
 		protected IValidation[] ObManage(IEnumerable<IValidation> errorsForField, object obj)
 		{
 			if (!Validate)
@@ -211,10 +223,11 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 
 			var errorsOfThisRun = new HashSet<IValidation>();
 
-			switch (Validation)
+		    var forField = errorsForField as IValidation[] ?? errorsForField.ToArray();
+		    switch (Validation)
 			{
 				case ValidationLogic.RunThroughAll:
-					foreach (var error in errorsForField)
+					foreach (var error in forField)
 					{
 						if (ManageValidationRule(obj, error))
 						{
@@ -223,7 +236,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 					}
 					break;
 				case ValidationLogic.BreakAtFirstFail:
-					foreach (var item in errorsForField)
+					foreach (var item in forField)
 					{
 						if (ManageValidationRule(obj, item))
 						{
@@ -233,7 +246,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 					}
 					break;
 				case ValidationLogic.ValidateSelf:
-					foreach (var validateError in this.ValidateErrors(errorsForField))
+					foreach (var validateError in this.ValidateErrors(forField))
 					{
 						errorsOfThisRun.Add(validateError);
 					}
@@ -244,7 +257,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 
 			if (AlwaysCheckFailedInNextRun)
 			{
-				foreach (var error in errorsForField.Except(errorsOfThisRun).Where(s => ActiveValidationCases.Contains(s)))
+				foreach (var error in forField.Except(errorsOfThisRun).Where(s => ActiveValidationCases.Contains(s)))
 				{
 					if (ManageValidationRule(obj, error))
 					{
@@ -340,7 +353,8 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		}
 
 		[Browsable(false)]
-		public bool WarningAsFailure { get; set; }
+        [Obsolete("The concept of Warnings is Obsolete and will be removed")]
+        public bool WarningAsFailure { get; set; }
 
 		public virtual Type RetrunT()
 		{

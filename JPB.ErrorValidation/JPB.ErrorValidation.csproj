@@ -73,6 +73,10 @@
     <Compile Include="ValidationTyps\Warning.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JPB.Extentions\JPB.Extentions.csproj">
+      <Project>{c1150265-60eb-4e75-b20b-61c9d8a88779}</Project>
+      <Name>JPB.Extentions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JPB.Tasking\JPB.Tasking.csproj">
       <Project>{0F6C25A5-DAF2-4BCE-8C4D-F6D6542A172E}</Project>
       <Name>JPB.Tasking</Name>

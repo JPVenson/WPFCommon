@@ -5,15 +5,30 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 {
     public class DelegateCommand : ICommand
     {
+        protected DelegateCommand()
+        {
+
+        }
+
         /// <summary>
         ///     Predicate to determine if the command is valid for execution
         /// </summary>
-        internal Func<object, bool> CanExecutePredicate;
+        protected internal Func<object, bool> CanExecutePredicate;
 
         /// <summary>
         ///     Action to be performed when this command is executed
         /// </summary>
-        internal Action<object> ExecutionAction;
+        protected internal Action<object> ExecutionAction;
+
+        /// <summary>
+        ///     Initializes a new instance of the DelegateCommand class.
+        ///     The command will always be valid for execution.
+        /// </summary>
+        /// <param name="execute">The delegate to call on execution</param>
+        public DelegateCommand(Action execute)
+            : this(execute, () => true)
+        {
+        }
 
         /// <summary>
         ///     Initializes a new instance of the DelegateCommand class.
@@ -21,7 +36,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         /// </summary>
         /// <param name="execute">The delegate to call on execution</param>
         public DelegateCommand(Action<object> execute)
-            : this(execute, null)
+            : this(execute, obj => true)
         {
         }
 
@@ -37,6 +52,16 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
             ExecutionAction = execute;
             CanExecutePredicate = canExecute;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the DelegateCommand class.
+        /// </summary>
+        /// <param name="execute">The delegate to call on execution</param>
+        /// <param name="canExecute">The predicate to determine if command is valid for execution</param>
+        public DelegateCommand(Action execute, Func<bool> canExecute)
+            : this(obj => execute(), obj => canExecute())
+        {
         }
 
         #region ICommand Members
@@ -77,5 +102,52 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
         }
 
         #endregion
+    }
+
+    public class DelegateCommand<TParameter> : DelegateCommand
+    {
+        /// <inheritdoc />
+        public DelegateCommand(Action execute) : this((obj) => execute())
+        {
+        }
+
+        /// <inheritdoc />
+        public DelegateCommand(Action<TParameter> execute) : this(execute, (obj) => true)
+        {
+        }
+
+        /// <inheritdoc />
+        public DelegateCommand(Action<TParameter> execute, Func<TParameter, bool> canExecute)
+        {
+            base.ExecutionAction = (obj) =>
+            {
+                if (obj is TParameter)
+                {
+                    execute((TParameter)obj);
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        "The Execute method detected an invalid obj type in the Arguments");
+                }
+            };
+
+            base.CanExecutePredicate = (obj) =>
+            {
+                if (obj is TParameter)
+                {
+                    return canExecute((TParameter)obj);
+                }
+                else
+                {
+                    return false;
+                }
+            };
+        }
+
+        /// <inheritdoc />
+        public DelegateCommand(Action execute, Func<bool> canExecute) : this(obj => execute(), (obj) => canExecute())
+        {
+        }
     }
 }

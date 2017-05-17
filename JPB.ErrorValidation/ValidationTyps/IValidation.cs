@@ -21,7 +21,7 @@ namespace JPB.ErrorValidation.ValidationTyps
         /// </summary>
         Func<object, bool> Condition { get; set; }
         /// <summary>
-        /// Set this to true to simulate a Virutal call the the underlying Error provider
+        /// Set this to true to simulate a Virtual call the the underlying Error provider.
         /// </summary>
         bool Unbound { get; set; }
     }

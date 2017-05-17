@@ -10,11 +10,18 @@
         xmlns:validationRules="clr-namespace:JPB.ErrorValidation.ValidationRules;assembly=JPB.ErrorValidation"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         mc:Ignorable="d"
+        
         Title="MainWindow" Height="350" Width="525"
         d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
 
 	<Window.Resources>
-		<SolidColorBrush Color="#FFCB2E2E" x:Key="ErrorForgroundColor"/>
+        <ResourceDictionary x:Key="Dictionary">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                Source="/PresentationFramework.Aero;component/themes/Aero.NormalColor.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        <SolidColorBrush Color="#FFCB2E2E" x:Key="ErrorForgroundColor"/>
 		<SolidColorBrush Color="#11FF0000" x:Key="ErrorBackgroundColor"/>
 
 		<DataTemplate x:Key="Validation" DataType="{x:Type validationTyps:IValidation}">
@@ -64,9 +71,11 @@
         <Button DockPanel.Dock="Top" Command="{Binding TaskBCommand}">TaskB</Button>
         <Label DockPanel.Dock="Top" Content="{Binding IsValidating}" />
 		<DockPanel DockPanel.Dock="Top">
-			<TextBlock DockPanel.Dock="Right" Text="{Binding IsValidating}"/>
+			<TextBlock DockPanel.Dock="Right"
+                       IsEnabled="False"
+                       Text="{Binding IsValidating}"/>
 			<TextBox DockPanel.Dock="Left"
-					 
+                         IsEnabled="False"
                  Text="{Binding ToValidationString, Mode=TwoWay,
                  ValidatesOnDataErrors=True,
                  NotifyOnValidationError=True,

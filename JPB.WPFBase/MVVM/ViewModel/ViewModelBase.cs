@@ -75,7 +75,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         /// <param name="member"></param>
         /// <param name="value"></param>
         /// <param name="propertyName"></param>
-        public void SetProperty(ref object member, object value, [CallerMemberName]string propertyName = null)
+        public void SetProperty<TArgument>(ref TArgument member, TArgument value, [CallerMemberName]string propertyName = null)
         {
             if (RaiseAcceptPendingChange(propertyName, value))
             {
@@ -91,7 +91,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
         /// <param name="member"></param>
         /// <param name="value"></param>
         /// <param name="property"></param>
-        public void SetProperty<TProperty>(ref object member, object value, Expression<Func<TProperty>> property)
+        public void SetProperty<TProperty>(ref TProperty member, TProperty value, Expression<Func<TProperty>> property)
         {
             SetProperty(ref member, value, GetPropertyName(property));
         }
