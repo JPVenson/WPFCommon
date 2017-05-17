@@ -156,38 +156,48 @@ namespace JPB.WPFBase.MVVM.ViewModel
             SendPropertyChanging(GetPropertyName(property));
         }
 
-        public static string GetPropertyName<TProperty>(Expression<Func<TProperty>> property)
-        {
-            var lambda = (LambdaExpression)property;
+		public static string GetPropertyName<TProperty>(Expression<Func<TProperty>> property)
+		{
+			return GetProperty(property).Name;
+		}
 
-            MemberExpression memberExpression;
-            var body = lambda.Body as UnaryExpression;
+		public static string GetPropertyName<TProperty, TObject>(Expression<Func<TObject, TProperty>> property)
+		{
+			return GetProperty(property).Name;
+		}
 
-            if (body != null)
-            {
-                UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression)unaryExpression.Operand;
-            }
-            else
-                memberExpression = (MemberExpression)lambda.Body;
-            return memberExpression.Member.Name;
-        }
+		public static PropertyInfo GetProperty<TProperty>(Expression<Func<TProperty>> property)
+		{
+			var lambda = (LambdaExpression)property;
 
-        public static PropertyInfo GetProperty<TProperty>(Expression<Func<TProperty>> property)
-        {
-            var lambda = (LambdaExpression)property;
+			MemberExpression memberExpression;
+			var body = lambda.Body as UnaryExpression;
 
-            MemberExpression memberExpression;
-            var body = lambda.Body as UnaryExpression;
+			if (body != null)
+			{
+				UnaryExpression unaryExpression = body;
+				memberExpression = (MemberExpression)unaryExpression.Operand;
+			}
+			else
+				memberExpression = (MemberExpression)lambda.Body;
+			return memberExpression.Member as PropertyInfo;
+		}
 
-            if (body != null)
-            {
-                UnaryExpression unaryExpression = body;
-                memberExpression = (MemberExpression)unaryExpression.Operand;
-            }
-            else
-                memberExpression = (MemberExpression)lambda.Body;
-            return memberExpression.Member as PropertyInfo;
-        }
-    }
+		public static PropertyInfo GetProperty<TProperty,TObject>(Expression<Func<TObject, TProperty>> property)
+		{
+			var lambda = (LambdaExpression)property;
+
+			MemberExpression memberExpression;
+			var body = lambda.Body as UnaryExpression;
+
+			if (body != null)
+			{
+				UnaryExpression unaryExpression = body;
+				memberExpression = (MemberExpression)unaryExpression.Operand;
+			}
+			else
+				memberExpression = (MemberExpression)lambda.Body;
+			return memberExpression.Member as PropertyInfo;
+		}
+	}
 }
