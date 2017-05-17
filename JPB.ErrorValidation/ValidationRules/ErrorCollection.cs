@@ -39,25 +39,27 @@ namespace JPB.ErrorValidation.ValidationRules
 
         public IEnumerable<IValidation> ReturnErrors(string columnName)
         {
-            return Errors.Where(s => s.ErrorIndicator.Contains(columnName));
+            return Errors.Where(s => s.ErrorIndicator.Contains(columnName) || !s.ErrorIndicator.Any());
         }
 
         public void Add(IValidation item)
         {
             Errors.Add(item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
         public void Add(IEnumerable<IValidation> item)
         {
             foreach (var validation in item)
             {
-                Errors.Add(validation);
+                Add(validation);
             }
         }
 
         public void Clear()
         {
             Errors.Clear();
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public bool Contains(IValidation item)
@@ -73,7 +75,13 @@ namespace JPB.ErrorValidation.ValidationRules
         public bool Remove(IValidation item)
         {
             if (Errors.Contains(item))
-                return Errors.Remove(item);
+            {
+                if (Errors.Remove(item))
+                {
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -87,6 +95,13 @@ namespace JPB.ErrorValidation.ValidationRules
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)Errors).GetEnumerator();
+        }
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            CollectionChanged?.Invoke(this, e);
         }
     }
 
