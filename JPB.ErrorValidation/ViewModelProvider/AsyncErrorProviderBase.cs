@@ -7,6 +7,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.ErrorValidation.ViewModelProvider.Base;
 using JPB.Tasking.TaskManagement.Threading;
@@ -18,15 +20,15 @@ namespace JPB.ErrorValidation.ViewModelProvider
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="TE"></typeparam>
-    public abstract class AsyncErrorProviderBase<T> :
-        ErrorProviderBase<T>,
-        INotifyDataErrorInfo where T : class, IErrorCollectionBase, new()
+    public abstract class AsyncErrorProviderBase :
+        ErrorProviderBase
     {
         private readonly SingelSeriellTaskFactory _errorFactory = new SingelSeriellTaskFactory(2);
         private readonly object _lockRoot = new object();
         private int _workerCount;
 
-        protected AsyncErrorProviderBase()
+
+        public AsyncErrorProviderBase(Dispatcher disp, IErrorCollectionBase errors) : base(disp, errors)
         {
             ErrorMapper = new ConcurrentDictionary<string, HashSet<IValidation>>();
 
@@ -42,6 +44,11 @@ namespace JPB.ErrorValidation.ViewModelProvider
                 AsyncState = AsyncState.AsyncSharedPerCall,
                 RunState = AsyncRunState.CurrentPlusOne
             };
+        }
+
+        public AsyncErrorProviderBase(IErrorCollectionBase errors) : this(Application.Current.Dispatcher, errors)
+        {
+
         }
 
         /// <summary>
@@ -310,6 +317,17 @@ namespace JPB.ErrorValidation.ViewModelProvider
                     }
                 }
             }
+        }
+    }
+
+    public class AsyncErrorProviderBase<T> : AsyncErrorProviderBase where T : IErrorCollectionBase, new()
+    {
+        public AsyncErrorProviderBase(Dispatcher disp) : base(disp, new T())
+        {
+        }
+
+        public AsyncErrorProviderBase() : this(Application.Current.Dispatcher)
+        {
         }
     }
 }
