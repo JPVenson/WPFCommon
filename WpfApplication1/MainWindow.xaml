@@ -15,12 +15,6 @@
         d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
 
 	<Window.Resources>
-        <ResourceDictionary x:Key="Dictionary">
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                Source="/PresentationFramework.Aero;component/themes/Aero.NormalColor.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
         <SolidColorBrush Color="#FFCB2E2E" x:Key="ErrorForgroundColor"/>
 		<SolidColorBrush Color="#11FF0000" x:Key="ErrorBackgroundColor"/>
 
@@ -75,7 +69,6 @@
                        IsEnabled="False"
                        Text="{Binding IsValidating}"/>
 			<TextBox DockPanel.Dock="Left"
-                         IsEnabled="False"
                  Text="{Binding ToValidationString, Mode=TwoWay,
                  ValidatesOnDataErrors=True,
                  NotifyOnValidationError=True,

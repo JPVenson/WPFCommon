@@ -106,13 +106,15 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
     public class DelegateCommand<TParameter> : DelegateCommand
     {
+	    public static readonly Func<TParameter, bool> True = (obj) => true;
+
         /// <inheritdoc />
         public DelegateCommand(Action execute) : this((obj) => execute())
         {
         }
 
         /// <inheritdoc />
-        public DelegateCommand(Action<TParameter> execute) : this(execute, (obj) => true)
+        public DelegateCommand(Action<TParameter> execute) : this(execute, True)
         {
         }
 
@@ -134,6 +136,9 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
             base.CanExecutePredicate = (obj) =>
             {
+	            if (canExecute == True)
+		            return true;
+
                 if (obj is TParameter)
                 {
                     return canExecute((TParameter)obj);

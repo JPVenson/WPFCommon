@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    public class ThreadSaveEnumerator<T> : IEnumerator<T>, IDisposable
+    public class ThreadSaveEnumerator<T> : IEnumerator<T>
     {
         private ThreadSaveObservableCollection<T> _collection;
         private int counter;
@@ -15,7 +15,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
         public ThreadSaveEnumerator(ThreadSaveObservableCollection<T> collection)
         {
             _collection = collection;
-            _collection.IsReadOnlyOptimistic = true;
         }
 
         public T Current
@@ -33,11 +32,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
         public bool MoveNext()
         {
-            if (_collection.Count > counter + 1)
-                return false;
-            counter++;
-            Current = _collection[counter];
-            return true;
+	        lock (_collection.SyncRoot)
+	        {
+				if (_collection.Count > counter + 1)
+					return false;
+				counter++;
+				Current = _collection[counter];
+				return true;
+			}
         }
 
         public void Reset()
