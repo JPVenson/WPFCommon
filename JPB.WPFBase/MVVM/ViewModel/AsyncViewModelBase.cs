@@ -747,6 +747,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		private void BackgroundSimpleWork(Task task)
 		{
+			OnTaskCreated(task);
 			if (task != null && task.Status == TaskStatus.Created)
 			{
 				task.Start();

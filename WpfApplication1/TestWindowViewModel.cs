@@ -1,8 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using JPB.ErrorValidation.ValidationRules;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.ErrorValidation.ViewModelProvider;
 using JPB.WPFBase.MVVM.DelegateCommand;
+using JPB.WPFBase.MVVM.ViewModel;
 
 namespace WpfApplication1
 {
@@ -12,14 +15,68 @@ namespace WpfApplication1
 
         public TestWindowViewModel()
         {
-            TaskACommand = new AsyncDelegateCommand(ExecuteTaskA, CanExecuteTaskA);
-            TaskBCommand = new AsyncDelegateCommand(ExecuteTaskB, CanExecuteTaskB);
-            TaskBCommand.AsyncCanExecute = true;
-            TaskACommand.AsyncCanExecute = true;
+	        ThreadSaveObservableCollection = new ThreadSaveObservableCollection<string>();
 
-            TaskACommand.AddDependency(TaskBCommand, DependLevel.Complete);
-            TaskBCommand.AddDependency(TaskACommand, DependLevel.WorkingOnly);
-        }
+	        base.SimpleWork(() =>
+	        {
+		        while (true)
+		        {
+			        try
+			        {
+				        Thread.Sleep(250);
+				        foreach (var item in ThreadSaveObservableCollection)
+				        {
+					        Console.WriteLine("LOG " + item);
+				        }
+					}
+			        catch (Exception e)
+			        {
+				        Console.WriteLine(e);
+				        throw;
+			        }
+		        }
+	        });
+
+			base.SimpleWork(() =>
+			{
+				var x = 0;
+				while (true)
+				{
+					Thread.Sleep(1);
+					var count = ThreadSaveObservableCollection.Count();
+					ThreadSaveObservableCollection.Add("Test Nr " + x++);
+				}
+			});
+
+			base.SimpleWork(() =>
+	        {
+		        while (true)
+		        {
+			        Thread.Sleep(2);
+			        var count = ThreadSaveObservableCollection.Count();
+			        if (count > 0)
+			        {
+				        var elementAt = ThreadSaveObservableCollection.FirstOrDefault();
+				        ThreadSaveObservableCollection.Remove(elementAt);
+			        }
+		        }
+	        });
+		}
+
+
+
+	    private ThreadSaveObservableCollection<string> _threadSaveObservableCollection;
+
+	    public ThreadSaveObservableCollection<string> ThreadSaveObservableCollection
+	    {
+		    get { return _threadSaveObservableCollection; }
+		    set
+		    {
+			    SendPropertyChanging(() => ThreadSaveObservableCollection);
+			    _threadSaveObservableCollection = value;
+			    SendPropertyChanged(() => ThreadSaveObservableCollection);
+		    }
+	    }
 
         public string ToValidationString
         {

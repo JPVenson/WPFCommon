@@ -10,7 +10,7 @@
         xmlns:validationRules="clr-namespace:JPB.ErrorValidation.ValidationRules;assembly=JPB.ErrorValidation"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         mc:Ignorable="d"
-        
+
         Title="MainWindow" Height="350" Width="525"
         d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
 
@@ -31,7 +31,7 @@
                 <ListBox ItemsSource="{Binding}" />
             </GroupBox>
         </DataTemplate>
-		
+
 		<ControlTemplate x:Key="MultiErrorControl">
 			<Grid>
 				<Border BorderBrush="{StaticResource ErrorForgroundColor}" BorderThickness="1" Background="{StaticResource ErrorBackgroundColor}"
@@ -75,17 +75,20 @@
                  UpdateSourceTrigger=PropertyChanged}"
                  Height="25" />
 		</DockPanel>
-		
-		
-		<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ActiveValidationCases}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding ErrorText}" Foreground="Red" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
 
-        <!--<TextBox
+
+		<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ActiveValidationCases}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding ErrorText}" Foreground="Red" />
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+
+		<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ThreadSaveObservableCollection}">
+		</ItemsControl>
+
+		<!--<TextBox
             Style="{StaticResource {x:Type TextBox}}"
             DockPanel.Dock="Top"
                  Text="{Binding ToValidationString, ValidatesOnNotifyDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />

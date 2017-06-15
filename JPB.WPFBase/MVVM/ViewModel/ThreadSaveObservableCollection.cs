@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows.Threading;
+// ReSharper disable ExplicitCallerInfoArgument
 
 #endregion
 
@@ -21,10 +22,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 #endif
 	public class ThreadSaveObservableCollection<T> :
 			AsyncViewModelBase,
-			ICollection<T>,
-			IEnumerable<T>,
 			IReadOnlyList<T>,
-			IReadOnlyCollection<T>,
 			IProducerConsumerCollection<T>,
 			IList,
 			IList<T>,
@@ -34,21 +32,27 @@ namespace JPB.WPFBase.MVVM.ViewModel
 #endif
 			IDisposable
 	{
-		private ThreadSaveObservableCollection(IEnumerable<T> collection, bool copy)
+		private ThreadSaveObservableCollection(IList<T> collection,bool copy)
 			: this((Dispatcher) null)
 		{
 			if (collection == null)
 			{
 				throw new ArgumentNullException("collection");
 			}
+			if (copy)
+			{
+				CopyFrom(collection);
+			}
+			else
+			{
+				_base = collection;
+			}
 
-			CopyFrom(collection);
-
-			actorHelper = new ViewModelBase();
+			_actorHelper = this;
 		}
 
-		public ThreadSaveObservableCollection(IEnumerable<T> collection)
-			: this(collection, false)
+		public ThreadSaveObservableCollection(IList<T> collection)
+			: this(collection, true)
 		{
 		}
 
@@ -59,20 +63,27 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		public ThreadSaveObservableCollection(Dispatcher fromThread)
 		{
-			actorHelper = new ViewModelBase(fromThread);
+			_actorHelper = new ViewModelBase(fromThread);
 			_base = new Collection<T>();
 		}
 
-		private readonly Collection<T> _base;
+		private readonly IList<T> _base;
 #if !WINDOWS_UWP
 		[NonSerialized]
 #endif
-		private readonly ThreadSaveViewModelActor actorHelper;
+		private readonly ThreadSaveViewModelActor _actorHelper;
 
 #if !WINDOWS_UWP
 		[NonSerialized]
 #endif
 		private bool _batchCommit;
+		protected bool BatchCommit
+		{
+			get { return _batchCommit; }
+			set { _batchCommit = value; }
+		}
+
+		public bool ThreadSaveEnumeration { get; set; } = true;
 
 		public bool IsReadOnlyOptimistic { get; set; }
 
@@ -87,6 +98,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		public IEnumerator<T> GetEnumerator()
 		{
+			if (ThreadSaveEnumeration)
+			{
+				IEnumerator<T> enumerator = null;
+				ThreadSaveAction(() => { enumerator = ToArray().Cast<T>().GetEnumerator(); });
+				return enumerator;
+			}
 			return _base.GetEnumerator();
 		}
 
@@ -106,7 +123,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				return;
 			}
-			actorHelper.ThreadSaveAction(
+			_actorHelper.ThreadSaveAction(
 			() =>
 			{
 				_base.Clear();
@@ -132,10 +149,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				return false;
 			}
-			T item2;
-			item2 = item;
+			var item2 = item;
 			var result = false;
-			actorHelper.ThreadSaveAction(
+			_actorHelper.ThreadSaveAction(
 			() =>
 			{
 				var index = IndexOf(item2);
@@ -152,10 +168,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			return result;
 		}
 
-		public int Count
-		{
-			get { return _base.Count; }
-		}
+		public int Count => _base.Count;
 
 		public bool IsReadOnly { get; set; }
 
@@ -177,7 +190,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			var tempitem = (T) value;
 			var indexOf = -1;
-			actorHelper.ThreadSaveAction(
+			_actorHelper.ThreadSaveAction(
 			() =>
 			{
 				indexOf = ((IList) _base).Add(tempitem);
@@ -211,10 +224,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			Remove((T) value);
 		}
 
-		public bool IsFixedSize
-		{
-			get { return IsReadOnly; }
-		}
+		public bool IsFixedSize => IsReadOnly;
 
 		public void RemoveAt(int index)
 		{
@@ -222,7 +232,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				return;
 			}
-			actorHelper.ThreadSaveAction(
+			_actorHelper.ThreadSaveAction(
 			() =>
 			{
 				var old = _base[index];
@@ -260,7 +270,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 
 			var tempitem = item;
-			actorHelper.ThreadSaveAction(
+			_actorHelper.ThreadSaveAction(
 			() =>
 			{
 				_base.Insert(index, tempitem);
@@ -298,12 +308,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			((ICollection) _base).CopyTo(array, index);
 		}
 
-		public object SyncRoot
-		{
-			get { return Lock; }
-		}
+		public object SyncRoot => Lock;
 
-		public bool IsSynchronized { get; private set; }
+		public bool IsSynchronized => Monitor.IsEntered(Lock);
 
 		public bool TryAdd(T item)
 		{
@@ -345,12 +352,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		protected virtual void StartBatchCommit()
 		{
-			_batchCommit = true;
+			BatchCommit = true;
 		}
 
 		protected virtual void EndBatchCommit()
 		{
-			_batchCommit = false;
+			BatchCommit = false;
 		}
 
 		/// <summary>
@@ -366,6 +373,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			bool withLock = true)
 		{
 			var cpy = Clone() as ThreadSaveObservableCollection<T>;
+			if (cpy == null)
+			{
+				return;
+			}
 			try
 			{
 				if (withLock)
@@ -410,8 +421,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 							case NotifyCollectionChangedAction.Reset:
 								Clear();
 								break;
-							default:
-								break;
 						}
 					}
 				}
@@ -422,10 +431,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				{
 					Monitor.Exit(Lock);
 				}
-				if (cpy != null)
-				{
-					cpy.Dispose();
-				}
+				cpy.Dispose();
 			}
 		}
 
@@ -472,7 +478,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			if (enumerable.Any())
 			{
-				actorHelper.ThreadSaveAction(
+				_actorHelper.ThreadSaveAction(
 				() =>
 				{
 					foreach (var variable in enumerable)
@@ -487,6 +493,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 		}
 
+		// ReSharper disable once UnusedParameter.Local
 		private void CheckType(object value)
 		{
 			if (value != null && !(value is T))
@@ -517,7 +524,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 
 			T oldItem;
-			actorHelper.ThreadSaveAction(
+			_actorHelper.ThreadSaveAction(
 			() =>
 			{
 				if (index + 1 > Count)
