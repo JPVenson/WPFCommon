@@ -9,36 +9,62 @@ using Dispatcher = Windows.UI.Core.CoreDispatcher;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    public abstract class ThreadSaveViewModelActor
+	/// <summary>
+	/// Base class for all UI related actors
+	/// </summary>
+	public abstract class ThreadSaveViewModelActor
     {
-        protected ThreadSaveViewModelActor()
-#if WINDOWS_UWP
-			: this(Window.Current.Dispatcher)
-#else
-            : this(Application.Current.Dispatcher)
-#endif
-        {
-        }
+		/// <summary>
+		/// Creates a new <code>ThreadSaveViewModelActor</code> and attaches the current dispatcher.
+		/// Will create no exception if the current Thread is not an UI Thread.
+		/// You can capture the Dispatcher Scope by using the <code>Catch</code> method
+		/// </summary>
+	    protected ThreadSaveViewModelActor()
+			    : this(DispatcherLock.GetDispatcher())
+	    {
+	    }
 
-        protected ThreadSaveViewModelActor(Dispatcher targetDispatcher)
-        {
-            Dispatcher = targetDispatcher ??
-#if WINDOWS_UWP
-			Window.Current.Dispatcher
-#else
-            Application.Current.Dispatcher
-#endif
-                ;
-            Lock = new object();
-        }
+		/// <summary>
+		/// Creates a new <code>ThreadSaveViewModelActor</code> and attaches the given dispatcher
+		/// </summary>
+		/// <param name="targetDispatcher"></param>
+	    protected ThreadSaveViewModelActor(Dispatcher targetDispatcher)
+	    {
+		    this.Dispatcher = targetDispatcher;
+		    this.Lock = new object();
+	    }
 
-        protected Dispatcher Dispatcher { get; set; }
+		/// <summary>
+		/// Captures the current Dispatcher Scope.
+		/// </summary>
+		/// <returns></returns>
+	    protected IDisposable CatpureScope()
+	    {
+		    return DispatcherLock.CatpureDispatcher();
+	    }
 
+		/// <summary>
+		///		The Related Dispatcher attached to this <code>ThreadSaveViewModelActor</code>
+		/// </summary>
+		protected Dispatcher Dispatcher { get; set; }
+
+		/// <summary>
+		///		A Instance related Lock object
+		/// </summary>
         public object Lock { get; set; }
 
+		/// <summary>
+		///		An informational Locked flag. If this Flag is set another thread or the current Thread is currently accessing the
+		///		given dispatcher.
+		/// </summary>
         public bool IsLocked { get; protected set; }
 
-        public void ThreadSaveAction(Action action)
+		/// <summary>
+		///		Executes the given <paramref name="action"/> inside the given <code>Dispatcher</code>.
+		///		If the caller dispatcher IS the given <code>Dispatcher</code>, it will execute synchrony
+		/// </summary>
+		/// <param name="action"></param>
+		public void ThreadSaveAction(Action action)
         {
             try
             {
@@ -61,7 +87,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
             }
         }
 
-        public void BeginThreadSaveAction(Action action)
+		/// <summary>
+		///		Executes the given <paramref name="action"/> inside the given <code>Dispatcher</code> by using BeginInvoke.
+		///		If the caller dispatcher IS the given <code>Dispatcher</code>, it will execute synchrony
+		/// </summary>
+		/// <param name="action"></param>
+		public void BeginThreadSaveAction(Action action)
         {
             if (Dispatcher.HasShutdownStarted)
                 return;

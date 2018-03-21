@@ -54,6 +54,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -78,6 +82,7 @@
     <Compile Include="MVVM\DelegateCommand\DelegateCommand.cs" />
     <Compile Include="MVVM\ViewModel\AsyncThreadSaveObservableCollection.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBase.cs" />
+    <Compile Include="MVVM\ViewModel\DispatcherLock.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveCollectionModel.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveEnumerator.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveObservableCollection.cs" />
@@ -85,6 +90,9 @@
     <Compile Include="MVVM\ViewModel\ThreadSaveViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
