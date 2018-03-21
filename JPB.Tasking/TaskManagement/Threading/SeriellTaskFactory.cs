@@ -7,10 +7,15 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace JPB.Tasking.TaskManagement.Threading
 {
+	/// <summary>
+	///		Creates a Queue of Actions that will be called asyncrolly as they are added
+	/// </summary>
     public class SerielTaskFactory : IDisposable
 	{
 		private readonly string _namedConsumer;
@@ -83,12 +88,14 @@ namespace JPB.Tasking.TaskManagement.Threading
 					return;
 
 				_isWorking = true;
-				_thread = new Thread(Worker);
-				_thread.Name = _namedConsumer;
+				_thread = new Thread(Worker)
+				{
+						Name = _namedConsumer
+				};
 				_thread.SetApartmentState(ApartmentState.MTA);
 				_thread.Start();
+				OnStateChanged();
 			}
-			OnStateChanged();
 		}
 
 		internal void Worker()
@@ -98,16 +105,18 @@ namespace JPB.Tasking.TaskManagement.Threading
 				while (ConcurrentQueue.Any() && !_isDisposed)
 				{
 					Action action;
-					if (ConcurrentQueue.TryDequeue(out action))
+					if (!ConcurrentQueue.TryDequeue(out action))
 					{
-						try
-						{
-							action.Invoke();
-						}
-						catch (Exception e)
-						{
-							OnTaskFailed(e);
-						}
+						continue;
+					}
+
+					try
+					{
+						action.Invoke();
+					}
+					catch (Exception e)
+					{
+						OnTaskFailed(e);
 					}
 				}
 			}
@@ -116,8 +125,13 @@ namespace JPB.Tasking.TaskManagement.Threading
 				lock (_lockRoot)
 				{
 					_isWorking = false;
+					OnStateChanged();
+					//in case that while we were executing the cleanup, another task was added
+					if (ConcurrentQueue.Any() && !_isDisposed)
+					{
+						StartScheduler();
+					}
 				}
-				OnStateChanged();
 			}
 		}
 
@@ -135,10 +149,13 @@ namespace JPB.Tasking.TaskManagement.Threading
 					_thread.Interrupt();
 					//the Thread should have been listening!!
 					_thread.Abort();
+					//await any cleanup or finaliser to be run
+					_thread.Join(Timeout);
 				}
 				_thread = null;
 			}
-			
+
+			_isWorking = false;
 			StateChanged = null;
 			TaskFailedAsync = null;
 		}
