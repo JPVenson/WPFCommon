@@ -18,32 +18,77 @@ namespace JPB.ErrorValidation.ViewModelProvider
     /// <summary>
     ///     Provides the INotifyDataErrorInfo Interface
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TE"></typeparam>
     public abstract class AsyncErrorProviderBase :
-        ErrorProviderBase
+        ErrorProviderBase, INotifyDataErrorInfo
     {
         private readonly SingelSeriellTaskFactory _errorFactory = new SingelSeriellTaskFactory(2);
         private readonly object _lockRoot = new object();
         private int _workerCount;
 
-
-        public AsyncErrorProviderBase(Dispatcher disp, IErrorCollectionBase errors) : base(disp, errors)
+        protected AsyncErrorProviderBase(Dispatcher disp, IErrorCollectionBase errors) : base(disp, errors)
         {
             ErrorMapper = new ConcurrentDictionary<string, HashSet<IValidation>>();
 
             PropertyChanged += AsyncErrorProviderBase_PropertyChanged;
-
-            foreach (var validation in UserErrors.SelectMany(f => f.ErrorIndicator).Distinct())
-            {
-                ErrorMapper.GetOrAdd(validation, new HashSet<IValidation>());
-            }
-
+            Load();
             AsyncValidationOption = new AsyncValidationOption
             {
                 AsyncState = AsyncState.AsyncSharedPerCall,
                 RunState = AsyncRunState.CurrentPlusOne
             };
+        }
+
+        private void Load()
+        {
+            UserErrors.CollectionChanged += UserErrorsCollectionChanged;
+
+            foreach (var validation in UserErrors.SelectMany(f => f.ErrorIndicator).Distinct())
+            {
+                ErrorMapper.GetOrAdd(validation, new HashSet<IValidation>());
+            }
+        }
+
+        private void UserErrorsCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (IValidation newValidation in e.NewItems)
+                {
+                    foreach (var indicator in newValidation.ErrorIndicator)
+                    {
+                        var errHashset = ErrorMapper.GetOrAdd(indicator, new HashSet<IValidation>());
+                        errHashset.Add(newValidation);
+                    }
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (IValidation newValidation in e.OldItems)
+                {
+                    foreach (var indicator in newValidation.ErrorIndicator)
+                    {
+                        var errHashset = ErrorMapper.GetOrAdd(indicator, new HashSet<IValidation>());
+                        errHashset.Remove(newValidation);
+                        if (!errHashset.Any())
+                        {
+                            ErrorMapper.TryRemove(indicator, out errHashset);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public override void ForceRefresh()
+        {
+            if (ErrorMapper != null)
+            {
+                foreach (var errorMap in ErrorMapper)
+                {
+                    ValidateAsync(errorMap.Key);
+                }
+            }
         }
 
         public AsyncErrorProviderBase(IErrorCollectionBase errors) : this(Application.Current.Dispatcher, errors)
@@ -222,33 +267,33 @@ namespace JPB.ErrorValidation.ViewModelProvider
             switch (asyncState)
             {
                 case AsyncState.AsyncSharedPerCall:
-                {
-                    RunAsyncSharedPerCall(elements.ToArray(), asyncRunState);
-                    break;
-                }
-                case AsyncState.Sync:
-                {
-                    RunSync(elements.ToArray());
-                    break;
-                }
-                case AsyncState.SyncToDispatcher:
-                {
-                    RunSyncToDispatcher(elements.ToArray());
-                    break;
-                }
-                case AsyncState.NoPreference:
-                {
-                    RunAuto(elements.ToArray(), asyncRunState);
-                    break;
-                }
-                case AsyncState.Async:
-                {
-                    foreach (var runIndipendendAsync in elements)
                     {
-                        RunAsyncSharedPerCall(new[] {runIndipendendAsync}, asyncRunState);
+                        RunAsyncSharedPerCall(elements.ToArray(), asyncRunState);
+                        break;
                     }
-                    break;
-                }
+                case AsyncState.Sync:
+                    {
+                        RunSync(elements.ToArray());
+                        break;
+                    }
+                case AsyncState.SyncToDispatcher:
+                    {
+                        RunSyncToDispatcher(elements.ToArray());
+                        break;
+                    }
+                case AsyncState.NoPreference:
+                    {
+                        RunAuto(elements.ToArray(), asyncRunState);
+                        break;
+                    }
+                case AsyncState.Async:
+                    {
+                        foreach (var runIndipendendAsync in elements)
+                        {
+                            RunAsyncSharedPerCall(new[] { runIndipendendAsync }, asyncRunState);
+                        }
+                        break;
+                    }
                 default:
                     throw new ArgumentOutOfRangeException();
             }

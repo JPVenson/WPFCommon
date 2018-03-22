@@ -147,7 +147,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 
 	    /// <inheritdoc />
 	    [Browsable(false)]
-		public void ForceRefresh()
+		public virtual void ForceRefresh()
 		{
 			if (Validate)
 			{

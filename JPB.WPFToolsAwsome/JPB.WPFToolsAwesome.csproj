@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -227,6 +223,9 @@
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AsyncViewModelBase.cs">
       <Link>MVVM\ViewModel\AsyncViewModelBase.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AsyncViewModelBaseOptions.cs">
+      <Link>MVVM\ViewModel\AsyncViewModelBaseOptions.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\DispatcherLock.cs">
       <Link>MVVM\ViewModel\DispatcherLock.cs</Link>
     </Compile>
@@ -247,9 +246,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Page Include="..\JPB.DynamicInputBox\InfoWindow\Controls\QuestionUserControl.xaml">
       <Link>InfoWindow\Controls\QuestionUserControl.xaml</Link>

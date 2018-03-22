@@ -16,7 +16,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 	/// <summary>
 	///		Creates a Queue of Actions that will be called asyncrolly as they are added
 	/// </summary>
-    public class SerielTaskFactory : IDisposable
+	public class SerielTaskFactory : IDisposable
 	{
 		private readonly string _namedConsumer;
 		private Thread _thread;
@@ -90,7 +90,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 				_isWorking = true;
 				_thread = new Thread(Worker)
 				{
-						Name = _namedConsumer
+					Name = _namedConsumer
 				};
 				_thread.SetApartmentState(ApartmentState.MTA);
 				_thread.Start();

@@ -30,7 +30,7 @@ namespace JPB.Extentions.Extensions
 
         public static string ToPropertyCsv<T>(this IEnumerable<T> source, Func<T, string> getProperty)
         {
-            return source.Select(getProperty).Aggregate((s, e) => s + "," + e);
+            return source.Any() ? source.Select(getProperty).Aggregate((s, e) => s + "," + e) : string.Empty;
         }
 
         public static IEnumerable<T> CastWhere<T, TE>(this ICollection<TE> source)

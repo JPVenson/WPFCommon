@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace JPB.Tasking.TaskManagement.Threading
 {
-	[Obsolete]
     public class SingelSeriellTaskFactory : IDisposable
     {
         private bool _isDisposing;

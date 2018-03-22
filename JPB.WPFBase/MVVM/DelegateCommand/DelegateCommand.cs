@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows.Input;
 
 namespace JPB.WPFBase.MVVM.DelegateCommand
@@ -144,7 +143,10 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
                 {
                     return canExecute((TParameter)obj);
                 }
-	            return false;
+                else
+                {
+                    return false;
+                }
             };
         }
 
