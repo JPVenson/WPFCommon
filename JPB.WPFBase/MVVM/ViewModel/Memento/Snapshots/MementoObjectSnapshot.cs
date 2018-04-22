@@ -1,0 +1,46 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+
+namespace JPB.WPFBase.MVVM.ViewModel.Memento.Snapshots
+{
+	[Serializable]
+	public class MementoObjectSnapshot : ISerializable
+	{
+		private const string SerCountMementoData = "DataLength";
+		private const string SerMementoData = "Data_{0}";
+		//public const string XmlSerNamespace = "https://jean-pierre-bachmann.de/WpfTools/Memento/Xml";
+
+		public MementoObjectSnapshot()
+		{
+			MementoSnapshots = new List<MementoPropertySnaptshot>();
+		}
+
+		public MementoObjectSnapshot(SerializationInfo info, StreamingContext context) : this()
+		{
+			var countMementoData = info.GetInt32(SerCountMementoData);
+			for (int i = 0; i < countMementoData; i++)
+			{
+				var moment = info.GetValue(string.Format(SerMementoData, i), typeof(MementoPropertySnaptshot)) as MementoPropertySnaptshot;
+				MementoSnapshots.Add(moment);
+			}
+		}
+
+		public ICollection<MementoPropertySnaptshot> MementoSnapshots { get; set; }
+
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue(SerCountMementoData, MementoSnapshots.Count);
+			var i = 0;
+			foreach (var o in MementoSnapshots)
+			{
+				info.AddValue(string.Format(SerMementoData, i), o, typeof(MementoPropertySnaptshot));
+				i++;
+			}
+		}
+	}
+}

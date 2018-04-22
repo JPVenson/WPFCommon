@@ -80,6 +80,19 @@
     <Compile Include="MVVM\ViewModel\AsyncViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBaseOptions.cs" />
     <Compile Include="MVVM\ViewModel\DispatcherLock.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\IMementoDataStamp.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\MementoController.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\MementoDataStamp.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\MementoOptions.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\MementoSerializationOptions.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\MementoValueProducer.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\MementoViewModelBase.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\UiMementoController.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\UiMementoProxy.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\WeakMementoDataStamp.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveCollectionModel.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveEnumerator.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveObservableCollection.cs" />
@@ -88,6 +101,7 @@
     <Compile Include="MVVM\ViewModel\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

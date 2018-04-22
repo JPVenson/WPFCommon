@@ -229,6 +229,45 @@
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\DispatcherLock.cs">
       <Link>MVVM\ViewModel\DispatcherLock.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs">
+      <Link>MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoDataStamp.cs">
+      <Link>MVVM\ViewModel\Memento\IMementoDataStamp.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoController.cs">
+      <Link>MVVM\ViewModel\Memento\MementoController.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoDataStamp.cs">
+      <Link>MVVM\ViewModel\Memento\MementoDataStamp.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoOptions.cs">
+      <Link>MVVM\ViewModel\Memento\MementoOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoSerializationOptions.cs">
+      <Link>MVVM\ViewModel\Memento\MementoSerializationOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoValueProducer.cs">
+      <Link>MVVM\ViewModel\Memento\MementoValueProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoViewModelBase.cs">
+      <Link>MVVM\ViewModel\Memento\MementoViewModelBase.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs">
+      <Link>MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs">
+      <Link>MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\UiMementoController.cs">
+      <Link>MVVM\ViewModel\Memento\UiMementoController.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\UiMementoProxy.cs">
+      <Link>MVVM\ViewModel\Memento\UiMementoProxy.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\WeakMementoDataStamp.cs">
+      <Link>MVVM\ViewModel\Memento\WeakMementoDataStamp.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveCollectionModel.cs">
       <Link>MVVM\ViewModel\ThreadSaveCollectionModel.cs</Link>
     </Compile>

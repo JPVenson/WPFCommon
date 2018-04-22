@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DynamicInputBox", "JPB.DynamicInputBox\JPB.DynamicInputBox.csproj", "{7D032140-B57A-4EFE-B6FA-C83E01AECC93}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFNetworkIntigration", "JPB.WPFNetworkIntigration\JPB.WPFNetworkIntigration.csproj", "{C7FA6C12-319F-45B2-8428-02DBA2586569}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFToolsAwesome", "JPB.WPFToolsAwsome\JPB.WPFToolsAwesome.csproj", "{75CDAED2-AFD5-45C1-9E44-C1719490A513}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WpfBase.Tests", "JPB.WpfBase.Tests\JPB.WpfBase.Tests.csproj", "{80491FCE-3DFE-4509-83B9-86167E2250C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,8 +93,19 @@ Global
 		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Release|Any CPU.Build.0 = Release|Any CPU
 		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Server|Any CPU.ActiveCfg = Release|Any CPU
 		{75CDAED2-AFD5-45C1-9E44-C1719490A513}.Server|Any CPU.Build.0 = Release|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.ExternalRelease|Any CPU.Build.0 = Release|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.Server|Any CPU.ActiveCfg = Release|Any CPU
+		{80491FCE-3DFE-4509-83B9-86167E2250C2}.Server|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D54F6EDD-B9A2-4B9A-987E-7298343F4B08}
 	EndGlobalSection
 EndGlobal

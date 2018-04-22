@@ -32,7 +32,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		protected AsyncViewModelBase(Dispatcher disp)
 				: base(disp)
 		{
-			Dispatcher.ShutdownStarted += disp_ShutdownStarted;
+			Dispatcher.ShutdownStarted += DispShutdownStarted;
 			Init();
 		}
 		/// <summary>
@@ -94,7 +94,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			AsyncViewModelBaseOptions = AsyncViewModelBaseOptions.Default();
 		}
 
-		private void disp_ShutdownStarted(object sender, EventArgs e)
+		internal virtual void DispShutdownStarted(object sender, EventArgs e)
 		{
 			try
 			{
