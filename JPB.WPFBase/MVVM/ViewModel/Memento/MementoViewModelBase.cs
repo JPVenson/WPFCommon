@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml;
@@ -22,6 +23,13 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 	{
 		internal ConcurrentDictionary<string, MementoValueProducer> MementoDataStore => _mementoDataStore;
 
+		internal static IDictionary<Type, string[]> MementoIgnores { get; set; }
+
+		static MementoViewModelBase()
+		{
+			MementoIgnores = new ConcurrentDictionary<Type, string[]>();
+		}
+
 		[NonSerialized]
 		private MementoController _mementoController;
 
@@ -37,16 +45,37 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 
 		private void CheckForIgnores(Type type)
 		{
+			
 			while (true)
 			{
-				if (type.GetCustomAttributes(false).Any(e => e is IgnoreMementoAttribute))
+				if (MementoIgnores.ContainsKey(type))
 				{
-					foreach (var propertyInfo in type.GetProperties())
+					foreach (var mementoIgnore in MementoIgnores[type])
 					{
-						MementoControl.Blacklist(propertyInfo.Name);
+						MementoControl.Blacklist(mementoIgnore);
 					}
 				}
+				else
+				{
+					var properties = type.GetProperties();
 
+					if (type.GetCustomAttributes(false).Any(e => e is IgnoreMementoAttribute))
+					{
+						foreach (var propertyName in MementoIgnores[type] = properties.Select(e => e.Name).ToArray())
+						{
+							MementoControl.Blacklist(propertyName);
+						}
+					}
+					else
+					{
+						var ignores = properties.Where(e => e.GetCustomAttribute(typeof(IgnoreMementoAttribute)) != null)
+						                        .Select(e => e.Name).ToArray();
+						foreach (var propertyName in MementoIgnores[type] = ignores)
+						{
+							MementoControl.Blacklist(propertyName);
+						}
+					}
+				}
 				if (type.BaseType != null && type.BaseType.Assembly != typeof(string).Assembly)
 				{
 					type = type.BaseType;

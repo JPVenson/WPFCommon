@@ -27,4 +27,12 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.Memento.Models
 			}
 		}
 	}
+
+	public class MementoFullWithDateTImeViewModel : MementoFullViewModel
+	{
+		protected override IMementoDataStamp CreateDataStemp()
+		{
+			return new MementoDataStampProxy(f => DateTime.Now, new MementoDataStamp());
+		}
+	}
 }

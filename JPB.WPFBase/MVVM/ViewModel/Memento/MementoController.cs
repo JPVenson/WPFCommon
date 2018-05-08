@@ -2,6 +2,7 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using JPB.WPFBase.MVVM.ViewModel.Memento.Snapshots;
 
 #endregion
@@ -152,18 +153,46 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 				switch (flags)
 				{
 					case ImportFlags.Append:
-						memento.MementoData.PushRange(snapshot.MementoData.ToArray());
+						if (snapshot.MementoData.Any())
+						{
+							memento.MementoData.PushRange(snapshot.MementoData.ToArray());
+						}
 
 						break;
 					case ImportFlags.Prefix:
 
 						var peek = new ConcurrentStack<IMementoDataStamp>();
-						peek.PushRange(snapshot.MementoData.ToArray());
-						peek.PushRange(memento.MementoData.ToArray());
+						if (snapshot.MementoData.Any())
+						{
+							peek.PushRange(snapshot.MementoData.ToArray());
+						}
+
+						if (memento.MementoData.Any())
+						{
+							peek.PushRange(memento.MementoData.ToArray());
+						}
 						memento.MementoData = peek;
 
 						break;
 				}
+
+				var currentValue = memento.GetValue(MementoHost);
+				IMementoDataStamp latestMoment;
+				if (!memento.MementoData.TryPeek(out latestMoment))
+				{
+					return this;
+				}
+
+				var lastMemento = latestMoment.GetData();
+				if (currentValue == null && lastMemento == null)
+				{
+					return this;
+				}
+				if (currentValue != lastMemento || !currentValue.Equals(lastMemento))
+				{
+					GoInHistory(memento.PropertyName, 1);
+				}
+
 
 				return this;
 			}

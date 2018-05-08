@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using JPB.WpfBase.Tests.MVVM.ViewModel.Memento.Models;
 using JPB.WPFBase.MVVM.ViewModel.Memento;
 using JPB.WPFBase.MVVM.ViewModel.Memento.Snapshots;
@@ -81,7 +84,7 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.Memento
 			Assert.That(mementoOfText.CurrentAge, Is.EqualTo(2));
 			Assert.That(mementoOfText.MementoDataStamps.Count(), Is.EqualTo(3));
 			Assert.That(mementoViewModel.Text, Is.EqualTo("Age2"));
-			
+
 			mementoViewModel.Text = "Age3 1/2";
 			Assert.That(mementoOfText.CurrentAge, Is.EqualTo(3));
 			Assert.That(mementoOfText.MementoDataStamps.Count(), Is.EqualTo(3));
@@ -117,6 +120,35 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.Memento
 			mementoViewModel.SendPropertyChanged(null);
 			mementoViewModel.SendPropertyChanged(string.Empty);
 		}
+		private readonly BinaryFormatter serializer = new BinaryFormatter();
+
+		[Test]
+		public void TestAdditonalData()
+		{
+			var mementoViewModel = new MementoFullWithDateTImeViewModel();
+			mementoViewModel.StartCapture();
+
+			mementoViewModel.Text = "It1-Age1";
+			mementoViewModel.Text = "It1-Age2";
+			mementoViewModel.Text = "It1-Age3";
+
+			mementoViewModel.StopCapture();
+
+			MementoObjectSnapshot snapshot;
+			mementoViewModel.MementoControl.Snapshot(out snapshot);
+
+			Assert.That(snapshot, Is.Not.Null);
+			MemoryStream memoryStream = new MemoryStream();
+			Assert.That(() =>
+			{
+				this.serializer.Serialize((Stream)memoryStream, (object)snapshot);
+				memoryStream.Seek(0L, SeekOrigin.Begin);
+				this.serializer.Deserialize((Stream)memoryStream);
+			}, Throws.Nothing);
+
+
+			Assert.That(snapshot, Is.BinarySerializable);
+		}
 
 		[Test]
 		public void TestSnapshot()
@@ -135,7 +167,31 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.Memento
 
 			Assert.That(snapshot, Is.Not.Null);
 			Assert.That(snapshot, Is.BinarySerializable);
-			Assert.That(snapshot, Is.XmlSerializable);
+			//Assert.That(snapshot, Is.XmlSerializable);
+		}
+
+		[Test]
+		public void TransferSnapshot()
+		{
+			var mementoViewModel = new MementoFullViewModel();
+			mementoViewModel.StartCapture();
+
+			mementoViewModel.Text = "It1-Age1";
+			mementoViewModel.Text = "It1-Age2";
+			mementoViewModel.Text = "It1-Age3";
+
+			mementoViewModel.StopCapture();
+
+			MementoObjectSnapshot snapshot;
+			mementoViewModel.MementoControl.Snapshot(out snapshot);
+
+			var copy = new MementoFullViewModel();
+
+			copy.MementoControl.ImportSnapshot(snapshot);
+
+			Assert.That(copy.Text, Is.EqualTo(mementoViewModel.Text));
+
+			//Assert.That(snapshot, Is.XmlSerializable);
 		}
 	}
 }

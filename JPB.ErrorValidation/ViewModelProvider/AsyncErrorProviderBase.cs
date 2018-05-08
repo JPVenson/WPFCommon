@@ -173,7 +173,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
                 case AsyncRunState.NoPreference:
                     if (_errorFactory.ConcurrentQueue.Count >= Environment.ProcessorCount)
                     {
-                        _errorFactory.Add(() =>
+                        _errorFactory.TryAdd(() =>
                         {
                             var exec = toExection();
                             BeginThreadSaveAction(() => { then(exec); });
@@ -186,14 +186,14 @@ namespace JPB.ErrorValidation.ViewModelProvider
 
                     break;
                 case AsyncRunState.CurrentPlusOne:
-                    _errorFactory.Add(() =>
+                    _errorFactory.TryAdd(() =>
                     {
                         var exec = toExection();
                         BeginThreadSaveAction(() => { then(exec); });
                     }, key);
                     break;
                 case AsyncRunState.OnlyOnePerTime:
-                    _errorFactory.Add(() =>
+                    _errorFactory.TryAdd(() =>
                     {
                         var exec = toExection();
                         BeginThreadSaveAction(() => { then(exec); });

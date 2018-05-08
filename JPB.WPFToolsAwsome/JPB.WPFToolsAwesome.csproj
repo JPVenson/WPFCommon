@@ -190,6 +190,9 @@
     <Compile Include="..\JPB.Tasking\TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs">
       <Link>TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SerialFactoryBase.cs">
+      <Link>TaskManagement\Threading\SerialFactoryBase.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SeriellTaskFactory.cs">
       <Link>TaskManagement\Threading\SeriellTaskFactory.cs</Link>
     </Compile>

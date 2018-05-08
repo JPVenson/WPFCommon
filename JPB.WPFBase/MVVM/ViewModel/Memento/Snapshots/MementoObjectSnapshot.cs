@@ -22,24 +22,30 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento.Snapshots
 
 		public MementoObjectSnapshot(SerializationInfo info, StreamingContext context) : this()
 		{
-			var countMementoData = info.GetInt32(SerCountMementoData);
-			for (int i = 0; i < countMementoData; i++)
+			using (new MementoSerialisationContext())
 			{
-				var moment = info.GetValue(string.Format(SerMementoData, i), typeof(MementoPropertySnaptshot)) as MementoPropertySnaptshot;
-				MementoSnapshots.Add(moment);
+				var countMementoData = info.GetInt32(SerCountMementoData);
+				for (int i = 0; i < countMementoData; i++)
+				{
+					var moment = info.GetValue(string.Format(SerMementoData, i), typeof(MementoPropertySnaptshot)) as MementoPropertySnaptshot;
+					MementoSnapshots.Add(moment);
+				}
 			}
 		}
 
-		public ICollection<MementoPropertySnaptshot> MementoSnapshots { get; set; }
+		public ICollection<MementoPropertySnaptshot> MementoSnapshots { get; internal set; }
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue(SerCountMementoData, MementoSnapshots.Count);
-			var i = 0;
-			foreach (var o in MementoSnapshots)
+			using (new MementoSerialisationContext())
 			{
-				info.AddValue(string.Format(SerMementoData, i), o, typeof(MementoPropertySnaptshot));
-				i++;
+				info.AddValue(SerCountMementoData, MementoSnapshots.Count);
+				var i = 0;
+				foreach (var o in MementoSnapshots)
+				{
+					info.AddValue(string.Format(SerMementoData, i), o, typeof(MementoPropertySnaptshot));
+					i++;
+				}
 			}
 		}
 	}
