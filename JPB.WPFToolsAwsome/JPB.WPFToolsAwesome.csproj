@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\JPB.WPFToolsAwesome.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -237,6 +238,9 @@
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoDataStamp.cs">
       <Link>MVVM\ViewModel\Memento\IMementoDataStamp.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoValueProducer.cs">
+      <Link>MVVM\ViewModel\Memento\IMementoValueProducer.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoController.cs">
       <Link>MVVM\ViewModel\Memento\MementoController.cs</Link>

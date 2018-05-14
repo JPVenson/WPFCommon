@@ -218,9 +218,9 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			snapshot = new MementoObjectSnapshot();
 			snapshot.MementoSnapshots = new List<MementoPropertySnaptshot>();
 
-			foreach (var mementoValueProducer in MementoHost.MementoData)
+			foreach (var mementoValueProducer in MementoHost.MementoDataStore.Select(e => e.Value.CreateSnapshot()).Where(e => e != null))
 			{
-				snapshot.MementoSnapshots.Add(mementoValueProducer.Value.CreateSnapshot());
+				snapshot.MementoSnapshots.Add(mementoValueProducer);
 			}
 
 			return this;
@@ -233,10 +233,12 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		/// <param name="propertyName"></param>
 		/// <param name="data"></param>
 		/// <returns></returns>
-		public MementoController Forget(string propertyName, out MementoValueProducer data)
+		public MementoController Forget(string propertyName, out IMementoValueProducer data)
 		{
-			MementoHost.MementoDataStore.TryRemove(propertyName, out data);
-			data.Forget();
+			IMementoValueHolder d;
+			MementoHost.MementoDataStore.TryRemove(propertyName, out d);
+			d.Forget();
+			data = d;
 			return this;
 		}
 
@@ -248,7 +250,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		/// <returns></returns>
 		public MementoController Forget(string propertyName)
 		{
-			MementoValueProducer data;
+			IMementoValueProducer data;
 			return Forget(propertyName, out data);
 		}
 

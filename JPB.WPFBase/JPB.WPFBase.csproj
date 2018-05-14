@@ -82,6 +82,7 @@
     <Compile Include="MVVM\ViewModel\DispatcherLock.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs" />
     <Compile Include="MVVM\ViewModel\Memento\IMementoDataStamp.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\IMementoValueProducer.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoController.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoDataStamp.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoOptions.cs" />

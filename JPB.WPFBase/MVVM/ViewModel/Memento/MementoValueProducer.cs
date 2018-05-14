@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -14,9 +15,9 @@ using JPB.WPFBase.MVVM.ViewModel.Memento.Snapshots;
 
 namespace JPB.WPFBase.MVVM.ViewModel.Memento
 {
-	public class MementoValueProducer
+	public class MementoValueProducer : IMementoValueHolder
 	{
-		internal ConcurrentStack<IMementoDataStamp> MementoData { get; set; }
+		ConcurrentStack<IMementoDataStamp> IMementoValueHolder.MementoData { get; set; }
 		private readonly MementoOptions _mementoOptions;
 		private int _currentAge;
 		private bool _resolveFailed;
@@ -33,7 +34,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			_mementoOptions = mementoOptions;
 			PropertyName = propertyName;
 			_propertyInfo = null;
-			MementoData = new ConcurrentStack<IMementoDataStamp>();
+			((IMementoValueHolder) this).MementoData = new ConcurrentStack<IMementoDataStamp>();
 			LockRoot = new object();
 		}
 
@@ -50,12 +51,17 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		/// <summary>
 		///		Returns a ReadOnly copy of the Current MementoData
 		/// </summary>
-		public IEnumerable<IMementoDataStamp> MementoDataStamps => MementoData.ToArray();
+		public IEnumerable<IMementoDataStamp> MementoDataStamps => ((IMementoValueHolder) this).MementoData.ToArray();
 
 		public object LockRoot { get; private set; }
 
-		internal MementoPropertySnaptshot CreateSnapshot()
+		MementoPropertySnaptshot IMementoValueHolder.CreateSnapshot()
 		{
+			if (_propertyInfo == null)
+			{
+				return null;
+			}
+
 			var dataSnapshot = MementoDataStamps.ToArray();
 			return new MementoPropertySnaptshot
 			{
@@ -84,7 +90,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 				}
 			}
 
-			if (_propertyInfo == null)
+			if (_propertyInfo == null || !_propertyInfo.CanRead || !_propertyInfo.CanWrite)
 			{
 				_resolveFailed = true;
 				Trace.TraceWarning(
@@ -100,7 +106,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			return true;
 		}
 
-		internal object GetValue(object viewModel)
+		object IMementoValueHolder.GetValue(object viewModel)
 		{
 			if (!ResolvePropertyInfoIfUnset(viewModel))
 			{
@@ -119,7 +125,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 
 		internal void SetValue(object viewModel, object value)
 		{
-			if (!ResolvePropertyInfoIfUnset(viewModel))
+			if (!_propertyInfo.CanWrite || !ResolvePropertyInfoIfUnset(viewModel))
 			{
 				return;
 			}
@@ -135,20 +141,22 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			}
 		}
 
-		internal bool TryAdd(MementoViewModelBase mementoViewModelBase, IMementoDataStamp dataStemp)
+		bool IMementoValueHolder.TryAdd(MementoViewModelBase mementoViewModelBase, IMementoDataStamp dataStemp)
 		{
 			if (Ignore)
 			{
 				return false;
 			}
 
-			var moment = GetValue(mementoViewModelBase);
+			var moment = ((IMementoValueHolder) this).GetValue(mementoViewModelBase);
 			if (!dataStemp.CanSetData(moment))
 			{
 				return false;
 			}
 
-			var currentMoment = MementoData.FirstOrDefault();
+			var memntoData = ((IMementoValueHolder) this).MementoData;
+
+			var currentMoment = memntoData.FirstOrDefault();
 
 			if (currentMoment != null && currentMoment.GetData() == moment)
 			{
@@ -158,16 +166,16 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			dataStemp.CaptureData(moment);
 			lock (LockRoot)
 			{
-				while (_currentAge < MementoData.Count)
+				while (_currentAge < memntoData.Count)
 				{
 					IMementoDataStamp outdatedStamp;
-					if (MementoData.TryPop(out outdatedStamp))
+					if (memntoData.TryPop(out outdatedStamp))
 					{
 						outdatedStamp.Forget();
 					}
 				}
 
-				MementoData.Push(dataStemp);
+				memntoData.Push(dataStemp);
 				_currentAge++;
 			}
 
@@ -181,10 +189,10 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		{
 			lock (LockRoot)
 			{
-				while (!MementoData.IsEmpty)
+				while (!((IMementoValueHolder) this).MementoData.IsEmpty)
 				{
 					IMementoDataStamp outdatedStamp;
-					if (MementoData.TryPop(out outdatedStamp))
+					if (((IMementoValueHolder) this).MementoData.TryPop(out outdatedStamp))
 					{
 						outdatedStamp.Forget();
 					}
@@ -230,7 +238,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		public bool CanGoInHistory(int ages)
 		{
 			var toAge = _currentAge + ages;
-			return toAge > 0 && toAge < MementoData.Count;
+			return toAge > 0 && toAge < ((IMementoValueHolder) this).MementoData.Count;
 		}
 	}
 }

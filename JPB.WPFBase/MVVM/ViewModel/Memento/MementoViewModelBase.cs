@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -19,9 +20,10 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 	/// <summary>
 	///     Uses the Memento Pattern to Store and revert all INotifyPropertyChanged/ing properties
 	/// </summary>
+	[IgnoreMemento]
 	public class MementoViewModelBase : AsyncViewModelBase, IDisposable
 	{
-		internal ConcurrentDictionary<string, MementoValueProducer> MementoDataStore => _mementoDataStore;
+		internal ConcurrentDictionary<string, IMementoValueHolder> MementoDataStore => _mementoDataStore;
 
 		internal static IDictionary<Type, string[]> MementoIgnores { get; set; }
 
@@ -34,18 +36,17 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		private MementoController _mementoController;
 
 		[NonSerialized]
-		private readonly ConcurrentDictionary<string, MementoValueProducer> _mementoDataStore;
+		private readonly ConcurrentDictionary<string, IMementoValueHolder> _mementoDataStore;
 
 		public MementoViewModelBase()
 		{
-			_mementoDataStore = new ConcurrentDictionary<string, MementoValueProducer>();
+			_mementoDataStore = new ConcurrentDictionary<string, IMementoValueHolder>();
 			MementoOptions = MementoOptions.Default;
 			CheckForIgnores(GetType());
 		}
 
 		private void CheckForIgnores(Type type)
 		{
-			
 			while (true)
 			{
 				if (MementoIgnores.ContainsKey(type))
@@ -76,7 +77,8 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 						}
 					}
 				}
-				if (type.BaseType != null && type.BaseType.Assembly != typeof(string).Assembly)
+				if (type.BaseType != null && type.BaseType.Assembly != typeof(string).Assembly 
+				                          && type.BaseType.Assembly != typeof(MementoController).Assembly)
 				{
 					type = type.BaseType;
 					continue;
@@ -127,9 +129,9 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		/// <summary>
 		///     The Current known Memento Data for all Properties
 		/// </summary>
-		public IReadOnlyDictionary<string, MementoValueProducer> MementoData
+		public IReadOnlyDictionary<string, IMementoValueProducer> MementoData
 		{
-			get { return new ReadOnlyDictionary<string, MementoValueProducer>(MementoDataStore); }
+			get { return new ReadOnlyDictionary<string, IMementoValueProducer>(MementoDataStore.ToDictionary(f => f.Key, f => f.Value as IMementoValueProducer)); }
 		}
 
 		/// <summary>
@@ -138,6 +140,8 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		public void StartCapture()
 		{
 			WeakEventManager<MementoViewModelBase, PropertyChangedEventArgs>.AddHandler(this, nameof(INotifyPropertyChanged.PropertyChanged), MementoViewModelBase_PropertyChanged);
+			WeakEventManager<MementoViewModelBase, PropertyChangingEventArgs>.AddHandler(this, nameof(INotifyPropertyChanging.PropertyChanging),
+			MementoViewModelBase_PropertyChangeing);
 			CaptureByINotifyPropertyChanged = true;
 		}
 
@@ -147,6 +151,8 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		public void StopCapture()
 		{
 			WeakEventManager<MementoViewModelBase, PropertyChangedEventArgs>.RemoveHandler(this, nameof(INotifyPropertyChanged.PropertyChanged), MementoViewModelBase_PropertyChanged);
+			WeakEventManager<MementoViewModelBase, PropertyChangingEventArgs>.RemoveHandler(this, nameof(INotifyPropertyChanging.PropertyChanging),
+			MementoViewModelBase_PropertyChangeing);
 			CaptureByINotifyPropertyChanged = false;
 		}
 
@@ -170,6 +176,31 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		[ThreadStatic]
 		[NonSerialized]
 		internal static bool DoNotSetMoment;
+
+		private void MementoViewModelBase_PropertyChangeing(object send, PropertyChangingEventArgs e)
+		{
+			if (string.IsNullOrWhiteSpace(e.PropertyName))
+			{
+				return;
+			}
+
+			var mementoValueProducer = GetOrAddMemento(e.PropertyName);
+			if (mementoValueProducer == null)
+			{
+				return;
+			}
+
+			var value = mementoValueProducer.GetValue(this);
+			if (value is INotifyCollectionChanged)
+			{
+				(value as INotifyCollectionChanged).CollectionChanged -= OnMomentTrackedCollectionChanged;
+			}
+		}
+
+		protected internal void OnMomentTrackedCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+		{
+
+		}
 
 		private void MementoViewModelBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
@@ -204,7 +235,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			GC.SuppressFinalize(this);
 		}
 
-		public MementoValueProducer GetOrAddMemento(string propertyName)
+		internal IMementoValueHolder GetOrAddMemento(string propertyName)
 		{
 			if (!DoNotSetMoment)
 			{
