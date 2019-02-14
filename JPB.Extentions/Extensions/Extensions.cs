@@ -7,6 +7,14 @@ namespace JPB.Extentions.Extensions
 {
     public static class Extensions
     {
+        /// <summary>
+        ///     Checks all public Properties for equality
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="self">The self.</param>
+        /// <param name="to">To.</param>
+        /// <param name="ignore">The ignore.</param>
+        /// <returns></returns>
         public static bool PublicInstancePropertiesEqual<T>(this T self, T to, params string[] ignore) where T : class
         {
             if (self != null && to != null)

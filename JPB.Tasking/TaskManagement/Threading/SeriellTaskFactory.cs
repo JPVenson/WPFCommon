@@ -22,7 +22,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		public SerielTaskFactory([CallerMemberName]string namedConsumer = null)
+		public SerielTaskFactory(bool keepRunning = false, [CallerMemberName] string namedConsumer = null) : base(keepRunning)
 		{
 			_namedConsumer = namedConsumer;
 			ConcurrentQueue = new ConcurrentQueue<Action>();

@@ -91,16 +91,16 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		/// <summary>
 		///		Creates a new <c>AsyncViewModelBase</c> with the given Dispatcher
 		/// </summary>
-		/// <param name="disp"></param>
-		protected MementoViewModelBase(Dispatcher disp)
-				: base(disp)
+		/// <param name="dispatcher"></param>
+		protected MementoViewModelBase(Dispatcher dispatcher)
+				: base(dispatcher)
 		{
 			Init();
 		}
 
-		internal override void DispShutdownStarted(object sender, EventArgs e)
+		internal override void DispatcherShutdownStarted(object sender, EventArgs e)
 		{
-			base.DispShutdownStarted(sender, e);
+			base.DispatcherShutdownStarted(sender, e);
 			Dispose();
 		}
 

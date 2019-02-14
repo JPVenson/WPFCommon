@@ -12,6 +12,9 @@ namespace JPB.ErrorValidation
         IEnumerable<IValidation> ReturnErrors(string columnName);
     }
 
+    /// <summary>
+    ///		A Generic not WPF related Interface for a Validator that can be loaded into the 
+    /// </summary>
     public interface IErrorValidatorBase
     {
         /// <summary>

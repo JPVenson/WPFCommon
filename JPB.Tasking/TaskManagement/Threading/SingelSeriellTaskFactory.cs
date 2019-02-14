@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 	///		Creates a Queue of Actions that will be called asyncrolly as they are added. By defining the <para>MaxRunPerKey</para> you define how many actions
 	///		should be run with the same key
 	/// </summary>
-	public class SingelSeriellTaskFactory : SerialFactoryBase
+	public class SingelSerielTaskFactory : SerialFactoryBase
 	{
 
 		private readonly int _maxRunPerKey;
@@ -19,12 +20,14 @@ namespace JPB.Tasking.TaskManagement.Threading
 
 		#endregion
 
-		/// <summary>
-		///		Creates a new Instance of the SingelSeriellTaskFactory and defines how many actions with the same key should be queued
-		/// </summary>
+		///  <summary>
+		/// 		Creates a new Instance of the SingelSeriellTaskFactory and defines how many actions with the same key should be queued
+		///  </summary>
+		/// <param name="keepRunning"></param>
 		/// <param name="maxRunPerKey"></param>
-		public SingelSeriellTaskFactory(int maxRunPerKey = 1)
+		public SingelSerielTaskFactory(bool keepRunning, int maxRunPerKey = 1, [CallerMemberName] string namedConsumer = null) : base(keepRunning)
 		{
+			_namedConsumer = namedConsumer;
 			_maxRunPerKey = maxRunPerKey;
 			ConcurrentQueue = new ConcurrentQueue<Tuple<Action, object>>();
 		}
@@ -71,13 +74,19 @@ namespace JPB.Tasking.TaskManagement.Threading
 			return true;
 		}
 
+		/// <inheritdoc />
 		protected override Action GetNext()
 		{
+			if (!HasNext())
+			{
+				return null;
+			}
 			Tuple<Action, object> next;
 			ConcurrentQueue.TryDequeue(out next);
-			return next.Item1;
+			return next?.Item1;
 		}
 
+		/// <inheritdoc />
 		protected override bool HasNext()
 		{
 			return !ConcurrentQueue.IsEmpty;

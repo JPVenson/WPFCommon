@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using JPB.ErrorValidation.ValidationRules;
 using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ValidationTyps
@@ -10,20 +11,20 @@ namespace JPB.ErrorValidation.ValidationTyps
 	/// </summary>
 	public class Error<T> : IValidation<T>
 	{
+		private Func<T, bool> _condition;
 		private string[] _errorIndicator;
 		private string _errorText;
-		private Func<T, bool> _condition;
 
-		public Error(string errorText, string errorIndicator, Func<T, bool> condition) : this(errorText, condition, errorIndicator)
+		public Error(string errorText, string errorIndicator, Func<T, bool> condition) : this(errorText, condition,
+			errorIndicator)
 		{
-
 		}
 
 		public Error(string errorText, Func<T, bool> condition, params string[] errorIndicator)
 		{
-			this._condition = condition;
-			this._errorIndicator = errorIndicator;
-			this._errorText = errorText;
+			_condition = condition;
+			_errorIndicator = errorIndicator;
+			_errorText = errorText;
 		}
 
 		public static Error<T> FromProperty<TProperty>(string errorText, Func<T, bool> condition,
@@ -34,7 +35,7 @@ namespace JPB.ErrorValidation.ValidationTyps
 
 		public Error<T> Include<TProperty>(Expression<Func<TProperty>> errorIndicator)
 		{
-			ErrorIndicator = ErrorIndicator.Concat(new[] { ViewModelBase.GetPropertyName(errorIndicator) }).ToArray();
+			ErrorIndicator = ErrorIndicator.Concat(new[] {ViewModelBase.GetPropertyName(errorIndicator)}).ToArray();
 			return this;
 		}
 
@@ -64,23 +65,23 @@ namespace JPB.ErrorValidation.ValidationTyps
 		}
 
 		/// <summary>
-		/// The Condition that indicates an Error. True error, False NoError
+		///     The Condition that indicates an Error. True error, False NoError
 		/// </summary>
 		Func<object, bool> IValidation.Condition
 		{
 			get
 			{
-				return (validator) =>
+				return validator =>
 				{
 					if (!(validator is T))
+					{
 						return true;
-					return Condition((T)validator);
+					}
+
+					return Condition((T) validator);
 				};
 			}
-			set
-			{
-				Condition = (arg) => value(arg);
-			}
+			set { Condition = arg => value(arg); }
 		}
 
 		public bool Unbound { get; set; }
@@ -90,7 +91,8 @@ namespace JPB.ErrorValidation.ValidationTyps
 
 	public class AsyncError<T> : Error<T>, IAsyncValidation
 	{
-		public AsyncError(string errorText, string errorIndicator, Func<T, bool> condition) : this(errorText, condition, errorIndicator)
+		public AsyncError(string errorText, string errorIndicator, Func<T, bool> condition) : this(errorText, condition,
+			errorIndicator)
 		{
 		}
 
@@ -99,7 +101,8 @@ namespace JPB.ErrorValidation.ValidationTyps
 		{
 		}
 
-		public AsyncError(string errorText, Func<T, bool> condition, AsyncState state, AsyncRunState runState, params string[] errorIndicator)
+		public AsyncError(string errorText, Func<T, bool> condition, AsyncState state, AsyncRunState runState,
+			params string[] errorIndicator)
 			: base(errorText, condition, errorIndicator)
 		{
 			AsyncState = state;

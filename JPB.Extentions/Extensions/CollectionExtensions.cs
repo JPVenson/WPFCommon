@@ -5,11 +5,28 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using JetBrains.Annotations;
 
 namespace JPB.Extentions.Extensions
 {
+    /// <summary>
+    ///     Defines a list of common used extensions for IEnumerables
+    /// </summary>
     public static class CollectionExtensions
     {
+        /// <summary>
+        /// Removes all items that matches the predicate.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">
+        /// source
+        /// or
+        /// predicate
+        /// </exception>
+        [PublicAPI]
         public static IEnumerable<T> RemoveWhere<T>(this IEnumerable<T> source, Func<T, bool> predicate)
         {
             if (source == null)
@@ -28,36 +45,16 @@ namespace JPB.Extentions.Extensions
             return enumerable;
         }
 
+        /// <summary>
+        ///     Enumerates all items and Concatenates the value of getProperty
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="getProperty">The get property.</param>
+        /// <returns></returns>
         public static string ToPropertyCsv<T>(this IEnumerable<T> source, Func<T, string> getProperty)
         {
             return source.Any() ? source.Select(getProperty).Aggregate((s, e) => s + "," + e) : string.Empty;
-        }
-
-        public static IEnumerable<T> CastWhere<T, TE>(this ICollection<TE> source)
-        {
-            return source.Where(e => e is T).Cast<T>();
-        }
-
-        public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<Object> enumerableList)
-            where T : class
-        {
-            var obCollection = new ObservableCollection<T>();
-
-            foreach (object item in enumerableList)
-                obCollection.Add(item as T);
-
-            return obCollection;
-        }
-
-        public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerableList)
-            where T : class
-        {
-            var obCollection = new ObservableCollection<T>();
-
-            foreach (T item in enumerableList)
-                obCollection.Add(item);
-
-            return obCollection;
         }
     }
 }

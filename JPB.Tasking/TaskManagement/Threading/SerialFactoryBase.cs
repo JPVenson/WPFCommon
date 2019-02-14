@@ -9,6 +9,17 @@ namespace JPB.Tasking.TaskManagement.Threading
 	/// </summary>
 	public abstract class SerialFactoryBase : IDisposable
 	{
+		private readonly bool _keepRunning;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SerialFactoryBase"/> class.
+		/// </summary>
+		/// <param name="keepRunning">if set to <c>true</c> the background thread will keep running until disposed.</param>
+		public SerialFactoryBase(bool keepRunning)
+		{
+			_keepRunning = keepRunning;
+		}
+
 		protected internal string _namedConsumer;
 		protected internal Thread _thread;
 		protected internal readonly object _lockRoot = new object();
@@ -74,7 +85,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 				{
 					try
 					{
-						action.Invoke();
+						action?.Invoke();
 					}
 					catch (Exception e)
 					{
@@ -113,7 +124,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 					_thread.Abort();
 					if (_thread.IsAlive)
 					{
-						//await any cleanup or finaliser to be run
+						//await any cleanup or finalizer to be run
 						_thread.Join(Timeout);
 					}
 				}
@@ -144,15 +155,31 @@ namespace JPB.Tasking.TaskManagement.Threading
 			}
 		}
 
+		readonly AutoResetEvent _continiusWorker = new AutoResetEvent(false);
+
 		protected internal void StartScheduler()
 		{
 			lock (_lockRoot)
 			{
+				_continiusWorker.Set();
 				if (_isWorking)
 					return;
 
 				_isWorking = true;
-				_thread = new Thread(Worker)
+				_thread = new Thread(() =>
+				{
+					if (!_keepRunning)
+					{
+						Worker();
+					}
+					else
+					{
+						while (_continiusWorker.WaitOne())
+						{
+							Worker();
+						}
+					}
+				})
 				{
 						Name = _namedConsumer
 				};

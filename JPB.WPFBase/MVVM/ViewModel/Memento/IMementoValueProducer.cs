@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using JPB.WPFBase.MVVM.ViewModel.Memento.Snapshots;
+﻿using System.Collections.Generic;
 
 namespace JPB.WPFBase.MVVM.ViewModel.Memento
 {
@@ -15,14 +13,5 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		bool CanGoInHistory(int ages);
 		void Forget();
 		void GoInHistory(MementoViewModelBase viewModel, int ages);
-	}
-
-	internal interface IMementoValueHolder : IMementoValueProducer
-	{
-		ConcurrentStack<IMementoDataStamp> MementoData { get; set; }
-		bool TryAdd(MementoViewModelBase originator, IMementoDataStamp stemp);
-		object GetValue(object orignator);
-
-		MementoPropertySnaptshot CreateSnapshot();
 	}
 }

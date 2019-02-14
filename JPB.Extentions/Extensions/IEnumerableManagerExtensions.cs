@@ -87,39 +87,6 @@ namespace JPB.Extentions.Extensions
             selecteditem = additionalAddingAction.Invoke();
         }
 
-        //// <summary>
-        //// A extention to manage a Remove of an Mananged class
-        //// The <see>Selectetitem</see> will be set to the position where the old was after a Remove
-        //// </summary>
-        //// <typeparam name="T">Type of <see>Selectetitem</see></typeparam>
-        //// <param name="sourcelist"><see>Sourcelist</see> where the item Action will be effectet </param>
-        //// <param name="Selectetitem">The selected item</param>
-        //// <param name="additionalAddingAction">The Additional action to run at the point where the Item should be Removed</param>
-        //// <param name="CompareProperty">The name of an Property of <see>T</see> witch will be used to Compare</param>
-        //// <exception cref="ArgumentException">Throws if the <see>Selectetitem</see> is NOT in <see>sourcelist</see> </exception>
-        //// <returns>The new Selectet item</returns>
-        ////public static T RemoveAndSetSelectetItem<T>(this IEnumerable<T> sourcelist, T Selectetitem, Action additionalAddingAction, string CompareProperty)
-        ////{
-        ////    if (Selectetitem == null)
-        ////        return default(T);
-        ////    var _compareProperty = typeof(T).GetProperty(CompareProperty);
-        ////    var buff = sourcelist.FirstOrDefault(s => _compareProperty.GetValue(s, null).Equals(_compareProperty.GetValue(Selectetitem, null)));
-        ////    var index = sourcelist.IndexOf(buff);
-        ////    if (buff == null && index != -1)
-        ////        throw new ArgumentException("Not found");
-        ////    additionalAddingAction.Invoke();
-        ////    var buffer = default(T);
-        ////    if (!sourcelist.Any())
-        ////        return buffer;
-        ////    if (index == sourcelist.Count())
-        ////        buffer = sourcelist.Last();
-        ////    else if (index == 0)
-        ////        buffer = sourcelist.Last();
-        ////    else if (index <= sourcelist.Count())
-        ////        buffer = sourcelist.ElementAt(index);
-        ////    return buffer;
-        ////}
-
         /// <summary>
         ///     A extention to manage a Remove of an Mananged class
         ///     The <see>Selectetitem</see> will be set to the position where the old was after a Remove

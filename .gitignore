@@ -157,3 +157,5 @@ $RECYCLE.BIN/
 /packages/JetBrains.Annotations.10.2.1
 /.vs/JPB.WPFToolsCommon/v15/Server/sqlite3
 /packages/NUnit.3.5.0
+/.vs/JPB.WPFToolsCommon/DesignTimeBuild
+/.vs

@@ -133,11 +133,13 @@ namespace JPB.ErrorValidation.ValidationRules
         protected override ICollection<IValidation> Errors { get; }
     }
 
-    public abstract class ErrorHashSet<T> : ErrorHashSet
+    public abstract class ErrorHashSet<T> : ErrorCollection<T>
     {
         public ErrorHashSet()
-            : base(typeof(T))
+            : base()
         {
+            Errors = new HashSet<IValidation>();
         }
+        protected override ICollection<IValidation> Errors { get; }
     }
 }

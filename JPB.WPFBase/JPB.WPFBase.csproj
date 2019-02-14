@@ -9,12 +9,13 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JPB.WPFBase</RootNamespace>
     <AssemblyName>JPB.WPFBase</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\JPB.WPFBase.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ExternalRelease|AnyCPU'">
     <OutputPath>..\..\Release\</OutputPath>
@@ -54,6 +56,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=2018.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.2018.2.1\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -70,39 +75,48 @@
     <Compile Include="Converter\BooleanInverseConverter.cs" />
     <Compile Include="Converter\BooleanVisibilityConverter.cs" />
     <Compile Include="Converter\BooleanVisibilityInverseConverter.cs" />
+    <Compile Include="Converter\ChainConverter.cs" />
     <Compile Include="Converter\TypedParamValueConverter.cs" />
     <Compile Include="Converter\TypedValueConverter.cs" />
     <Compile Include="Converter\VisibilityBooleanConverter.cs" />
-    <Compile Include="MVVM\DelegateCommand\AsyncDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\AutoDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\DelegateCommand.cs" />
-    <Compile Include="MVVM\ViewModel\AsyncThreadSaveObservableCollection.cs" />
+    <Compile Include="MVVM\DelegateCommand\DelegateCommandBase.cs" />
+    <Compile Include="MVVM\ViewModel\AcceptPendingChangeEventArgs.cs" />
+    <Compile Include="MVVM\ViewModel\AcceptPendingChangeHandler.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBaseOptions.cs" />
     <Compile Include="MVVM\ViewModel\DispatcherLock.cs" />
+    <Compile Include="MVVM\ViewModel\IAcceptPendingChange.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\Attributes\IgnoreMementoAttribute.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs" />
     <Compile Include="MVVM\ViewModel\Memento\IMementoDataStamp.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\IMementoValueHolder.cs" />
     <Compile Include="MVVM\ViewModel\Memento\IMementoValueProducer.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\ImportFlags.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoController.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoDataStamp.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\MementoDataStampProxy.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoOptions.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoSerializationOptions.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\ResolvePropertyOnMomentHost.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoValueProducer.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoViewModelBase.cs" />
+    <Compile Include="MVVM\ViewModel\Memento\Snapshots\MementoSerialisationContext.cs" />
     <Compile Include="MVVM\ViewModel\Memento\UiMementoController.cs" />
     <Compile Include="MVVM\ViewModel\Memento\UiMementoProxy.cs" />
     <Compile Include="MVVM\ViewModel\Memento\WeakMementoDataStamp.cs" />
-    <Compile Include="MVVM\ViewModel\ThreadSaveCollectionModel.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveEnumerator.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveObservableCollection.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveViewModelActor.cs" />
-    <Compile Include="MVVM\ViewModel\ThreadSaveViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

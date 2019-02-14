@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Reflection;
 
 namespace JPB.WPFBase.MVVM.ViewModel.Memento
 {
-	public delegate PropertyInfo ResolvePropertyOnMomentHost(object momentHost, string propertyName);
-
 	/// <summary>
 	///     Contains all Memento Options for a ViewModel. Set the Default to enable all NEW created memento using ViewModels to
 	///     use the given options

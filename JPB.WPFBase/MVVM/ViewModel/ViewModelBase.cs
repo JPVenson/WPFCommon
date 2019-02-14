@@ -1,203 +1,242 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region
+
+using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
+using JetBrains.Annotations;
+
+#endregion
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-    public delegate void AcceptPendingChangeHandler(
-       object sender,
-       AcceptPendingChangeEventArgs e);
+	/// <summary>
+	///     Base MVVM View-Model
+	/// </summary>
+	public class ViewModelBase : ThreadSaveViewModelActor,
+		IAcceptPendingChange,
+		INotifyPropertyChanged,
+		INotifyPropertyChanging
+	{
+		/// <inheritdoc />
+		public ViewModelBase(Dispatcher dispatcher)
+			: base(dispatcher)
+		{
+		}
 
-    public interface IAcceptPendingChange
-    {
-        event AcceptPendingChangeHandler PendingChange;
-    }
+		/// <inheritdoc />
+		public ViewModelBase()
+		{
+		}
 
-    public class AcceptPendingChangeEventArgs : EventArgs
-    {
-        public AcceptPendingChangeEventArgs(string propertyName, object newValue)
-        {
-            PropertyName = propertyName;
-            NewValue = newValue;
-        }
+		/// <summary>
+		///     Raises the accept pending change.
+		/// </summary>
+		/// <param name="propertyName">Name of the property.</param>
+		/// <param name="newValue">The new value.</param>
+		/// <returns></returns>
+		[PublicAPI]
+		protected virtual bool RaiseAcceptPendingChange(
+			string propertyName,
+			object newValue)
+		{
+			var e = new AcceptPendingChangeEventArgs(propertyName, newValue);
+			var handler = PendingChange;
+			if (handler != null)
+			{
+				handler(this, e);
+				return !e.CancelPendingChange;
+			}
 
-        public string PropertyName { get; private set; }
-        public object NewValue { get; private set; }
-        public bool CancelPendingChange { get; set; }
-        // flesh this puppy out
-    }
+			return true;
+		}
 
-    public class ViewModelBase : ThreadSaveViewModelActor, IAcceptPendingChange, INotifyPropertyChanged, INotifyPropertyChanging
-    {
-        public ViewModelBase(Dispatcher disp)
-            : base(disp)
-        {
+		/// <summary>
+		///     Allows to raise the AcceptPending Change for the Memento Pattern
+		/// </summary>
+		/// <param name="member"></param>
+		/// <param name="value"></param>
+		/// <param name="propertyName"></param>
+		[PublicAPI]
+		public void SetProperty<TArgument>(ref TArgument member, TArgument value,
+			[CallerMemberName] string propertyName = null)
+		{
+			if (RaiseAcceptPendingChange(propertyName, value))
+			{
+				SendPropertyChanging(propertyName);
+				member = value;
+				SendPropertyChanged(propertyName);
+			}
+		}
 
-        }
+		/// <summary>
+		///     Allows to raise the AcceptPending Change for the Memento Pattern
+		/// </summary>
+		/// <param name="member"></param>
+		/// <param name="value"></param>
+		/// <param name="property"></param>
+		[NotifyPropertyChangedInvocator("property")]
+		[PublicAPI]
+		public void SetProperty<TProperty>(ref TProperty member, TProperty value, Expression<Func<TProperty>> property)
+		{
+			SetProperty(ref member, value, GetPropertyName(property));
+		}
 
-        public ViewModelBase()
-        {
+		/// <summary>
+		///     Raises this ViewModels PropertyChanged event
+		/// </summary>
+		/// <param name="propertyName">Name of the property that has a new value</param>
+		[NotifyPropertyChangedInvocator("propertyName")]
+		[PublicAPI]
+		public void SendPropertyChanged([CallerMemberName] string propertyName = null)
+		{
+			SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
+		}
 
-        }
+		/// <summary>
+		///     Raises this ViewModels PropertyChanged event
+		/// </summary>
+		/// <param name="e">Arguments detailing the change</param>
+		[PublicAPI]
+		protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
+		{
+			var handler = PropertyChanged;
+			if (handler != null)
+			{
+				ThreadSaveAction(() => handler(this, e));
+			}
+		}
 
-        #region INotifyPropertyChanged Members
+		/// <summary>
+		///     Raises the PropertyChanged Event
+		/// </summary>
+		/// <typeparam name="TProperty"></typeparam>
+		/// <param name="property"></param>
+		[PublicAPI]
+		public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
+		{
+			SendPropertyChanged(GetPropertyName(property));
+		}
 
-        /// <summary>
-        ///     Raised when a property on this object has a new value
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event PropertyChangingEventHandler PropertyChanging;
-        public event AcceptPendingChangeHandler PendingChange;
+		/// <summary>
+		///     Raises this ViewModels PropertyChanged event
+		/// </summary>
+		/// <param name="propertyName">Name of the property that has a new value</param>
+		[PublicAPI]
+		public void SendPropertyChanging([CallerMemberName] string propertyName = null)
+		{
+			SendPropertyChanging(new PropertyChangingEventArgs(propertyName));
+		}
 
-        #endregion
+		/// <summary>
+		///     Raises this ViewModels PropertyChanging event
+		/// </summary>
+		/// <param name="e">Arguments detailing the change</param>
+		[PublicAPI]
+		protected virtual void SendPropertyChanging(PropertyChangingEventArgs e)
+		{
+			var handler = PropertyChanging;
+			if (handler != null)
+			{
+				ThreadSaveAction(() => handler(this, e));
+			}
+		}
 
-        protected virtual bool RaiseAcceptPendingChange(
-            string propertyName,
-            object newValue)
-        {
-            var e = new AcceptPendingChangeEventArgs(propertyName, newValue);
-            var handler = this.PendingChange;
-            if (handler != null)
-            {
-                handler(this, e);
-                return !e.CancelPendingChange;
-            }
-            return true;
-        }
+		/// <summary>
+		///     Raises this ViewModels PropertyChanging event
+		/// </summary>
+		/// <param name="property">Arguments detailing the change</param>
+		[PublicAPI]
+		public void SendPropertyChanging<TProperty>(Expression<Func<TProperty>> property)
+		{
+			SendPropertyChanging(GetPropertyName(property));
+		}
 
-        /// <summary>
-        /// Allows to raise the AcceptPending Change for the Memento Pattern
-        /// </summary>
-        /// <param name="member"></param>
-        /// <param name="value"></param>
-        /// <param name="propertyName"></param>
-        public void SetProperty<TArgument>(ref TArgument member, TArgument value, [CallerMemberName]string propertyName = null)
-        {
-            if (RaiseAcceptPendingChange(propertyName, value))
-            {
-                SendPropertyChanging(propertyName);
-                member = value;
-                SendPropertyChanged(propertyName);
-            }
-        }
-
-        /// <summary>
-        /// Allows to raise the AcceptPending Change for the Memento Pattern
-        /// </summary>
-        /// <param name="member"></param>
-        /// <param name="value"></param>
-        /// <param name="property"></param>
-        public void SetProperty<TProperty>(ref TProperty member, TProperty value, Expression<Func<TProperty>> property)
-        {
-            SetProperty(ref member, value, GetPropertyName(property));
-        }
-
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanged event
-        /// </summary>
-        /// <param name="propertyName">Name of the property that has a new value</param>
-        public void SendPropertyChanged([CallerMemberName]string propertyName = null)
-        {
-            SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
-
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanged event
-        /// </summary>
-        /// <param name="e">Arguments detailing the change</param>
-        protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
-        {
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        /// <summary>
-        /// Raises the PropertyChanged Event
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="property"></param>
-        public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
-        {
-            SendPropertyChanged(GetPropertyName(property));
-        }
-
-
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanged event
-        /// </summary>
-        /// <param name="propertyName">Name of the property that has a new value</param>
-        public void SendPropertyChanging([CallerMemberName]string propertyName = null)
-        {
-            SendPropertyChanging(new PropertyChangingEventArgs(propertyName));
-        }
-
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanging event
-        /// </summary>
-        /// <param name="e">Arguments detailing the change</param>
-        protected virtual void SendPropertyChanging(PropertyChangingEventArgs e)
-        {
-            var handler = PropertyChanging;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        /// <summary>
-        ///     Raises this ViewModels PropertyChanging event
-        /// </summary>
-        /// <param name="property">Arguments detailing the change</param>
-        public void SendPropertyChanging<TProperty>(Expression<Func<TProperty>> property)
-        {
-            SendPropertyChanging(GetPropertyName(property));
-        }
-
+		/// <summary>
+		///     Helper for getting the Lambda Property from the expression
+		/// </summary>
+		/// <typeparam name="TProperty">The type of the property.</typeparam>
+		/// <param name="property">The property.</param>
+		/// <returns></returns>
+		[PublicAPI]
 		public static string GetPropertyName<TProperty>(Expression<Func<TProperty>> property)
 		{
 			return GetProperty(property).Name;
 		}
 
-		public static string GetPropertyName<TProperty, TObject>(Expression<Func<TObject, TProperty>> property)
-		{
-			return GetProperty(property).Name;
-		}
-
+		/// <summary>
+		///     Helper for getting the property info of an expression
+		/// </summary>
+		/// <typeparam name="TProperty">The type of the property.</typeparam>
+		/// <param name="property">The property.</param>
+		/// <returns></returns>
 		public static PropertyInfo GetProperty<TProperty>(Expression<Func<TProperty>> property)
 		{
-			var lambda = (LambdaExpression)property;
+			var lambda = (LambdaExpression) property;
 
 			MemberExpression memberExpression;
 			var body = lambda.Body as UnaryExpression;
 
 			if (body != null)
 			{
-				UnaryExpression unaryExpression = body;
-				memberExpression = (MemberExpression)unaryExpression.Operand;
+				var unaryExpression = body;
+				memberExpression = (MemberExpression) unaryExpression.Operand;
 			}
 			else
-				memberExpression = (MemberExpression)lambda.Body;
+			{
+				memberExpression = (MemberExpression) lambda.Body;
+			}
+
 			return memberExpression.Member as PropertyInfo;
 		}
 
-		public static PropertyInfo GetProperty<TProperty,TObject>(Expression<Func<TObject, TProperty>> property)
+		/// <summary>
+		///     Helper for getting the property info of an expression
+		/// </summary>
+		/// <typeparam name="TProperty">The type of the property.</typeparam>
+		/// <typeparam name="TObject"></typeparam>
+		/// <param name="property">The property.</param>
+		/// <returns></returns>
+		public static PropertyInfo GetProperty<TProperty, TObject>(Expression<Func<TObject, TProperty>> property)
 		{
-			var lambda = (LambdaExpression)property;
+			var lambda = (LambdaExpression) property;
 
 			MemberExpression memberExpression;
 			var body = lambda.Body as UnaryExpression;
 
 			if (body != null)
 			{
-				UnaryExpression unaryExpression = body;
-				memberExpression = (MemberExpression)unaryExpression.Operand;
+				var unaryExpression = body;
+				memberExpression = (MemberExpression) unaryExpression.Operand;
 			}
 			else
-				memberExpression = (MemberExpression)lambda.Body;
+			{
+				memberExpression = (MemberExpression) lambda.Body;
+			}
+
 			return memberExpression.Member as PropertyInfo;
 		}
+
+		#region INotifyPropertyChanged Members
+
+		/// <summary>
+		///     Raised when a property on this object has a new value
+		/// </summary>
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		/// <summary>
+		///     Raised when a Property will be changed directly after event invoke
+		/// </summary>
+		public event PropertyChangingEventHandler PropertyChanging;
+
+		/// <inheritdoc />
+		/// <summary>
+		///     Raised when using the SetProperty() method. Can be used to cancel a change
+		/// </summary>
+		public event AcceptPendingChangeHandler PendingChange;
+
+		#endregion
 	}
 }

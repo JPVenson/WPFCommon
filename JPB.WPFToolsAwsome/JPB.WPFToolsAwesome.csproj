@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JPB.WPFToolsAwesome</RootNamespace>
     <AssemblyName>JPB.WPFToolsAwesome</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,6 +33,9 @@
     <DocumentationFile>bin\Release\JPB.WPFToolsAwesome.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=2018.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.2018.2.1\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -112,9 +116,6 @@
     </Compile>
     <Compile Include="..\JPB.DynamicInputBox\InputWindow.cs">
       <Link>InfoWindow\InputWindow.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.ErrorValidation\ErrorObserver.cs">
-      <Link>Error\ErrorObserver.cs</Link>
     </Compile>
     <Compile Include="..\JPB.ErrorValidation\IErrorInfoProvider.cs">
       <Link>Error\IErrorInfoProvider.cs</Link>
@@ -197,8 +198,8 @@
     <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SeriellTaskFactory.cs">
       <Link>TaskManagement\Threading\SeriellTaskFactory.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SingelSeriellTaskFactory.cs">
-      <Link>TaskManagement\Threading\SingelSeriellTaskFactory.cs</Link>
+    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SingelSerialTaskFactory.cs">
+      <Link>TaskManagement\Threading\SingelSerialTaskFactory.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\Converter\BooleanInverseConverter.cs">
       <Link>Converter\BooleanInverseConverter.cs</Link>
@@ -209,6 +210,9 @@
     <Compile Include="..\JPB.WPFBase\Converter\BooleanVisibilityInverseConverter.cs">
       <Link>Converter\BooleanVisibilityInverseConverter.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\Converter\ChainConverter.cs">
+      <Link>Converter\ChainConverter.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\Converter\TypedParamValueConverter.cs">
       <Link>Converter\TypedParamValueConverter.cs</Link>
     </Compile>
@@ -218,11 +222,20 @@
     <Compile Include="..\JPB.WPFBase\Converter\VisibilityBooleanConverter.cs">
       <Link>Converter\VisibilityBooleanConverter.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\AsyncDelegateCommand.cs">
-      <Link>MVVM\DelegateCommand\AsyncDelegateCommand.cs</Link>
+    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\AutoDelegateCommand.cs">
+      <Link>MVVM\DelegateCommand\AutoDelegateCommand.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\DelegateCommand.cs">
       <Link>MVVM\DelegateCommand\DelegateCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\DelegateCommandBase.cs">
+      <Link>MVVM\DelegateCommand\DelegateCommandBase.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AcceptPendingChangeEventArgs.cs">
+      <Link>MVVM\ViewModel\AcceptPendingChangeEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AcceptPendingChangeHandler.cs">
+      <Link>MVVM\ViewModel\AcceptPendingChangeHandler.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AsyncViewModelBase.cs">
       <Link>MVVM\ViewModel\AsyncViewModelBase.cs</Link>
@@ -233,20 +246,35 @@
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\DispatcherLock.cs">
       <Link>MVVM\ViewModel\DispatcherLock.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\IAcceptPendingChange.cs">
+      <Link>MVVM\ViewModel\IAcceptPendingChange.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Attributes\IgnoreMementoAttribute.cs">
+      <Link>MVVM\ViewModel\Memento\Attributes\IgnoreMementoAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs">
       <Link>MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoDataStamp.cs">
       <Link>MVVM\ViewModel\Memento\IMementoDataStamp.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoValueHolder.cs">
+      <Link>MVVM\ViewModel\Memento\IMementoValueHolder.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoValueProducer.cs">
       <Link>MVVM\ViewModel\Memento\IMementoValueProducer.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\ImportFlags.cs">
+      <Link>MVVM\ViewModel\Memento\ImportFlags.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoController.cs">
       <Link>MVVM\ViewModel\Memento\MementoController.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoDataStamp.cs">
       <Link>MVVM\ViewModel\Memento\MementoDataStamp.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoDataStampProxy.cs">
+      <Link>MVVM\ViewModel\Memento\MementoDataStampProxy.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoOptions.cs">
       <Link>MVVM\ViewModel\Memento\MementoOptions.cs</Link>
@@ -260,11 +288,17 @@
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoViewModelBase.cs">
       <Link>MVVM\ViewModel\Memento\MementoViewModelBase.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\ResolvePropertyOnMomentHost.cs">
+      <Link>MVVM\ViewModel\Memento\ResolvePropertyOnMomentHost.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs">
       <Link>MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs">
       <Link>MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoSerialisationContext.cs">
+      <Link>MVVM\ViewModel\Memento\Snapshots\MementoSerialisationContext.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\UiMementoController.cs">
       <Link>MVVM\ViewModel\Memento\UiMementoController.cs</Link>
@@ -275,24 +309,20 @@
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\WeakMementoDataStamp.cs">
       <Link>MVVM\ViewModel\Memento\WeakMementoDataStamp.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveCollectionModel.cs">
-      <Link>MVVM\ViewModel\ThreadSaveCollectionModel.cs</Link>
-    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveObservableCollection.cs">
       <Link>MVVM\ViewModel\ThreadSaveObservableCollection.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveViewModelActor.cs">
       <Link>MVVM\ViewModel\ThreadSaveViewModelActor.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveViewModelBase.cs">
-      <Link>MVVM\ViewModel\ThreadSaveViewModelBase.cs</Link>
-    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ViewModelBase.cs">
       <Link>MVVM\ViewModel\ViewModelBase.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <Page Include="..\JPB.DynamicInputBox\InfoWindow\Controls\QuestionUserControl.xaml">
       <Link>InfoWindow\Controls\QuestionUserControl.xaml</Link>

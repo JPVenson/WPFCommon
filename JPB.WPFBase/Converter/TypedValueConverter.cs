@@ -4,48 +4,41 @@ using System.Windows.Data;
 
 namespace JPB.WPFBase.Converter
 {
+    /// <summary>
+    ///     Defines a base class for using the IValueConverter Interface.
+    
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="E"></typeparam>
     public abstract class TypedValueConverter<T, E> : IValueConverter
     {
         #region Implementation of IValueConverter
 
         /// <summary>
-        ///     Konvertiert einen Wert.
+        ///  <see cref="IValueConverter.Convert"/>
         /// </summary>
-        /// <returns>
-        ///     Ein konvertierter Wert.Wenn die Methode null zurückgibt, wird der gültige NULL-Wert verwendet.
-        /// </returns>
-        /// <param name="value">Der von der Bindungsquelle erzeugte Wert.</param>
-        /// <param name="targetType">Der Typ der Bindungsziel-Eigenschaft.</param>
-        /// <param name="parameter">Der zu verwendende Konverterparameter.</param>
-        /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public abstract E Convert(T value, Type targetType, object parameter, CultureInfo culture);
 
         /// <summary>
-        ///     Konvertiert einen Wert.
+        ///  <see cref="IValueConverter.ConvertBack"/>
         /// </summary>
-        /// <returns>
-        ///     Ein konvertierter Wert.Wenn die Methode null zurückgibt, wird der gültige NULL-Wert verwendet.
-        /// </returns>
-        /// <param name="value">Der Wert, der vom Bindungsziel erzeugt wird.</param>
-        /// <param name="targetType">Der Typ, in den konvertiert werden soll.</param>
-        /// <param name="parameter">Der zu verwendende Konverterparameter.</param>
-        /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public abstract T ConvertBack(E value, Type targetType, object parameter, CultureInfo culture);
 
         #endregion
 
         #region Implementation of IValueConverter
 
-        /// <summary>
-        ///     Konvertiert einen Wert.
-        /// </summary>
-        /// <returns>
-        ///     Ein konvertierter Wert.Wenn die Methode null zurückgibt, wird der gültige NULL-Wert verwendet.
-        /// </returns>
-        /// <param name="value">Der von der Bindungsquelle erzeugte Wert.</param>
-        /// <param name="targetType">Der Typ der Bindungsziel-Eigenschaft.</param>
-        /// <param name="parameter">Der zu verwendende Konverterparameter.</param>
-        /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
+        /// <inheritdoc />
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is T))
@@ -56,16 +49,7 @@ namespace JPB.WPFBase.Converter
             return Convert((T) value, targetType, parameter, culture);
         }
 
-        /// <summary>
-        ///     Konvertiert einen Wert.
-        /// </summary>
-        /// <returns>
-        ///     Ein konvertierter Wert.Wenn die Methode null zurückgibt, wird der gültige NULL-Wert verwendet.
-        /// </returns>
-        /// <param name="value">Der Wert, der vom Bindungsziel erzeugt wird.</param>
-        /// <param name="targetType">Der Typ, in den konvertiert werden soll.</param>
-        /// <param name="parameter">Der zu verwendende Konverterparameter.</param>
-        /// <param name="culture">Die im Konverter zu verwendende Kultur.</param>
+        /// <inheritdoc />
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is E))

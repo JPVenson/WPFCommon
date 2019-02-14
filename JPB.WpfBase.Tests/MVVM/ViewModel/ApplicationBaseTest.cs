@@ -36,7 +36,7 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel
 			_appThread.Start();
 
 			appCreated.Wait();
-			DispatcherLock.Current = new DispatcherLock(App.Dispatcher);
+			//DispatcherLock.Current = new DispatcherLock(App.Dispatcher);
 		}
 
 		[TearDown]

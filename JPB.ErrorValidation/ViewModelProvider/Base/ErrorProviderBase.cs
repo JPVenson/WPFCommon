@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Data;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using JPB.ErrorValidation.ValidationTyps;
@@ -16,23 +14,78 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		AsyncViewModelBase,
 		IErrorValidatorBase
 	{
+		public enum ValidationLogic
+		{
+			/// <summary>
+			///		The Error evaluation will stop when it first encounters an error.
+			/// </summary>
+			BreakAtFirstFail,
+
+			/// <summary>
+			///		All affected errors will be validated
+			/// </summary>
+			RunThroughAll,
+
+			/// <summary>
+			///     Calls the <see cref="ErrorProviderBase.ValidateErrors"/> 
+			/// </summary>
+			ValidateSelf
+		}
+
 		private string _error;
 		private IErrorCollectionBase _userErrors;
-        ///<inheritdoc />
+
+		protected ErrorProviderBase(Dispatcher dispatcher, IErrorCollectionBase errors)
+			: base(dispatcher)
+		{
+			InitErrorProvider(errors);
+		}
+
+		protected ErrorProviderBase(IErrorCollectionBase errors)
+		{
+			InitErrorProvider(errors);
+		}
+
+		/// <summary>
+		///     How should be validated
+		/// </summary>
+		[Browsable(false)]
+		[XmlIgnore]
+		protected ValidationLogic Validation { get; set; }
+
+		/// <summary>
+		///     For IDataErrorInfo support with multiple Errors for one field.
+		/// </summary>
+		[Browsable(false)]
+		[XmlIgnore]
+		public Func<string, string, string> AggregateMultiError { get; set; }
+
+		/// <summary>
+		///     Check failed Errors on next Invoke even if they are not explicit called.
+		/// </summary>
+		[Browsable(false)]
+		public bool AlwaysCheckFailedInNextRun { get; set; }
+
+		///<inheritdoc />
 		public string Error
 		{
 			get
 			{
 				if (Validate)
+				{
 					return _error;
+				}
+
 				return string.Empty;
 			}
 			set
 			{
 				if (value == _error)
+				{
 					return;
+				}
 
-				base.ThreadSaveAction(() =>
+				ThreadSaveAction(() =>
 				{
 					_error = value;
 					SendPropertyChanged();
@@ -40,42 +93,8 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			}
 		}
 
-		protected ErrorProviderBase(Dispatcher disp, IErrorCollectionBase errors)
-			: base(disp)
-		{
-			this.InitErrorProvider(errors);
-		}
-
-		protected ErrorProviderBase(IErrorCollectionBase errors)
-		{
-			this.InitErrorProvider(errors);
-		}
-
-		private void InitErrorProvider(IErrorCollectionBase errors)
-		{
-			ActiveValidationCases = new ThreadSaveObservableCollection<IValidation>();
-		   
-
-            UserErrors = errors;
-			PropertyChanged += ErrorProviderBase_PropertyChanged;
-			MessageFormat = "{1}";
-			Validation = ValidationLogic.RunThroughAll;
-			Validate = true;
-			AlwaysCheckFailedInNextRun = true;
-		}
-
-		private void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-			this.HandleUnboundPropertys(e.PropertyName);
-		}
-
-		private void HandleUnboundPropertys(string propName)
-		{
-			ObManage(UserErrors.Where(f => f.Unbound && (string.IsNullOrWhiteSpace(propName) || f.ErrorIndicator.Contains(propName))), this);
-		}
-
-        /// <inheritdoc />
-        public virtual IErrorCollectionBase UserErrors
+		/// <inheritdoc />
+		public virtual IErrorCollectionBase UserErrors
 		{
 			get { return _userErrors; }
 			set
@@ -85,68 +104,29 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				ForceRefresh();
 			}
 		}
-        
-        /// <inheritdoc />
-        [Browsable(false)]
+
+		/// <inheritdoc />
+		[Browsable(false)]
 		public bool Validate { get; set; }
 
-		/// <summary>
-		/// How should be validated
-		/// </summary>
-		[Browsable(false)]
+		/// <inheritdoc />
 		[XmlIgnore]
-		protected ValidationLogic Validation { get; set; }
-
-        /// <inheritdoc />
-        [XmlIgnore]
-        public ICollection<IValidation> ActiveValidationCases { get; set; }
-
-        /// <summary>
-        /// The list of all Active Errors
-        /// </summary>
-        //[XmlIgnore]
-        //public ICollectionView ActiveValidationCasesView { get; set; }
-
-
-        /// <inheritdoc />
-        [XmlIgnore]
+		public ICollection<IValidation> ActiveValidationCases { get; set; }
+		
+		/// <inheritdoc />
+		[XmlIgnore]
 		public bool HasError
 		{
 			get { return ActiveValidationCases.Any(); }
 		}
 
-        /// <inheritdoc />
-        [Browsable(false)]
+		/// <inheritdoc />
+		[Browsable(false)]
 		public string MessageFormat { get; set; }
 
-		/// <summary>
-		/// For IDataErrorInfo support with multibe Errors for one field.
-		/// </summary>
+
+		/// <inheritdoc />
 		[Browsable(false)]
-		[XmlIgnore]
-		public Func<string, string, string> AggregateMultiError { get; set; }
-
-		/// <summary>
-		/// Check failed Errors on next Invoke
-		/// </summary>
-		[Browsable(false)]
-		public bool AlwaysCheckFailedInNextRun { get; set; }
-
-		public enum ValidationLogic
-		{
-			BreakAtFirstFail,
-            [Obsolete("The concept of Warnings is Obsolete and will be removed")]
-			BreakAtFirstFailButRunAllWarnings,
-			RunThroughAll,
-            /// <summary>
-            /// Do not use a specifc logic but use the ValidateErrors function to enumerate the Errors
-            /// </summary>
-			ValidateSelf,
-		}
-
-
-	    /// <inheritdoc />
-	    [Browsable(false)]
 		public virtual void ForceRefresh()
 		{
 			if (Validate)
@@ -159,7 +139,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		}
 
 		/// <summary>
-		/// Gets all Errors for the Field
+		///     Gets all Errors for the Field
 		/// </summary>
 		/// <param name="columnName"></param>
 		/// <param name="obj"></param>
@@ -170,8 +150,32 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			return ObManage(columnName, obj);
 		}
 
+		private void InitErrorProvider(IErrorCollectionBase errors)
+		{
+			ActiveValidationCases = new ThreadSaveObservableCollection<IValidation>();
+
+			UserErrors = errors;
+			PropertyChanged += ErrorProviderBase_PropertyChanged;
+			MessageFormat = "{1}";
+			Validation = ValidationLogic.RunThroughAll;
+			Validate = true;
+			AlwaysCheckFailedInNextRun = true;
+		}
+
+		private void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			HandleUnboundPropertys(e.PropertyName);
+		}
+
+		private void HandleUnboundPropertys(string propName)
+		{
+			ObManage(
+				UserErrors.Where(f =>
+					f.Unbound && (string.IsNullOrWhiteSpace(propName) || f.ErrorIndicator.Contains(propName))), this);
+		}
+
 		/// <summary>
-		/// Overwrite to create your own Validation logic
+		///     Overwrite to create your own Validation logic
 		/// </summary>
 		/// <param name="errorsForField"></param>
 		/// <returns></returns>
@@ -181,19 +185,19 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			throw new NotImplementedException("Please create your own Validation");
 		}
 
-        /// <summary>
-        /// The main function for Starting an Validation Cycle
-        /// </summary>
-        /// <param name="errorIndicator"></param>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+		/// <summary>
+		///     The main function for Starting an Validation Cycle
+		/// </summary>
+		/// <param name="errorIndicator"></param>
+		/// <param name="obj"></param>
+		/// <returns></returns>
 		protected IValidation[] ObManage(string errorIndicator, object obj)
 		{
-		   return ObManage(ProduceValidations(errorIndicator), obj);
+			return ObManage(ProduceValidations(errorIndicator), obj);
 		}
 
 		/// <summary>
-		/// Returns all known Errors of this Instance
+		///     Returns all known Errors of this Instance
 		/// </summary>
 		/// <param name="errorIndicator"></param>
 		/// <returns></returns>
@@ -202,29 +206,30 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			return UserErrors.ReturnErrors(errorIndicator);
 		}
 
-        /// <summary>
-        /// The main Validation logic that handels all errors base on the current Validation flag
-        /// </summary>
-        /// <param name="errorsForField"></param>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+		/// <summary>
+		///     The main Validation logic that handels all errors base on the current Validation flag
+		/// </summary>
+		/// <param name="errorsForField"></param>
+		/// <param name="obj"></param>
+		/// <returns></returns>
 		protected IValidation[] ObManage(IEnumerable<IValidation> errorsForField, object obj)
 		{
 			if (!Validate)
 			{
-			    if (ActiveValidationCases.Any())
-			    {
-			        ActiveValidationCases.Clear();
-                    Error = string.Empty;
-                    SendPropertyChanged(() => HasError);
-                }
+				if (ActiveValidationCases.Any())
+				{
+					ActiveValidationCases.Clear();
+					Error = string.Empty;
+					SendPropertyChanged(() => HasError);
+				}
+
 				return new IValidation[0];
 			}
 
 			var errorsOfThisRun = new HashSet<IValidation>();
 
-		    var forField = errorsForField as IValidation[] ?? errorsForField.ToArray();
-		    switch (Validation)
+			var forField = errorsForField as IValidation[] ?? errorsForField.ToArray();
+			switch (Validation)
 			{
 				case ValidationLogic.RunThroughAll:
 					foreach (var error in forField)
@@ -234,6 +239,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 							errorsOfThisRun.Add(error);
 						}
 					}
+
 					break;
 				case ValidationLogic.BreakAtFirstFail:
 					foreach (var item in forField)
@@ -244,12 +250,14 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 							break;
 						}
 					}
+
 					break;
 				case ValidationLogic.ValidateSelf:
-					foreach (var validateError in this.ValidateErrors(forField))
+					foreach (var validateError in ValidateErrors(forField))
 					{
 						errorsOfThisRun.Add(validateError);
 					}
+
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
@@ -290,32 +298,34 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 					}
 				}
 			}
+
 			return errorsOfThisRun.ToArray();
 		}
 
 		protected bool ManageValidationRule(object obj, IValidation item)
 		{
-			bool conditionresult;
+			bool isError;
 			try
 			{
-				conditionresult = item.Condition(obj);
+				isError = item.Condition(obj);
 			}
 			catch (Exception)
 			{
-				conditionresult = true;
+				isError = true;
 			}
 
 			//Condition is true and error is in our list of errors
-			if (conditionresult && !ActiveValidationCases.Contains(item))
+			if (isError && !ActiveValidationCases.Contains(item))
 			{
 				ActiveValidationCases.Add(item);
 				SendPropertyChanged(() => HasError);
 				return true;
 			}
+
 			//Error is Kown
 			if (ActiveValidationCases.Contains(item))
 			{
-				if (!conditionresult)
+				if (!isError)
 				{
 					ActiveValidationCases.Remove(item);
 					SendPropertyChanged(() => HasError);
@@ -326,45 +336,34 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				}
 			}
 
-			return conditionresult;
+			return isError;
 		}
 
 		/// <summary>
-		/// Will trigger when the list of Errors has Changed
+		///     Will trigger when the list of Errors has Changed
 		/// </summary>
 		public event NotifyCollectionChangedEventHandler CollectionChanged
 		{
 			add
 			{
-				var changed = ActiveValidationCases as INotifyCollectionChanged;
-				if (changed != null)
+				if (ActiveValidationCases is INotifyCollectionChanged changed)
 				{
 					changed.CollectionChanged += value;
 				}
 			}
 			remove
 			{
-				var changed = ActiveValidationCases as INotifyCollectionChanged;
-				if (changed != null)
+				if (ActiveValidationCases is INotifyCollectionChanged changed)
 				{
 					changed.CollectionChanged -= value;
 				}
 			}
 		}
-
-		[Browsable(false)]
-        [Obsolete("The concept of Warnings is Obsolete and will be removed")]
-        public bool WarningAsFailure { get; set; }
-
-		public virtual Type RetrunT()
-		{
-			return GetType();
-		}
 	}
 
 	public abstract class ErrorProviderBase<T> : ErrorProviderBase where T : class, IErrorCollectionBase, new()
 	{
-		protected ErrorProviderBase(Dispatcher disp) : base(disp, new T())
+		protected ErrorProviderBase(Dispatcher dispatcher) : base(dispatcher, new T())
 		{
 		}
 

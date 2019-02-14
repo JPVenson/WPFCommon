@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -9,9 +10,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	/// </summary>
 	internal class DispatcherLock : IDisposable
 	{
+		static DispatcherLock()
+		{
+			Current = new AsyncLocal<DispatcherLock>();
+		}
+
 		private readonly Dispatcher _currentDispatcher;
-		[ThreadStatic]
-		internal static DispatcherLock Current;
+
+		internal static AsyncLocal<DispatcherLock> Current;
 
 		/// <summary>
 		///		Gets the Captured Dispatcher or the current Application dispatcher.
@@ -20,7 +26,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns></returns>
 		public static Dispatcher GetDispatcher()
 		{
-			return Current?._currentDispatcher ?? Application.Current.Dispatcher;
+			return Current.Value?._currentDispatcher ?? Application.Current.Dispatcher;
 		}
 
 		internal DispatcherLock(Dispatcher currentDispatcher)
@@ -32,14 +38,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		///		Captures the Dispatcher from the current Application inside the thread
 		/// </summary>
 		/// <returns>An IDisposable object that can be used to remove the assosiation</returns>
-		public static DispatcherLock CatpureDispatcher()
+		public static DispatcherLock CaptureDispatcher()
 		{
-			if (Current != null)
-			{
-				return Current;
-			}
-
-			return Current = new DispatcherLock(Application.Current.Dispatcher);
+			return Current.Value ?? (Current.Value = new DispatcherLock(Application.Current.Dispatcher));
 		}
 
 		/// <summary>
@@ -47,7 +48,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		public void Dispose()
 		{
-			Current = null;
+			Current.Value = null;
 		}
 	}
 }
