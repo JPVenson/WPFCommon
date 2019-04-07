@@ -73,6 +73,11 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		/// <inheritdoc />
 		public IEnumerable GetErrors(string propertyName)
 		{
+			if (propertyName == null)
+			{
+				propertyName = string.Empty;
+			}
+
 			ErrorMapper.TryGetValue(propertyName, out var errorJob);
 			return errorJob?.Select(f => ValidationToUiError == null ? f : ValidationToUiError(f));
 		}

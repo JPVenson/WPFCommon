@@ -58,7 +58,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		/// </summary>
 		[Browsable(false)]
 		[XmlIgnore]
-		public Func<string, string, string> AggregateMultiError { get; set; }
+		public Func<object, object, object> AggregateMultiError { get; set; }
 
 		/// <summary>
 		///     Check failed Errors on next Invoke even if they are not explicit called.
@@ -286,8 +286,11 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			{
 				if (AggregateMultiError != null)
 				{
-					Error = errorsOfThisRun.Aggregate("",
-						(current, validation) => AggregateMultiError(current, validation.ErrorText));
+					Error = errorsOfThisRun
+						.Select(e => e.ErrorText)
+						.Aggregate(
+						(current, validation) => AggregateMultiError(current, validation))
+						?.ToString();
 				}
 				else
 				{

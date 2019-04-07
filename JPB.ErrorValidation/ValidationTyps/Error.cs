@@ -13,7 +13,7 @@ namespace JPB.ErrorValidation.ValidationTyps
 	{
 		private Func<T, bool> _condition;
 		private string[] _errorIndicator;
-		private string _errorText;
+		private object _errorText;
 
 		public Error(string errorText, string errorIndicator, Func<T, bool> condition) : this(errorText, condition,
 			errorIndicator)
@@ -47,7 +47,7 @@ namespace JPB.ErrorValidation.ValidationTyps
 			set { _errorIndicator = value; }
 		}
 
-		public virtual string ErrorText
+		public virtual object ErrorText
 		{
 			get { return _errorText; }
 			set { _errorText = value; }
@@ -59,7 +59,7 @@ namespace JPB.ErrorValidation.ValidationTyps
 			set { _condition = value; }
 		}
 
-		public virtual string ErrorType
+		public virtual object ErrorType
 		{
 			get { return "Need"; }
 		}

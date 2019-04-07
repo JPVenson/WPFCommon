@@ -7,10 +7,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using System.Windows.Data;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 
@@ -90,6 +92,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			_actorHelper = new ViewModelBase(fromThread);
 			_base = new Collection<T>();
+			CollectionViews = new ConcurrentDictionary<string, ICollectionView>();
 		}
 
 		/// <summary>
@@ -399,6 +402,26 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				return _base.ToArray();
 			}
+		}
+
+		private IDictionary<string, ICollectionView> CollectionViews { get; set; }
+
+		/// <summary>
+		///		Obtains a ether new Collection view or a cached one
+		/// </summary>
+		/// <returns></returns>
+		public ICollectionView ObtainView(string key = "Default")
+		{
+			if (CollectionViews.ContainsKey(key))
+			{
+				return CollectionViews[key];
+			}
+
+			if (key == "Default")
+			{
+				return CollectionViews[key] = CollectionViewSource.GetDefaultView(this);
+			}
+			return CollectionViews[key] = new ListCollectionView(this);
 		}
 		
 		/// <inheritdoc />

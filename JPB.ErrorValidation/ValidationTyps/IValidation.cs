@@ -7,7 +7,7 @@ namespace JPB.ErrorValidation.ValidationTyps
         /// <summary>
         /// An description what kind of Validation is used e.g "Warning", "Error", "FYI"
         /// </summary>
-        string ErrorType { get; }
+        object ErrorType { get; }
         /// <summary>
         /// An indicator for all fields that participate on the Validation
         /// </summary>
@@ -15,7 +15,7 @@ namespace JPB.ErrorValidation.ValidationTyps
         /// <summary>
         /// The text that should be emitted when the Condition is True
         /// </summary>
-        string ErrorText { get; set; }
+        object ErrorText { get; set; }
         /// <summary>
         /// The Condition that indicates an Error. True error, False NoError
         /// </summary>

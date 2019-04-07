@@ -300,6 +300,36 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			});
 		}
 
+		private Task CreateNewTaskAsync(Func<Task> delegateTask)
+		{
+			var hasLock = DispatcherLock.Current;
+			return AsyncViewModelBaseOptions.TaskFactory.StartNew(async () =>
+			{
+				if (hasLock != null)
+				{
+					DispatcherLock.Current = hasLock;
+				}
+
+				await delegateTask.Invoke();
+			});
+		}
+
+		private async Task<T> CreateNewTaskAsync<T>(Func<Task<T>> delegateTask)
+		{
+			var hasLock = DispatcherLock.Current;
+			var result = default(T);
+			await AsyncViewModelBaseOptions.TaskFactory.StartNew(async () =>
+			{
+				if (hasLock != null)
+				{
+					DispatcherLock.Current = hasLock;
+				}
+
+				result = await delegateTask.Invoke();
+			});
+			return result;
+		}
+
 		/// <summary>
 		///     Runs the <paramref name="delegateTask" /> in a task and schedules the <paramref name="continueWith" /> in the
 		///     Dispatcher
@@ -326,7 +356,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 
 			return
-				SimpleWorkInternal(CreateNewTask(() => delegateTask.Invoke().Wait()), s =>
+				SimpleWorkInternal(CreateNewTaskAsync(async () => await delegateTask.Invoke()), s =>
 					ThreadSaveAction(continueWith), taskName, setWorking);
 		}
 
@@ -615,7 +645,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 
 			return
-				SimpleWorkInternal(CreateNewTask(() => delegateTask.Invoke().Wait()),
+				SimpleWorkInternal(CreateNewTask(async () => await delegateTask.Invoke()),
 					task => continueWith(),
 					taskName);
 		}
@@ -637,7 +667,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 
 			return
-				SimpleWorkInternal(CreateNewTask(() => delegateTask.Invoke().Wait()),
+				SimpleWorkInternal(CreateNewTask(async () => await delegateTask.Invoke()),
 					null,
 					taskName);
 		}
