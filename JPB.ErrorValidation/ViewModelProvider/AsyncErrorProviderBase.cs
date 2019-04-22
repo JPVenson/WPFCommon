@@ -197,7 +197,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 					}
 					else
 					{
-						SimpleWorkWithSyncContinue(gerValidations, then);
+						SimpleWork(gerValidations, then);
 					}
 
 					break;

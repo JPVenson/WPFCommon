@@ -30,8 +30,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	/// <typeparam name="T"></typeparam>
 #if !WINDOWS_UWP
 	[Serializable]
-	[DebuggerDisplay("TSOC<{typeof(T)}> - Count = {" + nameof(Count) + "}")]
+	[DebuggerDisplay("TSOC<{typeof(T)}>[{Count}]")]
 	[SuppressMessage("ReSharper", "NotResolvedInText")]
+	[DebuggerTypeProxy(typeof(ThreadSaveObservableCollection<>.ThreadSaveObservableCollectionDebuggerProxy))]
 #endif
 	public class ThreadSaveObservableCollection<T> :
 		AsyncViewModelBase,
@@ -56,6 +57,65 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		[NonSerialized]
 #endif
 		private bool _batchCommit;
+
+		private class ThreadSaveObservableCollectionDebuggerProxy : IEnumerable<T>
+		{
+			private readonly ThreadSaveObservableCollection<T> _source;
+
+			public ThreadSaveObservableCollectionDebuggerProxy(ThreadSaveObservableCollection<T> source)
+			{
+				_source = source;
+			}
+
+			public IEnumerator<T> GetEnumerator()
+			{
+				return _source._base.GetEnumerator();
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return ((IEnumerable)_source).GetEnumerator();
+			}
+
+			public int Count
+			{
+				get { return _source.Count; }
+			}
+
+			public bool IsReadOnly
+			{
+				get { return _source.IsReadOnly; }
+			}
+
+			public object SyncRoot
+			{
+				get { return _source.Lock; }
+			}
+
+			public bool IsSynchronized
+			{
+				get { return _source.IsSynchronized; }
+			}
+
+			/// <summary>
+			///		Gets or Sets a if an Enumeration of this Collection should occur in a ThreadSave manner
+			/// </summary>
+			public bool ThreadSaveEnumeration
+			{
+				get { return _source.ThreadSaveEnumeration; }
+			}
+
+			/// <summary>
+			/// Gets or sets a value indicating whether this instance is read only optimistic.
+			/// </summary>
+			/// <value>
+			///   <c>true</c> if this instance is read only optimistic; otherwise, <c>false</c>.
+			/// </value>
+			public bool IsReadOnlyOptimistic
+			{
+				get { return _source.IsReadOnlyOptimistic; }
+			}
+		}
 
 		private ThreadSaveObservableCollection(IList<T> collection, bool copy)
 			: this(DispatcherLock.GetDispatcher())
@@ -174,12 +234,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				return 0;
 			}
 
-			var tempItem = (T) value;
+			var tempItem = (T)value;
 			var indexOf = -1;
 			_actorHelper.ThreadSaveAction(
 				() =>
 				{
-					indexOf = ((IList) _base).Add(tempItem);
+					indexOf = ((IList)_base).Add(tempItem);
 					SendPropertyChanged(nameof(Count));
 					SendPropertyChanged("Item[]");
 					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
@@ -191,27 +251,27 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public bool Contains(object value)
 		{
-			return ((IList) _base).Contains(value);
+			return ((IList)_base).Contains(value);
 		}
 
 		/// <inheritdoc />
 		public int IndexOf(object value)
 		{
-			return ((IList) _base).IndexOf(value);
+			return ((IList)_base).IndexOf(value);
 		}
 
 		/// <inheritdoc />
 		public void Insert(int index, object value)
 		{
 			CheckType(value);
-			Insert(index, (T) value);
+			Insert(index, (T)value);
 		}
 
 		/// <inheritdoc />
 		public void Remove(object value)
 		{
 			CheckType(value);
-			Remove((T) value);
+			Remove((T)value);
 		}
 
 		/// <inheritdoc />
@@ -251,7 +311,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					return;
 				}
 
-				_base[index] = (T) value;
+				_base[index] = (T)value;
 			}
 		}
 
@@ -260,13 +320,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			Add(item as object);
 		}
-		
+
 		/// <inheritdoc />
 		public bool Contains(T item)
 		{
 			return _base.Contains(item);
 		}
-		
+
 		/// <inheritdoc />
 		public bool Remove(T item)
 		{
@@ -292,13 +352,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				});
 			return result;
 		}
-		
+
 		/// <inheritdoc />
 		public int IndexOf(T item)
 		{
 			return _base.IndexOf(item);
 		}
-		
+
 		/// <inheritdoc />
 		public void Insert(int index, T item)
 		{
@@ -317,7 +377,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 						item, index));
 				});
 		}
-		
+
 		/// <inheritdoc />
 		T IList<T>.this[int index]
 		{
@@ -348,25 +408,25 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			_base.CopyTo(array, arrayIndex);
 		}
-		
+
 		/// <inheritdoc />
 		public void CopyTo(Array array, int index)
 		{
-			((ICollection) _base).CopyTo(array, index);
+			((ICollection)_base).CopyTo(array, index);
 		}
-		
+
 		/// <inheritdoc />
 		public object SyncRoot
 		{
 			get { return Lock; }
 		}
-		
+
 		/// <inheritdoc />
 		public bool IsSynchronized
 		{
 			get { return Monitor.IsEntered(Lock); }
 		}
-		
+
 		/// <inheritdoc />
 		public bool TryAdd(T item)
 		{
@@ -378,7 +438,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			Add(item);
 			return true;
 		}
-		
+
 		/// <inheritdoc />
 		public bool TryTake(out T item)
 		{
@@ -394,7 +454,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			return false;
 		}
-		
+
 		/// <inheritdoc />
 		public T[] ToArray()
 		{
@@ -423,7 +483,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 			return CollectionViews[key] = new ListCollectionView(this);
 		}
-		
+
 		/// <inheritdoc />
 		public IEnumerator<T> GetEnumerator()
 		{
@@ -439,7 +499,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			return _base.GetEnumerator();
 		}
-		
+
 		/// <inheritdoc />
 		IEnumerator IEnumerable.GetEnumerator()
 		{
@@ -451,7 +511,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			get { return _base.Count; }
 		}
-		
+
 		/// <inheritdoc />
 		public T this[int index]
 		{
@@ -536,7 +596,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 							break;
 						case NotifyCollectionChangedAction.Replace:
-							ReplaceItem(item.NewStartingIndex, (T) item.NewItems[0]);
+							ReplaceItem(item.NewStartingIndex, (T)item.NewItems[0]);
 							break;
 						case NotifyCollectionChangedAction.Move:
 
@@ -557,7 +617,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				cpy.Dispose();
 			}
 		}
-		
+
 		/// <summary>
 		///		Raises the <see cref="INotifyCollectionChanged.CollectionChanged"/> event
 		/// </summary>
@@ -627,7 +687,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				return;
 			}
-			
+
 			var enumerable = collection as T[] ?? collection.ToArray();
 
 			if (enumerable.Any())

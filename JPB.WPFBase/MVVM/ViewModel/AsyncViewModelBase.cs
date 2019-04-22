@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -41,7 +42,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		///     Creates a new <c>AsyncViewModelBase</c> with ether the Captured dispatcher from the current DispatcherLock or the
 		///     current Application Dispatcher
 		/// </summary>
-		protected AsyncViewModelBase() 
+		protected AsyncViewModelBase()
 			: this(DispatcherLock.GetDispatcher())
 		{
 		}
@@ -133,7 +134,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///     Allows you to check for a Condtion if the calling method is named after the mehtod you would like to check but
+		///     Allows you to check for a Condition if the calling method is named after the method you would like to check but
 		///     starts with "Can"
 		/// </summary>
 		/// <param name="taskName"></param>
@@ -196,8 +197,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns>The created and running Task</returns>
 		[NotNull]
 		[PublicAPI]
-		public Task SimpleWorkWithSyncContinue<T>([NotNull] Task<T> delegateTask, [NotNull] Action<T> continueWith,
-			bool setWorking,
+		public Task SimpleWorkAsync<T>([NotNull] Task<T> delegateTask, [CanBeNull] Action<T> continueWith = null,
+			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
@@ -205,13 +206,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				throw new ArgumentNullException(nameof(delegateTask));
 			}
 
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
 			return SimpleWorkInternal(delegateTask, s =>
-				ThreadSaveAction(() => continueWith(s.Result)), taskName, setWorking);
+			{
+				if (continueWith != null)
+				{
+					ThreadSaveAction(() => continueWith(s.Result));
+				}
+			}, taskName, setWorking);
 		}
 
 		/// <summary>
@@ -224,22 +225,22 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns>The created and running Task</returns>
 		[NotNull]
 		[PublicAPI]
-		public Task SimpleWorkWithSyncContinue([NotNull] Task delegateTask, [NotNull] Action continueWith,
-			bool setWorking,
+		public Task SimpleWorkAsync([NotNull] Task delegateTask, [CanBeNull] Action continueWith = null,
+			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
 			{
 				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
 			}
 
 			return SimpleWorkInternal(delegateTask, s =>
-				ThreadSaveAction(continueWith), taskName, setWorking);
+			{
+				if (continueWith != null)
+				{
+					ThreadSaveAction(continueWith);
+				}
+			}, taskName, setWorking);
 		}
 
 		/// <summary>
@@ -254,80 +255,22 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns>The created and running Task</returns>
 		[NotNull]
 		[PublicAPI]
-		public Task SimpleWorkWithSyncContinue<T>([NotNull] Func<T> delegateTask, [NotNull] Action<T> continueWith,
-			bool setWorking,
+		public Task SimpleWork<T>([NotNull] Func<T> delegateTask, [CanBeNull] Action<T> continueWith = null,
+			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
 			{
 				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
 			}
 
 			return SimpleWorkInternal(CreateNewAsyncTask(delegateTask), s =>
-				ThreadSaveAction(() => continueWith(s.Result)), taskName, setWorking);
-		}
-
-		private Task<T> CreateNewAsyncTask<T>(Func<T> delegateTask)
-		{
-			var hasLock = DispatcherLock.Current;
-			return AsyncViewModelBaseOptions.TaskFactory.StartNew(() =>
 			{
-				if (hasLock != null)
+				if (continueWith != null)
 				{
-					DispatcherLock.Current = hasLock;
+					ThreadSaveAction(() => continueWith(s.Result));
 				}
-
-				return delegateTask.Invoke();
-			});
-		}
-
-		private Task CreateNewTask(Action delegateTask)
-		{
-			var hasLock = DispatcherLock.Current;
-			return AsyncViewModelBaseOptions.TaskFactory.StartNew(() =>
-			{
-				if (hasLock != null)
-				{
-					DispatcherLock.Current = hasLock;
-				}
-
-				delegateTask.Invoke();
-			});
-		}
-
-		private Task CreateNewTaskAsync(Func<Task> delegateTask)
-		{
-			var hasLock = DispatcherLock.Current;
-			return AsyncViewModelBaseOptions.TaskFactory.StartNew(async () =>
-			{
-				if (hasLock != null)
-				{
-					DispatcherLock.Current = hasLock;
-				}
-
-				await delegateTask.Invoke();
-			});
-		}
-
-		private async Task<T> CreateNewTaskAsync<T>(Func<Task<T>> delegateTask)
-		{
-			var hasLock = DispatcherLock.Current;
-			var result = default(T);
-			await AsyncViewModelBaseOptions.TaskFactory.StartNew(async () =>
-			{
-				if (hasLock != null)
-				{
-					DispatcherLock.Current = hasLock;
-				}
-
-				result = await delegateTask.Invoke();
-			});
-			return result;
+			}, taskName, setWorking);
 		}
 
 		/// <summary>
@@ -341,8 +284,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns>The created and running Task</returns>
 		[NotNull]
 		[PublicAPI]
-		public Task SimpleWorkWithSyncContinueAsync([NotNull] Func<Task> delegateTask, [NotNull] Action continueWith,
-			bool setWorking,
+		public Task SimpleWorkAsync([NotNull] Func<Task> delegateTask, [CanBeNull] Action continueWith = null,
+			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
@@ -350,14 +293,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				throw new ArgumentNullException(nameof(delegateTask));
 			}
 
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
 			return
-				SimpleWorkInternal(CreateNewTaskAsync(async () => await delegateTask.Invoke()), s =>
-					ThreadSaveAction(continueWith), taskName, setWorking);
+				SimpleWorkInternal(CreateNewTaskAsync(delegateTask), s =>
+				{
+					if (continueWith != null)
+					{
+						ThreadSaveAction(continueWith);
+					}
+				}, taskName, setWorking);
 		}
 
 		/// <summary>
@@ -372,82 +315,25 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns>The created and running Task</returns>
 		[NotNull]
 		[PublicAPI]
-		public Task SimpleWorkWithSyncContinueAsync<T>([NotNull] Func<Task<T>> delegateTask,
-			[NotNull] Action<T> continueWith,
-			bool setWorking,
+		public Task SimpleWorkAsync<T>([NotNull] Func<Task<T>> delegateTask,
+			[CanBeNull] Action<T> continueWith,
+			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
 			{
 				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
 			}
 
 			return
-				SimpleWorkInternal(CreateNewAsyncTask(delegateTask.Invoke),
-					t => continueWith(t.Result.Result), taskName, setWorking);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> in a task and schedules the <paramref name="continueWith" /> in the
-		///     Dispatcher
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkWithSyncContinue<T>([NotNull] Func<T> delegateTask, [NotNull] Action<T> continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return SimpleWorkInternal(CreateNewAsyncTask(delegateTask.Invoke), s =>
-				ThreadSaveAction(() => continueWith(s.Result)), taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> in a task and schedules the <paramref name="continueWith" /> in the
-		///     Dispatcher
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkWithSyncContinueAsync<T>([NotNull] Func<Task<T>> delegateTask,
-			[NotNull] Action<T> continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return
-				SimpleWorkInternal(CreateNewAsyncTask(delegateTask.Invoke),
-					t => continueWith(t.Result.Result), taskName);
+				SimpleWorkInternal(CreateNewTaskAsync(delegateTask),
+					t =>
+					{
+						if (continueWith != null)
+						{
+							ThreadSaveAction(() => continueWith(t.Result));
+						}
+					}, taskName, setWorking);
 		}
 
 		/// <summary>
@@ -456,11 +342,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		/// <param name="delegateTask"></param>
 		/// <param name="continueWith"></param>
+		/// <param name="setWorking"></param>
 		/// <param name="taskName"></param>
 		/// <returns>The created and running Task</returns>
 		[NotNull]
 		[PublicAPI]
-		public Task SimpleWorkWithSyncContinue([NotNull] Action delegateTask, [NotNull] Action continueWith,
+		public Task SimpleWork([NotNull] Action delegateTask, [CanBeNull] Action continueWith = null,
+			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
@@ -468,236 +356,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				throw new ArgumentNullException(nameof(delegateTask));
 			}
 
-			if (continueWith == null)
+			return SimpleWorkInternal(CreateNewTask(delegateTask), s =>
 			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return SimpleWorkInternal(CreateNewTask(delegateTask.Invoke), s =>
-				ThreadSaveAction(continueWith), taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> in a task. Does not set the IsWorking Flag
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task BackgroundSimpleWork([NotNull] Action delegateTask,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			return SimpleWorkInternal(CreateNewTask(delegateTask.Invoke), null,
-				taskName, false);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> in a task. Does not set the IsWorking Flag
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task BackgroundSimpleWork<T>([NotNull] Func<T> delegateTask, [NotNull] Action<T> continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return SimpleWorkInternal(CreateNewAsyncTask(delegateTask.Invoke),
-				t => continueWith(t.Result), taskName, false);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> in a task. Does not set the IsWorking Flag
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task BackgroundSimpleWorkAsync<T>([NotNull] Func<Task<T>> delegateTask, [NotNull] Action<T> continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return
-				SimpleWorkInternal(CreateNewAsyncTask(delegateTask.Invoke),
-					t => continueWith(t.Result.Result), taskName, false);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" />
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Action delegateTask, [CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			return SimpleWorkInternal(CreateNewTask(delegateTask.Invoke), null,
-				taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> and executes the continueWith after that
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Action delegateTask, [NotNull] Action continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return SimpleWorkInternal(CreateNewTask(delegateTask.Invoke),
-				task => continueWith(), taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> and executes the continueWith after that
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork<T>([NotNull] Func<T> delegateTask, [NotNull] Action<T> continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return SimpleWorkInternal(CreateNewAsyncTask(delegateTask.Invoke),
-				s => continueWith(s.Result),
-				taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> and executes the continueWith after that
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkAsync([NotNull] Func<Task> delegateTask, [NotNull] Action continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return
-				SimpleWorkInternal(CreateNewTask(async () => await delegateTask.Invoke()),
-					task => continueWith(),
-					taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> and executes the continueWith after that
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkAsync([NotNull] Func<Task> delegateTask,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			return
-				SimpleWorkInternal(CreateNewTask(async () => await delegateTask.Invoke()),
-					null,
-					taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="delegateTask" /> and executes the continueWith after that
-		/// </summary>
-		/// <param name="delegateTask"></param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkAsync<T>([NotNull] Func<Task<T>> delegateTask, [NotNull] Action<T> continueWith,
-			[CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (delegateTask == null)
-			{
-				throw new ArgumentNullException(nameof(delegateTask));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return
-				SimpleWorkInternal(CreateNewAsyncTask(delegateTask.Invoke),
-					s => continueWith(s.Result.Result),
-					taskName);
+				if (continueWith != null)
+				{
+					ThreadSaveAction(continueWith);
+				}
+			}, taskName, setWorking);
 		}
 
 		/// <summary>
@@ -712,7 +377,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns></returns>
 		[NotNull]
 		[PublicAPI]
-		public Task SimpleWork([NotNull] Delegate delegateTask, [NotNull] Delegate continueWith,
+		public Task SimpleWork([NotNull] Delegate delegateTask, [CanBeNull] Delegate continueWith,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
@@ -720,73 +385,20 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				throw new ArgumentNullException(nameof(delegateTask));
 			}
 
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
 			return SimpleWorkInternal(CreateNewAsyncTask(async () =>
 			{
 				var dynamicInvokeResult = delegateTask.DynamicInvoke();
-				if (dynamicInvokeResult is Task)
+				if (dynamicInvokeResult is Task task)
 				{
-					await (dynamicInvokeResult as Task);
+					await task.ConfigureAwait(false);
 				}
-			}), task => continueWith.DynamicInvoke());
-		}
-		
-		/// <summary>
-		///     Runs the <paramref name="task" /> and executes the continueWith after that
-		/// </summary>
-		/// <param name="task">An Started or Not started task</param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <param name="setWorking"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Task task, [NotNull] Delegate continueWith,
-			[CallerMemberName] string taskName = AnonymousTask,
-			bool setWorking = true)
-		{
-			if (task == null)
+			}), task =>
 			{
-				throw new ArgumentNullException(nameof(task));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return SimpleWorkInternal(task, t => continueWith.DynamicInvoke(), taskName, setWorking);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="task" /> and executes the continueWith after that
-		/// </summary>
-		/// <param name="task">An Started or Not started task</param>
-		/// <param name="continueWith"></param>
-		/// <param name="taskName"></param>
-		/// <param name="setWorking"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Task task, [NotNull] Action continueWith,
-			[CallerMemberName] string taskName = AnonymousTask,
-			bool setWorking = true)
-		{
-			if (task == null)
-			{
-				throw new ArgumentNullException(nameof(task));
-			}
-
-			if (continueWith == null)
-			{
-				throw new ArgumentNullException(nameof(continueWith));
-			}
-
-			return SimpleWorkInternal(task, t => continueWith(), taskName, setWorking);
+				if (continueWith != null)
+				{
+					ThreadSaveAction(() => continueWith.DynamicInvoke());
+				}
+			});
 		}
 
 		private Task SimpleWorkInternal<T>(Task<T> task, Action<Task<T>> continueWith, string taskName = AnonymousTask,
@@ -828,110 +440,56 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					_namedTasks.Add(new Tuple<string, Task>(taskName, task));
 				}
 
-				ThreadSaveAction(() =>
-				{
-					SendPropertyChanged(() => IsWorkingTask);
-					CommandManager.InvalidateRequerySuggested();
-				});
+				SendPropertyChanged(() => IsWorkingTask);
+				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
 				if (setWorking)
 				{
 					StartWork();
 				}
 
-				task.ContinueWith(s => CreateContinue(s, continueWith, taskName, setWorking)());
-				BackgroundSimpleWork(task);
+				task.ContinueWith(s => GeneralContinue(s, continueWith, taskName, setWorking), TaskContinuationOptions.AttachedToParent);
+				OnTaskCreated(task);
+
 				return task;
 			}
 
 			return null;
 		}
 
-		private Action CreateContinue(Task s, Action<Task> continueWith, string taskName, bool setWOrking = true)
+		private void GeneralContinue(Task s, Action<Task> continueWith, string taskName, bool setWOrking = true)
 		{
-			Action continueWithWrapper = () =>
+			try
 			{
-				try
+				if (s.IsFaulted)
 				{
-					if (s.IsFaulted)
+					if (OnTaskException(s.Exception))
 					{
-						if (OnTaskException(s.Exception))
-						{
-							return;
-						}
-
-						s.Exception?.Handle(OnTaskException);
+						return;
 					}
 
-					continueWith?.Invoke(s);
+					s.Exception?.Handle(OnTaskException);
 				}
-				finally
+
+				continueWith?.Invoke(s);
+			}
+			finally
+			{
+				lock (_namedTasks)
 				{
-					lock (_namedTasks)
-					{
-						var fod = _namedTasks.FirstOrDefault(e => e.Item1 == taskName);
-						_namedTasks.Remove(fod);
-					}
-
-					if (setWOrking)
-					{
-						EndWork();
-					}
-
-					ThreadSaveAction(() =>
-					{
-						SendPropertyChanged(() => IsWorkingTask);
-						CommandManager.InvalidateRequerySuggested();
-					});
+					var fod = _namedTasks.FirstOrDefault(e => e.Item1 == taskName);
+					_namedTasks.Remove(fod);
 				}
-			};
 
-			return continueWithWrapper;
-		}
+				if (setWOrking)
+				{
+					EndWork();
+				}
 
-		private void BackgroundSimpleWork(Task task)
-		{
-			OnTaskCreated(task);
-			if (task != null && task.Status == TaskStatus.Created)
-			{
-				task.Start();
+				SendPropertyChanged(() => IsWorkingTask);
+				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
+
+				OnTaskDone(s);
 			}
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="task" />
-		/// </summary>
-		/// <param name="task">An Started or Not started task</param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Task task, [CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (task == null)
-			{
-				throw new ArgumentNullException(nameof(task));
-			}
-
-			return SimpleWorkInternal(task, null, taskName);
-		}
-
-		/// <summary>
-		///     Runs the <paramref name="task" />
-		/// </summary>
-		/// <param name="task">An Started or Not started task</param>
-		/// <param name="setWorking"></param>
-		/// <param name="taskName"></param>
-		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Task task, bool setWorking, [CallerMemberName] string taskName = AnonymousTask)
-		{
-			if (task == null)
-			{
-				throw new ArgumentNullException(nameof(task));
-			}
-
-			return SimpleWorkInternal(task, null, taskName, setWorking);
 		}
 
 		/// <summary>
@@ -987,7 +545,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			IEnumerator IEnumerable.GetEnumerator()
 			{
-				return ((IEnumerable) _tasks).GetEnumerator();
+				return ((IEnumerable)_tasks).GetEnumerator();
 			}
 
 			private void _sender_TaskCreated(object sender, Task e)
@@ -1018,12 +576,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			set
 			{
 				_isWorking = value;
-				ThreadSaveAction(() =>
-				{
-					SendPropertyChanged(() => IsWorking);
-					SendPropertyChanged(() => IsNotWorking);
-					CommandManager.InvalidateRequerySuggested();
-				});
+				SendPropertyChanged(() => IsWorking);
+				SendPropertyChanged(() => IsNotWorking);
+				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
 			}
 		}
 
@@ -1039,5 +594,57 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		#endregion
+
+		private Task<T> CreateNewAsyncTask<T>(Func<T> delegateTask)
+		{
+			var hasLock = DispatcherLock.Current;
+			return AsyncViewModelBaseOptions.TaskFactory.StartNew(() =>
+			{
+				if (hasLock != null)
+				{
+					DispatcherLock.Current = hasLock;
+				}
+				return delegateTask.Invoke();
+			});
+		}
+
+		private Task CreateNewTask(Action delegateTask)
+		{
+			return CreateNewAsyncTask<object>(() =>
+			{
+				delegateTask();
+				return null;
+			});
+		}
+
+		private Task CreateNewTaskAsync(Func<Task> delegateTask)
+		{
+			return CreateNewTaskAsync<object>(async () =>
+			{
+				await delegateTask();
+				return null;
+			});
+		}
+
+		private Task<T> CreateNewTaskAsync<T>(Func<Task<T>> delegateTask)
+		{
+			var hasLock = DispatcherLock.Current;
+			return AsyncViewModelBaseOptions.TaskFactory.StartNew(() =>
+			{
+				if (hasLock != null)
+				{
+					DispatcherLock.Current = hasLock;
+				}
+
+				var invoke = delegateTask();
+				if (invoke == null)
+				{
+					throw new ArgumentNullException("delegateTask", "The given task executed by this method was null");
+				}
+
+				invoke.Wait();
+				return invoke.Result;
+			});
+		}
 	}
 }

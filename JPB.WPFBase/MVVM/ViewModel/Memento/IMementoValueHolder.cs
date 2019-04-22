@@ -7,7 +7,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 	{
 		ConcurrentStack<IMementoDataStamp> MementoData { get; set; }
 		bool TryAdd(MementoViewModelBase originator, IMementoDataStamp stemp);
-		object GetValue(object orignator);
+		object GetValue(MementoViewModelBase orignator);
 
 		MementoPropertySnaptshot CreateSnapshot();
 	}

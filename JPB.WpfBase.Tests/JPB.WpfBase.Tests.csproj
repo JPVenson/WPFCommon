@@ -48,8 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MVVM\ViewModel\ApplicationBaseTest.cs" />
+    <Compile Include="MVVM\ViewModel\AsyncViewModel\AsyncViewModelBaseTests.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoTests.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Models\MementoViewModel.cs" />
+    <Compile Include="WpfBootstrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

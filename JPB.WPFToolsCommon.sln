@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WPFToolsAwesome", "JPB.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.WpfBase.Tests", "JPB.WpfBase.Tests\JPB.WpfBase.Tests.csproj", "{80491FCE-3DFE-4509-83B9-86167E2250C2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CCA9A7DD-7E01-4813-B548-982688778F6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +96,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{80491FCE-3DFE-4509-83B9-86167E2250C2} = {CCA9A7DD-7E01-4813-B548-982688778F6B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D54F6EDD-B9A2-4B9A-987E-7298343F4B08}

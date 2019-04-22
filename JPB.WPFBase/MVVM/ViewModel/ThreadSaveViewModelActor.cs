@@ -18,18 +18,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	public abstract class ThreadSaveViewModelActor
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ThreadSaveViewModelActor"/> class by using the <seealso cref="DispatcherLock"/>.
-		/// </summary>
-		protected ThreadSaveViewModelActor()
-			: this(DispatcherLock.GetDispatcher())
-		{
-		}
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="ThreadSaveViewModelActor"/> class.
 		/// </summary>
 		/// <param name="targetDispatcher">The target dispatcher.</param>
-		protected ThreadSaveViewModelActor(Dispatcher targetDispatcher)
+		protected ThreadSaveViewModelActor(Dispatcher targetDispatcher = null)
 		{
 			Dispatcher = targetDispatcher ?? DispatcherLock.GetDispatcher();
 			Lock = new object();

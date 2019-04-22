@@ -112,6 +112,7 @@
     <Compile Include="MVVM\ViewModel\ThreadSaveObservableCollection.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveViewModelActor.cs" />
     <Compile Include="MVVM\ViewModel\ViewModelBase.cs" />
+    <Compile Include="MVVM\ViewModel\ViewModelBaseINPCCommonNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

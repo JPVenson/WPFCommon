@@ -35,7 +35,6 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			PropertyName = propertyName;
 			_propertyInfo = null;
 			((IMementoValueHolder) this).MementoData = new ConcurrentStack<IMementoDataStamp>();
-			LockRoot = new object();
 		}
 
 		/// <summary>
@@ -52,9 +51,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		///		Returns a ReadOnly copy of the Current MementoData
 		/// </summary>
 		public IEnumerable<IMementoDataStamp> MementoDataStamps => ((IMementoValueHolder) this).MementoData.ToArray();
-
-		public object LockRoot { get; private set; }
-
+		
 		MementoPropertySnaptshot IMementoValueHolder.CreateSnapshot()
 		{
 			if (_propertyInfo == null)
@@ -71,7 +68,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			};
 		}
 
-		private bool ResolvePropertyInfoIfUnset(object viewModel)
+		private bool ResolvePropertyInfoIfUnset(MementoViewModelBase viewModel)
 		{
 			if (_resolveFailed)
 			{
@@ -106,7 +103,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			return true;
 		}
 
-		object IMementoValueHolder.GetValue(object viewModel)
+		object IMementoValueHolder.GetValue(MementoViewModelBase viewModel)
 		{
 			if (!ResolvePropertyInfoIfUnset(viewModel))
 			{
@@ -123,7 +120,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 			return data;
 		}
 
-		internal void SetValue(object viewModel, object value)
+		internal void SetValue(MementoViewModelBase viewModel, object value)
 		{
 			if (!_propertyInfo.CanWrite || !ResolvePropertyInfoIfUnset(viewModel))
 			{
@@ -148,24 +145,25 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 				return false;
 			}
 
-			var moment = ((IMementoValueHolder) this).GetValue(mementoViewModelBase);
-			if (!dataStemp.CanSetData(moment))
+			var result = false;
+			mementoViewModelBase.ThreadSaveAction(() =>
 			{
-				return false;
-			}
+				var moment = ((IMementoValueHolder)this).GetValue(mementoViewModelBase);
+				if (!dataStemp.CanSetData(moment))
+				{
+					return;
+				}
 
-			var memntoData = ((IMementoValueHolder) this).MementoData;
+				var memntoData = ((IMementoValueHolder)this).MementoData;
 
-			var currentMoment = memntoData.FirstOrDefault();
+				var currentMoment = memntoData.FirstOrDefault();
 
-			if (currentMoment != null && currentMoment.GetData() == moment)
-			{
-				return false;
-			}
+				if (currentMoment != null && currentMoment.GetData() == moment)
+				{
+					return;
+				}
 
-			dataStemp.CaptureData(moment);
-			lock (LockRoot)
-			{
+				dataStemp.CaptureData(moment);
 				while (_currentAge < memntoData.Count)
 				{
 					IMementoDataStamp outdatedStamp;
@@ -177,9 +175,11 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 
 				memntoData.Push(dataStemp);
 				_currentAge++;
-			}
 
-			return true;
+				result = true;
+			});
+
+			return result;
 		}
 
 		/// <summary>
@@ -187,18 +187,15 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		/// </summary>
 		public void Forget()
 		{
-			lock (LockRoot)
+			while (!((IMementoValueHolder)this).MementoData.IsEmpty)
 			{
-				while (!((IMementoValueHolder) this).MementoData.IsEmpty)
+				IMementoDataStamp outdatedStamp;
+				if (((IMementoValueHolder)this).MementoData.TryPop(out outdatedStamp))
 				{
-					IMementoDataStamp outdatedStamp;
-					if (((IMementoValueHolder) this).MementoData.TryPop(out outdatedStamp))
-					{
-						outdatedStamp.Forget();
-					}
-
-					_currentAge--;
+					outdatedStamp.Forget();
 				}
+
+				_currentAge--;
 			}
 		}
 		///  <summary>
@@ -209,7 +206,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 		///  <returns></returns>
 		public void GoInHistory(MementoViewModelBase viewModel, int ages)
 		{
-			lock (LockRoot)
+			viewModel.ThreadSaveAction(() =>
 			{
 				if (!CanGoInHistory(ages))
 				{
@@ -227,7 +224,7 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 
 				var ageValue = ageValueHolder.GetData();
 				SetValue(viewModel, ageValue);
-			}
+			});
 		}
 
 		/// <summary>

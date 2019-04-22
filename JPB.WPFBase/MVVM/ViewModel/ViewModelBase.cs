@@ -60,7 +60,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <param name="value"></param>
 		/// <param name="propertyName"></param>
 		[PublicAPI]
-		public void SetProperty<TArgument>(ref TArgument member, TArgument value,
+		public virtual void SetProperty<TArgument>(ref TArgument member, TArgument value,
 			[CallerMemberName] string propertyName = null)
 		{
 			if (RaiseAcceptPendingChange(propertyName, value))
@@ -79,7 +79,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <param name="property"></param>
 		[NotifyPropertyChangedInvocator("property")]
 		[PublicAPI]
-		public void SetProperty<TProperty>(ref TProperty member, TProperty value, Expression<Func<TProperty>> property)
+		public virtual void SetProperty<TProperty>(ref TProperty member, TProperty value, Expression<Func<TProperty>> property)
 		{
 			SetProperty(ref member, value, GetPropertyName(property));
 		}
@@ -90,7 +90,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <param name="propertyName">Name of the property that has a new value</param>
 		[NotifyPropertyChangedInvocator("propertyName")]
 		[PublicAPI]
-		public void SendPropertyChanged([CallerMemberName] string propertyName = null)
+		public virtual void SendPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 			SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
 		}
@@ -115,7 +115,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <typeparam name="TProperty"></typeparam>
 		/// <param name="property"></param>
 		[PublicAPI]
-		public void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
+		public virtual void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
 		{
 			SendPropertyChanged(GetPropertyName(property));
 		}
@@ -125,7 +125,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		/// <param name="propertyName">Name of the property that has a new value</param>
 		[PublicAPI]
-		public void SendPropertyChanging([CallerMemberName] string propertyName = null)
+		public virtual void SendPropertyChanging([CallerMemberName] string propertyName = null)
 		{
 			SendPropertyChanging(new PropertyChangingEventArgs(propertyName));
 		}
@@ -149,7 +149,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		/// <param name="property">Arguments detailing the change</param>
 		[PublicAPI]
-		public void SendPropertyChanging<TProperty>(Expression<Func<TProperty>> property)
+		public virtual void SendPropertyChanging<TProperty>(Expression<Func<TProperty>> property)
 		{
 			SendPropertyChanging(GetPropertyName(property));
 		}
@@ -221,20 +221,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		#region INotifyPropertyChanged Members
 
-		/// <summary>
-		///     Raised when a property on this object has a new value
-		/// </summary>
+		/// <inheritdoc />
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		/// <summary>
-		///     Raised when a Property will be changed directly after event invoke
-		/// </summary>
+		/// <inheritdoc />
 		public event PropertyChangingEventHandler PropertyChanging;
 
 		/// <inheritdoc />
-		/// <summary>
-		///     Raised when using the SetProperty() method. Can be used to cancel a change
-		/// </summary>
 		public event AcceptPendingChangeHandler PendingChange;
 
 		#endregion

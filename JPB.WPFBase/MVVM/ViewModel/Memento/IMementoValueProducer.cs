@@ -6,7 +6,6 @@ namespace JPB.WPFBase.MVVM.ViewModel.Memento
 	{
 		int CurrentAge { get; }
 		bool Ignore { get; set; }
-		object LockRoot { get; }
 		IEnumerable<IMementoDataStamp> MementoDataStamps { get; }
 		string PropertyName { get; }
 
