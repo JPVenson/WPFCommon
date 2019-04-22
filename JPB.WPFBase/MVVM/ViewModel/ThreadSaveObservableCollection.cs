@@ -30,7 +30,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	/// <typeparam name="T"></typeparam>
 #if !WINDOWS_UWP
 	[Serializable]
-	[DebuggerDisplay("TSOC<{typeof(T)}>[{Count}]")]
+	[DebuggerDisplay("Count = {Count}")]
 	[SuppressMessage("ReSharper", "NotResolvedInText")]
 	[DebuggerTypeProxy(typeof(ThreadSaveObservableCollection<>.ThreadSaveObservableCollectionDebuggerProxy))]
 #endif
@@ -75,6 +75,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			IEnumerator IEnumerable.GetEnumerator()
 			{
 				return ((IEnumerable)_source).GetEnumerator();
+			}
+
+			public IEnumerable<T> Items
+			{
+				get { return _source._base; }
 			}
 
 			public int Count

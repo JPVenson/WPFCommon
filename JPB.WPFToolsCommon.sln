@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DynamicInputBox", "JPB.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.ErrorValidation", "JPB.ErrorValidation\JPB.ErrorValidation.csproj", "{795AE2CF-4B7A-4C3B-8A29-618B727FB252}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.Extentions", "JPB.Extentions\JPB.Extentions.csproj", "{C1150265-60EB-4E75-B20B-61C9D8A88779}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.Extensions", "JPB.Extentions\JPB.Extensions.csproj", "{C1150265-60EB-4E75-B20B-61C9D8A88779}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.Tasking", "JPB.Tasking\JPB.Tasking.csproj", "{0F6C25A5-DAF2-4BCE-8C4D-F6D6542A172E}"
 EndProject

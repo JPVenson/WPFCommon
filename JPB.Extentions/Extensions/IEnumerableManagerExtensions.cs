@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace JPB.Extentions.Extensions
 {
-    public static class IEnumerableManagerExtensions
+    public static class CommonIEnumerableExtensions
     {
         /// <summary>
         ///     Looks for an specitic element in source and return his null based position

@@ -11,7 +11,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 	///		Creates a Queue of Actions that will be called async as they are added. By defining the <para>MaxRunPerKey</para> you define how many actions
 	///		should be run with the same key
 	/// </summary>
-	public class SingelSerialTaskFactory : SerialTaskDispatcherBase
+	public class MultiTaskDispatcher : SerialTaskDispatcherBase
 	{
 		private readonly int _maxRunPerKey;
 
@@ -24,7 +24,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 		///  </summary>
 		/// <param name="keepRunning"></param>
 		/// <param name="maxRunPerKey"></param>
-		public SingelSerialTaskFactory(bool keepRunning, int maxRunPerKey = 1, [CallerMemberName] string namedConsumer = null) : base(keepRunning)
+		public MultiTaskDispatcher(bool keepRunning, int maxRunPerKey = 1, [CallerMemberName] string namedConsumer = null) : base(keepRunning)
 		{
 			_namedConsumer = namedConsumer;
 			_maxRunPerKey = maxRunPerKey;

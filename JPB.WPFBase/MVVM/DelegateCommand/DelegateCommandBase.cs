@@ -35,6 +35,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
 			return CanExecutePredicate;
 		}
+
 		protected Action<object> ObtainExecute()
 		{
 			if (UseWeakReference)
@@ -108,13 +109,30 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
 		/// <inheritdoc />
 		public abstract event EventHandler CanExecuteChanged;
-		
+
+		/// <summary>
+		///		Executes the CanExecute with null as Parameter
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool CanExecute()
+		{
+			return CanExecute(null);
+		}
+
 		/// <inheritdoc />
 		public virtual bool CanExecute(object parameter)
 		{
 			var canExecute = ObtainCanExecute();
 			return CanExecutePredicate == null 
 			       || (canExecute != null && canExecute(parameter));
+		}
+
+		/// <summary>
+		///		Executes the command with null as parameter
+		/// </summary>
+		public virtual void Execute()
+		{
+			Execute(null);
 		}
 		
 		/// <inheritdoc />

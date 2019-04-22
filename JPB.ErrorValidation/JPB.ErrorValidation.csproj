@@ -53,15 +53,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ValidationRules\ErrorCollectionWrapper.cs" />
+    <Compile Include="ValidationRules\ErrorHashSet.cs" />
     <Compile Include="ValidationRules\ThreadSaveValidationRuleBase.cs" />
     <Compile Include="ValidationTyps\AsyncState.cs" />
     <Compile Include="ValidationTyps\AsyncValidationOption.cs" />
     <Compile Include="ValidationTyps\ErrorExtentions.cs" />
     <Compile Include="ValidationTyps\IAsyncValidation.cs" />
     <Compile Include="ValidationTyps\IAsyncValidationOption.cs" />
-    <Compile Include="ViewModelProvider\AsyncErrorProviderBase.cs" />
-    <Compile Include="ViewModelProvider\DataErrorBase.cs" />
-    <Compile Include="ViewModelProvider\Base\SimpleErrorProviderBase.cs" />
+    <Compile Include="ViewModelProvider\Base\AsyncErrorProviderBase.cs" />
+    <Compile Include="ViewModelProvider\DataError.cs" />
     <Compile Include="ViewModelProvider\Base\ErrorProviderBase.cs" />
     <Compile Include="IErrorInfoProvider.cs" />
     <Compile Include="IErrorProviderBase.cs" />
@@ -73,9 +74,9 @@
     <Compile Include="ValidationTyps\Warning.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JPB.Extentions\JPB.Extentions.csproj">
+    <ProjectReference Include="..\JPB.Extentions\JPB.Extensions.csproj">
       <Project>{c1150265-60eb-4e75-b20b-61c9d8a88779}</Project>
-      <Name>JPB.Extentions</Name>
+      <Name>JPB.Extensions</Name>
     </ProjectReference>
     <ProjectReference Include="..\JPB.Tasking\JPB.Tasking.csproj">
       <Project>{0F6C25A5-DAF2-4BCE-8C4D-F6D6542A172E}</Project>

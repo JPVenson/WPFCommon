@@ -47,10 +47,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MVVM\Commanding\DelegateCommandTests.cs" />
     <Compile Include="MVVM\ViewModel\ApplicationBaseTest.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModel\AsyncViewModelBaseTests.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoTests.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Models\MementoViewModel.cs" />
+    <Compile Include="MVVM\ViewModel\ThreadSaveCollection\ThreadSaveObservableCollectionTests.cs" />
     <Compile Include="WpfBootstrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

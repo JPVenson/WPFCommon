@@ -6,7 +6,7 @@ using System.Windows.Threading;
 namespace JPB.ErrorValidation.ViewModelProvider.Base
 {
     public abstract class SimpleErrorProviderBase<T> :
-        SimpleErrorProviderBase where T : class, IErrorCollectionBase, new()
+        ErrorProvider where T : class, IErrorCollectionBase, new()
     {
         protected SimpleErrorProviderBase()
             : this(Dispatcher.FromThread(Thread.CurrentThread), new T())
@@ -21,20 +21,21 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
         }
     }
 
-    public abstract class SimpleErrorProviderBase :
+    public abstract class ErrorProvider :
        ErrorProviderBase, IDataErrorInfo
     {
-        protected SimpleErrorProviderBase(IErrorCollectionBase errors)
+        protected ErrorProvider(IErrorCollectionBase errors)
             : this(Dispatcher.FromThread(Thread.CurrentThread), errors)
         {
 
         }
 
-        protected SimpleErrorProviderBase(Dispatcher dispatcher, IErrorCollectionBase errors)
+        protected ErrorProvider(Dispatcher dispatcher, IErrorCollectionBase errors)
             : base(dispatcher, errors)
         {
         }
 
         public new abstract string this[string columnName] { get; }
+        public string Error { get; }
     }
 }

@@ -8,13 +8,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Windows;
 using System.Windows.Threading;
 using JPB.ErrorValidation.ValidationTyps;
-using JPB.ErrorValidation.ViewModelProvider.Base;
 using JPB.Tasking.TaskManagement.Threading;
 
-namespace JPB.ErrorValidation.ViewModelProvider
+namespace JPB.ErrorValidation.ViewModelProvider.Base
 {
 	/// <summary>
 	///   Provides the INotifyDataErrorInfo Interface
@@ -22,7 +20,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 	public abstract class AsyncErrorProviderBase :
 		ErrorProviderBase, INotifyDataErrorInfo
 	{
-		private readonly SingelSerialTaskFactory _errorFactory = new SingelSerialTaskFactory(false, 2);
+		private readonly MultiTaskDispatcher _errorTaskDispatcher = new MultiTaskDispatcher(false, 2);
 		private readonly object _lockRoot = new object();
 		private int _workerCount;
 
@@ -39,7 +37,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			};
 		}
 
-		public AsyncErrorProviderBase(IErrorCollectionBase errors) 
+		protected AsyncErrorProviderBase(IErrorCollectionBase errors) 
 			: this(null, errors)
 		{
 		}
@@ -73,9 +71,10 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		/// <inheritdoc />
 		public IEnumerable GetErrors(string propertyName)
 		{
-			if (propertyName == null)
+			//in case somebody asks for everything give then everything
+			if (string.IsNullOrWhiteSpace(propertyName))
 			{
-				propertyName = string.Empty;
+				return ErrorMapper.Values.SelectMany(g => g.Select(f => ValidationToUiError == null ? f : ValidationToUiError(f)));
 			}
 
 			ErrorMapper.TryGetValue(propertyName, out var errorJob);
@@ -187,9 +186,9 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			switch (validation2Key)
 			{
 				case AsyncRunState.NoPreference:
-					if (_errorFactory.ConcurrentQueue.Count >= Environment.ProcessorCount)
+					if (_errorTaskDispatcher.ConcurrentQueue.Count >= Environment.ProcessorCount)
 					{
-						_errorFactory.TryAdd(() =>
+						_errorTaskDispatcher.TryAdd(() =>
 						{
 							var exec = gerValidations();
 							BeginThreadSaveAction(() => { then(exec); });
@@ -202,14 +201,14 @@ namespace JPB.ErrorValidation.ViewModelProvider
 
 					break;
 				case AsyncRunState.CurrentPlusOne:
-					_errorFactory.TryAdd(() =>
+					_errorTaskDispatcher.TryAdd(() =>
 					{
 						var exec = gerValidations();
 						BeginThreadSaveAction(() => { then(exec); });
 					}, key);
 					break;
 				case AsyncRunState.OnlyOnePerTime:
-					_errorFactory.TryAdd(() =>
+					_errorTaskDispatcher.TryAdd(() =>
 					{
 						var exec = gerValidations();
 						BeginThreadSaveAction(() => { then(exec); });

@@ -5,6 +5,7 @@ using System.Threading;
 using JPB.ErrorValidation.ValidationRules;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.ErrorValidation.ViewModelProvider;
+using JPB.ErrorValidation.ViewModelProvider.Base;
 using JPB.WPFBase.MVVM.ViewModel;
 
 namespace WpfApplication1

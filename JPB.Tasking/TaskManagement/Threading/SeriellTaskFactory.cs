@@ -17,19 +17,17 @@ namespace JPB.Tasking.TaskManagement.Threading
 	/// <summary>
 	///		Creates a Queue of Actions that will be called asyncrolly as they are added
 	/// </summary>
-	public class SerielTaskFactory : SerialFactoryBase, IDisposable
+	public class ActionDispatcher : SerialTaskDispatcherBase, IDisposable
 	{
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public SerielTaskFactory(bool keepRunning = false, [CallerMemberName] string namedConsumer = null) : base(keepRunning)
+		/// <inheritdoc />
+		public ActionDispatcher(bool keepRunning = false, [CallerMemberName] string namedConsumer = null) : base(keepRunning)
 		{
 			_namedConsumer = namedConsumer;
 			ConcurrentQueue = new ConcurrentQueue<Action>();
 			Timeout = DefaultTimeout;
 		}
 		/// <summary>
-		/// Current enqued Actions
+		/// Current queued Actions
 		/// </summary>
 		public ConcurrentQueue<Action> ConcurrentQueue { get; private set; }
 
@@ -41,7 +39,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 		{
 			if (_isDisposed)
 			{
-				throw new ObjectDisposedException("The Instance of the " + nameof(SerielTaskFactory) + " was disposed and cannot accept new Actions");
+				throw new ObjectDisposedException("The Instance of the " + nameof(ActionDispatcher) + " was disposed and cannot accept new Actions");
 			}
 
 			TryAdd(action);

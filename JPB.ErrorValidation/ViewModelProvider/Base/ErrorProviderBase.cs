@@ -65,34 +65,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		/// </summary>
 		[Browsable(false)]
 		public bool AlwaysCheckFailedInNextRun { get; set; }
-
-		///<inheritdoc />
-		public string Error
-		{
-			get
-			{
-				if (Validate)
-				{
-					return _error;
-				}
-
-				return string.Empty;
-			}
-			set
-			{
-				if (value == _error)
-				{
-					return;
-				}
-
-				ThreadSaveAction(() =>
-				{
-					_error = value;
-					SendPropertyChanged();
-				});
-			}
-		}
-
+		
 		/// <inheritdoc />
 		public virtual IErrorCollectionBase UserErrors
 		{
@@ -164,10 +137,10 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 
 		private void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			HandleUnboundPropertys(e.PropertyName);
+			HandleUnboundProperties(e.PropertyName);
 		}
 
-		private void HandleUnboundPropertys(string propName)
+		private void HandleUnboundProperties(string propName)
 		{
 			ObManage(
 				UserErrors.Where(f =>
@@ -203,7 +176,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		/// <returns></returns>
 		protected virtual IEnumerable<IValidation> ProduceValidations(string errorIndicator)
 		{
-			return UserErrors.ReturnErrors(errorIndicator);
+			return UserErrors.FilterErrors(errorIndicator);
 		}
 
 		/// <summary>
@@ -219,7 +192,6 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				if (ActiveValidationCases.Any())
 				{
 					ActiveValidationCases.Clear();
-					Error = string.Empty;
 					SendPropertyChanged(() => HasError);
 				}
 
@@ -274,30 +246,6 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 					else
 					{
 						errorsOfThisRun.Remove(error);
-					}
-				}
-			}
-
-			if (!ActiveValidationCases.Any())
-			{
-				Error = string.Empty;
-			}
-			else
-			{
-				if (AggregateMultiError != null)
-				{
-					Error = errorsOfThisRun
-						.Select(e => e.ErrorText)
-						.Aggregate(
-						(current, validation) => AggregateMultiError(current, validation))
-						?.ToString();
-				}
-				else
-				{
-					var fod = errorsOfThisRun.FirstOrDefault();
-					if (fod != null && fod.ErrorText != Error)
-					{
-						Error = string.Format(MessageFormat, fod.ErrorType, fod.ErrorText);
 					}
 				}
 			}

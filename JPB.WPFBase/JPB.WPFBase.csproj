@@ -79,8 +79,10 @@
     <Compile Include="Converter\TypedParamValueConverter.cs" />
     <Compile Include="Converter\TypedValueConverter.cs" />
     <Compile Include="Converter\VisibilityBooleanConverter.cs" />
+    <Compile Include="MVVM\DelegateCommand\AsyncDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\AutoDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\DelegateCommand.cs" />
+    <Compile Include="MVVM\DelegateCommand\StrictDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\DelegateCommandBase.cs" />
     <Compile Include="MVVM\ViewModel\AcceptPendingChangeEventArgs.cs" />
     <Compile Include="MVVM\ViewModel\AcceptPendingChangeHandler.cs" />

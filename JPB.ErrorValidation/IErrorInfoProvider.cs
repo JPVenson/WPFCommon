@@ -9,7 +9,7 @@ namespace JPB.ErrorValidation
 {
     public interface IErrorCollectionBase : ICollection<IValidation>, INotifyCollectionChanged
     {
-        IEnumerable<IValidation> ReturnErrors(string columnName);
+        IEnumerable<IValidation> FilterErrors(string columnName);
     }
 
     /// <summary>
@@ -17,10 +17,6 @@ namespace JPB.ErrorValidation
     /// </summary>
     public interface IErrorValidatorBase
     {
-        /// <summary>
-        /// The general Error string for this Object
-        /// </summary>
-        string Error { get; set; }
         /// <summary>
         /// Enabled/Disable all validation
         /// </summary>

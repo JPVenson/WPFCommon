@@ -7,8 +7,8 @@
     <ProjectGuid>{C1150265-60EB-4E75-B20B-61C9D8A88779}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JPB.Extentions</RootNamespace>
-    <AssemblyName>JPB.Extentions</AssemblyName>
+    <RootNamespace>JPB.Extensions</RootNamespace>
+    <AssemblyName>JPB.Extensions</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -54,11 +54,7 @@
   <ItemGroup>
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\DateHelperExtention.cs" />
-    <Compile Include="Extensions\Extensions.cs" />
-    <Compile Include="Extensions\IEnumerableManagerExtensions.cs" />
-    <Compile Include="Extensions\ITypContainer.cs" />
-    <Compile Include="Extensions\SaveExtensions.cs" />
-    <Compile Include="Extensions\TypeStore.cs" />
+    <Compile Include="Extensions\CommonIEnumerableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

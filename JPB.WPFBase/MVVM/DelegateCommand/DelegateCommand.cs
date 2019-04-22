@@ -83,12 +83,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 			{
 				if (obj is TParameter)
 				{
-					execute((TParameter) obj);
-				}
-				else
-				{
-					throw new InvalidOperationException(
-						"The Execute method detected an invalid obj type in the Arguments");
+					execute((TParameter)obj);
 				}
 			}, obj =>
 			{
@@ -99,7 +94,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
 				if (obj is TParameter)
 				{
-					return canExecute((TParameter) obj);
+					return canExecute((TParameter)obj);
 				}
 
 				return false;

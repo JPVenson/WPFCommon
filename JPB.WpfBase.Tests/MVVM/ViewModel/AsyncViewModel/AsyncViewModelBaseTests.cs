@@ -64,7 +64,7 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.AsyncViewModel
 			Thread.Sleep(1000);
 		}
 
-		public Task AttachTaskEndedHandler(AsyncViewModelBase vm)
+		public static Task AttachTaskEndedHandler(AsyncViewModelBase vm)
 		{
 			var waiter = new ManualResetEventSlim();
 

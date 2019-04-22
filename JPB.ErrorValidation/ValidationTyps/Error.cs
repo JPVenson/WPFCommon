@@ -15,19 +15,30 @@ namespace JPB.ErrorValidation.ValidationTyps
 		private string[] _errorIndicator;
 		private object _errorText;
 
-		public Error(string errorText, string errorIndicator, Func<T, bool> condition) : this(errorText, condition,
+		/// <summary>
+		///		Creates a new Error object that defines a single validation that can be proved
+		/// </summary>
+		/// <param name="errorText">The Error object. This object is given to the UI to display this error.</param>
+		/// <param name="errorIndicator">Defines a single or Multiple Properties on the Target ViewModel that this validation relies on. This defines when the Validation will be executed as well as where it will be displayed.</param>
+		/// <param name="condition">The Condition on which this error defines as "Failed" or "Success"</param>
+		public Error(object errorText, string errorIndicator, Func<T, bool> condition) : this(errorText, condition,
 			errorIndicator)
 		{
 		}
-
-		public Error(string errorText, Func<T, bool> condition, params string[] errorIndicator)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="errorText">The Error object. This object is given to the UI to display this error.</param>
+		/// <param name="errorIndicator">Defines a single or Multiple Properties on the Target ViewModel that this validation relies on. This defines when the Validation will be executed as well as where it will be displayed.</param>
+		/// <param name="condition">The Condition on which this error defines as "Failed" or "Success"</param>
+		public Error(object errorText, Func<T, bool> condition, params string[] errorIndicator)
 		{
 			_condition = condition;
 			_errorIndicator = errorIndicator;
 			_errorText = errorText;
 		}
 
-		public static Error<T> FromProperty<TProperty>(string errorText, Func<T, bool> condition,
+		public static Error<T> FromProperty<TProperty>(object errorText, Func<T, bool> condition,
 			Expression<Func<TProperty>> errorIndicator)
 		{
 			return new Error<T>(errorText, condition, ViewModelBase.GetPropertyName(errorIndicator));

@@ -159,47 +159,35 @@
     <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\AsyncErrorProviderBase.cs">
       <Link>Error\ViewModelProvider\AsyncErrorProviderBase.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\ErrorProvider.cs">
+      <Link>Error\ViewModelProvider\Base\ErrorProvider.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\ErrorProviderBase.cs">
       <Link>Error\ViewModelProvider\Base\ErrorProviderBase.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\SimpleErrorProviderBase.cs">
-      <Link>Error\ViewModelProvider\Base\SimpleErrorProviderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\DataErrorBase.cs">
-      <Link>Error\ViewModelProvider\DataErrorBase.cs</Link>
+    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\DataError.cs">
+      <Link>Error\ViewModelProvider\DataError.cs</Link>
     </Compile>
     <Compile Include="..\JPB.Extentions\Extensions\CollectionExtensions.cs">
       <Link>Extensions\CollectionExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.Extentions\Extensions\CommonIEnumerableExtensions.cs">
+      <Link>Extensions\CommonIEnumerableExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.Extentions\Extensions\DateHelperExtention.cs">
       <Link>Extensions\DateHelperExtention.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.Extentions\Extensions\Extensions.cs">
-      <Link>Extensions\Extensions.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.Extentions\Extensions\IEnumerableManagerExtensions.cs">
-      <Link>Extensions\IEnumerableManagerExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.Extentions\Extensions\ITypContainer.cs">
-      <Link>Extensions\ITypContainer.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.Extentions\Extensions\SaveExtensions.cs">
-      <Link>Extensions\SaveExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.Extentions\Extensions\TypeStore.cs">
-      <Link>Extensions\TypeStore.cs</Link>
     </Compile>
     <Compile Include="..\JPB.Tasking\TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs">
       <Link>TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SerialFactoryBase.cs">
-      <Link>TaskManagement\Threading\SerialFactoryBase.cs</Link>
+    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\MultiTaskDispatcher.cs">
+      <Link>TaskManagement\Threading\MultiTaskDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SerialTaskDispatcherBase.cs">
+      <Link>TaskManagement\Threading\SerialTaskDispatcherBase.cs</Link>
     </Compile>
     <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SeriellTaskFactory.cs">
       <Link>TaskManagement\Threading\SeriellTaskFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SingelSerialTaskFactory.cs">
-      <Link>TaskManagement\Threading\SingelSerialTaskFactory.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\Converter\BooleanInverseConverter.cs">
       <Link>Converter\BooleanInverseConverter.cs</Link>
@@ -222,6 +210,9 @@
     <Compile Include="..\JPB.WPFBase\Converter\VisibilityBooleanConverter.cs">
       <Link>Converter\VisibilityBooleanConverter.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\AsyncDelegateCommand.cs">
+      <Link>MVVM\DelegateCommand\AsyncDelegateCommand.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\AutoDelegateCommand.cs">
       <Link>MVVM\DelegateCommand\AutoDelegateCommand.cs</Link>
     </Compile>
@@ -230,6 +221,9 @@
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\DelegateCommandBase.cs">
       <Link>MVVM\DelegateCommand\DelegateCommandBase.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\StrictDelegateCommand.cs">
+      <Link>MVVM\DelegateCommand\StrictDelegateCommand.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AcceptPendingChangeEventArgs.cs">
       <Link>MVVM\ViewModel\AcceptPendingChangeEventArgs.cs</Link>

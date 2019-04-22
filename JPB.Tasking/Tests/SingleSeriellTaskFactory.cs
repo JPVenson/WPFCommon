@@ -21,7 +21,7 @@ namespace JPB.Tasking.Tests
 		public void Create()
 		{
 			AutoResetEvent mre;
-			using (var factory = new SingelSerialTaskFactory(false))
+			using (var factory = new MultiTaskDispatcher(false))
 			{
 				mre = new AutoResetEvent(false);
 				factory.TryAdd(() => { Thread.Sleep(100); }, 1);

@@ -24,7 +24,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 	/// <summary>
 	///     Provides the IDataErrorInfo interface
 	/// </summary>
-	public abstract class DataErrorBase : SimpleErrorProviderBase
+	public abstract class DataErrorBase : ErrorProvider
 	{
 		protected DataErrorBase(IErrorCollectionBase errors) : base(errors)
 		{
