@@ -79,6 +79,7 @@
     <Compile Include="Converter\TypedParamValueConverter.cs" />
     <Compile Include="Converter\TypedValueConverter.cs" />
     <Compile Include="Converter\VisibilityBooleanConverter.cs" />
+    <Compile Include="Logger\DispatcherStatusMonitor.cs" />
     <Compile Include="MVVM\DelegateCommand\AsyncDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\AutoDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\DelegateCommand.cs" />
@@ -119,6 +120,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JPB.Tasking\JPB.Tasking.csproj">
+      <Project>{0F6C25A5-DAF2-4BCE-8C4D-F6D6542A172E}</Project>
+      <Name>JPB.Tasking</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

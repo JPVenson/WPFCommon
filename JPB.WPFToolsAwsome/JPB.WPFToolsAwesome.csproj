@@ -126,6 +126,12 @@
     <Compile Include="..\JPB.ErrorValidation\ValidationRules\ErrorCollection.cs">
       <Link>Error\ValidationRules\ErrorCollection.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ValidationRules\ErrorCollectionWrapper.cs">
+      <Link>Error\ValidationRules\ErrorCollectionWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.ErrorValidation\ValidationRules\ErrorHashSet.cs">
+      <Link>Error\ValidationRules\ErrorHashSet.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.ErrorValidation\ValidationRules\ThreadSaveValidationRuleBase.cs">
       <Link>Error\ValidationRules\ThreadSaveValidationRuleBase.cs</Link>
     </Compile>
@@ -156,11 +162,8 @@
     <Compile Include="..\JPB.ErrorValidation\ValidationTyps\Warning.cs">
       <Link>Error\ValidationTyps\Warning.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\AsyncErrorProviderBase.cs">
-      <Link>Error\ViewModelProvider\AsyncErrorProviderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\ErrorProvider.cs">
-      <Link>Error\ViewModelProvider\Base\ErrorProvider.cs</Link>
+    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\AsyncErrorProviderBase.cs">
+      <Link>Error\ViewModelProvider\Base\AsyncErrorProviderBase.cs</Link>
     </Compile>
     <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\ErrorProviderBase.cs">
       <Link>Error\ViewModelProvider\Base\ErrorProviderBase.cs</Link>
@@ -177,6 +180,9 @@
     <Compile Include="..\JPB.Extentions\Extensions\DateHelperExtention.cs">
       <Link>Extensions\DateHelperExtention.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\ActionDispatcher.cs">
+      <Link>TaskManagement\Threading\ActionDispatcher.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.Tasking\TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs">
       <Link>TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs</Link>
     </Compile>
@@ -185,9 +191,6 @@
     </Compile>
     <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SerialTaskDispatcherBase.cs">
       <Link>TaskManagement\Threading\SerialTaskDispatcherBase.cs</Link>
-    </Compile>
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SeriellTaskFactory.cs">
-      <Link>TaskManagement\Threading\SeriellTaskFactory.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\Converter\BooleanInverseConverter.cs">
       <Link>Converter\BooleanInverseConverter.cs</Link>
