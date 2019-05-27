@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Windows.Threading;
-using JPB.ErrorValidation.ViewModelProvider.Base;
-using JPB.WPFBase.MVVM.ViewModel;
 
-namespace JPB.ErrorValidation.ViewModelProvider
+namespace JPB.ErrorValidation.ViewModelProvider.Base
 {
 	/// <summary>
 	///     Provides the IDataErrorInfo interface

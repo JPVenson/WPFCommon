@@ -6,25 +6,15 @@ using System.Windows.Data;
 namespace JPB.WPFBase.Converter
 {
     /// <summary>
-    ///     Runs through all converter
+    ///     Aggregates multiple Converters and executes them sequential with the result of the previous is the argument of the next one 
     /// </summary>
     /// <seealso cref="System.Windows.Data.IValueConverter" />
-    public class ChainConverter : IValueConverter
+    public class ChainConverter : List<IValueConverter>, IValueConverter
     {
-        public ChainConverter()
-        {
-            Converters = new List<IValueConverter>();
-        }
-
-        /// <summary>
-        ///     The list of all Converter to be used
-        /// </summary>
-        public ICollection<IValueConverter> Converters { get; set; }
-
         /// <inheritdoc />
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            foreach (var valueConverter in Converters)
+            foreach (var valueConverter in this)
             {
                 value = valueConverter.Convert(value, targetType, parameter, culture);
             }
@@ -35,7 +25,7 @@ namespace JPB.WPFBase.Converter
         /// <inheritdoc />
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            foreach (var valueConverter in Converters)
+            foreach (var valueConverter in this)
             {
                 value = valueConverter.ConvertBack(value, targetType, parameter, culture);
             }

@@ -4,12 +4,12 @@ using System.Windows.Data;
 
 namespace JPB.WPFBase.Converter
 {
+
     /// <summary>
-    ///     Defines a base class for using the IValueConverter Interface.
-    
+    ///     Serves as a base type for converting one type to another using strong typed interfaces
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <typeparam name="E"></typeparam>
+    /// <typeparam name="TE"></typeparam>
     public abstract class TypedValueConverter<T, E> : IValueConverter
     {
         #region Implementation of IValueConverter

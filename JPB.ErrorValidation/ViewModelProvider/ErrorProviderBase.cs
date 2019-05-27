@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.WPFBase.MVVM.ViewModel;
 
-namespace JPB.ErrorValidation.ViewModelProvider.Base
+namespace JPB.ErrorValidation.ViewModelProvider
 {
 	public abstract class ErrorProviderBase :
 		AsyncViewModelBase,
@@ -125,14 +125,16 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 
 		private void InitErrorProvider(IErrorCollectionBase errors)
 		{
-			ActiveValidationCases = new ThreadSaveObservableCollection<IValidation>();
-
-			UserErrors = errors;
-			PropertyChanged += ErrorProviderBase_PropertyChanged;
-			MessageFormat = "{1}";
-			Validation = ValidationLogic.RunThroughAll;
-			Validate = true;
-			AlwaysCheckFailedInNextRun = true;
+			ThreadSaveAction(() =>
+			{
+				ActiveValidationCases = new ThreadSaveObservableCollection<IValidation>();
+				UserErrors = errors;
+				PropertyChanged += ErrorProviderBase_PropertyChanged;
+				MessageFormat = "{1}";
+				Validation = ValidationLogic.RunThroughAll;
+				Validate = true;
+				AlwaysCheckFailedInNextRun = true;
+			});
 		}
 
 		private void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)

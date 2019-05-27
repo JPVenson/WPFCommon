@@ -6,13 +6,19 @@ using System.Linq.Expressions;
 
 namespace JPB.WPFBase.MVVM.DelegateCommand
 {
+	/// <summary>
+	///		An delegate command that uses Expressions in its CanExecute method combined with the INotifyPropertyChanged
+	///		event from its owner to detect changes in its CanExecute state
+	/// </summary>
 	public class AutoDelegateCommand : DelegateCommandBase
 	{
+		/// <inheritdoc />
 		public AutoDelegateCommand(INotifyPropertyChanged owner, Action execute, Expression<Func<bool>> canExecute) :
 			base(execute, canExecute.Compile())
 		{
 			EvaluateCanExecute(owner, canExecute);
 		}
+
 		private HashSet<string> UsedProperties { get; set; }
 
 		private void EvaluateCanExecute(INotifyPropertyChanged execute, Expression<Func<bool>> canExecute)
@@ -47,8 +53,12 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 			}
 		}
 
+		/// <inheritdoc />
 		public override event EventHandler CanExecuteChanged;
 
+		/// <summary>
+		///		Raises the <see cref="CanExecuteChanged"/> event
+		/// </summary>
 		protected virtual void OnCanExecuteChanged()
 		{
 			CanExecuteChanged?.Invoke(this, EventArgs.Empty);

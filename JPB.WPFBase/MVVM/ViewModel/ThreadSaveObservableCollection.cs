@@ -147,11 +147,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			: this(collection, true)
 		{
 		}
+
 		/// <inheritdoc />
 		public ThreadSaveObservableCollection()
 			: this(DispatcherLock.GetDispatcher())
 		{
 		}
+
 		/// <inheritdoc />
 		public ThreadSaveObservableCollection(Dispatcher fromThread)
 		{

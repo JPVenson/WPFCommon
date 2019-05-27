@@ -9,6 +9,9 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 	/// <seealso cref="System.Windows.Input.ICommand" />
 	public abstract class DelegateCommandBase : ICommand
 	{
+		/// <summary>
+		///		If set to true the Execute and CanExecute argument are stored as Weak References
+		/// </summary>
 		public bool UseWeakReference { get; }
 
 		/// <summary>
@@ -25,6 +28,10 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
 		protected internal Action<object> ExecutePredicate;
 
+		/// <summary>
+		///		Should return the Cached CanExecute method
+		/// </summary>
+		/// <returns></returns>
 		protected Func<object, bool> ObtainCanExecute()
 		{
 			if (UseWeakReference)
@@ -36,6 +43,10 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 			return CanExecutePredicate;
 		}
 
+		/// <summary>
+		///		Should return the Cached Execute method
+		/// </summary>
+		/// <returns></returns>
 		protected Action<object> ObtainExecute()
 		{
 			if (UseWeakReference)
@@ -47,6 +58,9 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 			return ExecutePredicate;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		protected DelegateCommandBase()
 		{
 		}

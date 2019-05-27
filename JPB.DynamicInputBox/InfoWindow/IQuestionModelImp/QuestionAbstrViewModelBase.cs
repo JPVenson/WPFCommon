@@ -10,6 +10,7 @@ using JPB.DynamicInputBox.InfoWindow.Interfaces;
 using JPB.ErrorValidation;
 using JPB.ErrorValidation.ValidationRules;
 using JPB.ErrorValidation.ValidationTyps;
+using JPB.ErrorValidation.ViewModelProvider;
 using JPB.ErrorValidation.ViewModelProvider.Base;
 
 namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp

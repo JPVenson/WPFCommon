@@ -15,6 +15,7 @@ using JPB.DynamicInputBox.InfoWindow.Controls;
 using JPB.DynamicInputBox.InfoWindow.IQuestionModelImp;
 using JPB.ErrorValidation;
 using JPB.ErrorValidation.ValidationRules;
+using JPB.ErrorValidation.ViewModelProvider;
 using JPB.ErrorValidation.ViewModelProvider.Base;
 using JPB.WPFBase.MVVM.DelegateCommand;
 

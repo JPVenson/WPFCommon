@@ -53,17 +53,21 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IErrorCollectionBase.cs" />
+    <Compile Include="IErrorValidatorBase.cs" />
     <Compile Include="ValidationRules\ErrorCollectionWrapper.cs" />
     <Compile Include="ValidationRules\ErrorHashSet.cs" />
     <Compile Include="ValidationRules\ThreadSaveValidationRuleBase.cs" />
+    <Compile Include="ValidationTyps\AsyncError.cs" />
+    <Compile Include="ValidationTyps\AsyncRunState.cs" />
     <Compile Include="ValidationTyps\AsyncState.cs" />
     <Compile Include="ValidationTyps\AsyncValidationOption.cs" />
     <Compile Include="ValidationTyps\ErrorExtentions.cs" />
     <Compile Include="ValidationTyps\IAsyncValidation.cs" />
     <Compile Include="ValidationTyps\IAsyncValidationOption.cs" />
     <Compile Include="ViewModelProvider\Base\AsyncErrorProviderBase.cs" />
-    <Compile Include="ViewModelProvider\DataError.cs" />
-    <Compile Include="ViewModelProvider\Base\ErrorProviderBase.cs" />
+    <Compile Include="ViewModelProvider\Base\DataError.cs" />
+    <Compile Include="ViewModelProvider\ErrorProviderBase.cs" />
     <Compile Include="IErrorInfoProvider.cs" />
     <Compile Include="IErrorProviderBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

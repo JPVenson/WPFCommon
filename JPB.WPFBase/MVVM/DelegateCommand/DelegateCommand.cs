@@ -49,6 +49,7 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 		{
 		}
 
+		/// <inheritdoc />
 		public override event EventHandler CanExecuteChanged
 		{
 			add { CommandManager.RequerySuggested += value; }

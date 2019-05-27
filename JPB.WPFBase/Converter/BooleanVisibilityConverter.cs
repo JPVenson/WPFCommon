@@ -2,22 +2,29 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using JetBrains.Annotations;
 
 namespace JPB.WPFBase.Converter
 {
-    [ValueConversion(typeof (Visibility), typeof (bool))]
-    public class BooleanVisibilityConverter : IValueConverter
+    /// <summary>
+    ///     Converts the boolean value to a <see cref="Visibility"/> where true is <see cref="Visibility.Visible"/> and any other value is <see cref="Visibility.Collapsed"/>
+    /// </summary>
+    [ValueConversion(typeof(bool), typeof(Visibility))]
+    [PublicAPI]
+    public class BooleanVisibilityConverter : TypedValueConverter<bool, Visibility>
     {
         #region IValueConverter Members
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        /// <inheritdoc />
+        public override Visibility Convert(bool value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((bool) value ? Visibility.Visible : Visibility.Collapsed);
+            return ((bool)value ? Visibility.Visible : Visibility.Collapsed);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        /// <inheritdoc />
+        public override bool ConvertBack(Visibility value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (((Visibility) value) == Visibility.Visible);
+            return (((Visibility)value) == Visibility.Visible);
         }
 
         #endregion

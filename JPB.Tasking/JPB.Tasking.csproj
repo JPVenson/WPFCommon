@@ -56,7 +56,6 @@
     <Compile Include="TaskManagement\Threading\SerialTaskDispatcherBase.cs" />
     <Compile Include="TaskManagement\Threading\ActionDispatcher.cs" />
     <Compile Include="TaskManagement\Threading\MultiTaskDispatcher.cs" />
-    <Compile Include="Tests\SingleSeriellTaskFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -61,12 +61,17 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 		{
 		}
 
+		/// <inheritdoc />
 		public override event EventHandler CanExecuteChanged
 		{
 			add { CommandManager.RequerySuggested += value; }
 			remove { CommandManager.RequerySuggested -= value; }
 		}
 
+		/// <summary>
+		///		Awaits the execution of this Event if any is currently running
+		/// </summary>
+		/// <returns></returns>
 		public async Task Await()
 		{
 			if (_isWorking != null)
@@ -77,11 +82,13 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 
 		private volatile Task _isWorking;
 
+		/// <inheritdoc />
 		public override bool CanExecute(object parameter)
 		{
 			return base.CanExecute(parameter) && (_isWorking == null || _isWorking.IsCompleted);
 		}
 
+		/// <inheritdoc />
 		public override void Execute(object parameter)
 		{
 			var execute = ObtainExecute();

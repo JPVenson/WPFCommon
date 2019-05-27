@@ -1,5 +1,8 @@
 ﻿namespace JPB.ErrorValidation.ValidationTyps
 {
+    /// <summary>
+    ///     Defines the Properties of an Async validation
+    /// </summary>
     public interface IAsyncValidationOption
     {
         /// <summary>

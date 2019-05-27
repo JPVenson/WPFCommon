@@ -1,7 +1,7 @@
 ﻿namespace JPB.WPFBase.MVVM.ViewModel
 {
 	/// <summary>
-	///     Handling Interface for Cancel changes
+	///     Handling Interface for Cancel changes. Must be used with <see cref="ViewModelBase.SetProperty{TArgument}(ref TArgument,TArgument,string)"/> in the ViewModel
 	/// </summary>
 	public interface IAcceptPendingChange
 	{
