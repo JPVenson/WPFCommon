@@ -532,7 +532,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public bool TryTake(out T item)
 		{
-			item = default;
+			item = default(T);
 			if (!Monitor.IsEntered(Lock))
 			{
 				lock (Lock)
