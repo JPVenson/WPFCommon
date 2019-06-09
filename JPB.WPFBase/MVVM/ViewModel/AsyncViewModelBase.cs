@@ -629,22 +629,16 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		private Task<T> CreateNewTaskAsync<T>(Func<Task<T>> delegateTask)
 		{
 			var hasLock = DispatcherLock.Current;
-			return AsyncViewModelBaseOptions.TaskFactory.StartNew(() =>
+			return AsyncViewModelBaseOptions.TaskFactory.StartNew(async () =>
 			{
 				if (hasLock != null)
 				{
 					DispatcherLock.Current = hasLock;
 				}
 
-				var invoke = delegateTask();
-				if (invoke == null)
-				{
-					throw new ArgumentNullException("delegateTask", "The given task executed by this method was null");
-				}
-
-				invoke.Wait();
-				return invoke.Result;
-			});
+				var invoke = await delegateTask();
+				return invoke;
+			}).Unwrap();
 		}
 	}
 }

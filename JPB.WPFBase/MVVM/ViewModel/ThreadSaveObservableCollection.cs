@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using System.CodeDom;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -23,9 +23,174 @@ using JetBrains.Annotations;
 namespace JPB.WPFBase.MVVM.ViewModel
 {
 	/// <summary>
+	///     Extends the <see cref="ThreadSaveObservableCollection{T}" /> with the IBindingList interface
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public class BindingListThreadSaveObservableCollection<T> : ThreadSaveObservableCollection<T>,
+		IBindingList
+
+	{
+		private readonly IList<PropertyDescriptor> _searchIndexes = new List<PropertyDescriptor>();
+
+		/// <summary>
+		/// </summary>
+		public BindingListThreadSaveObservableCollection()
+		{
+			AllowNew = InitializerInfo != null;
+		}
+
+		/// <inheritdoc />
+		public object AddNew()
+		{
+			if (InitializerInfo == null)
+			{
+				throw new NotSupportedException($"AllowNew for type '{typeof(T)}' is invalid");
+			}
+
+			return InitializerInfo.Invoke(null);
+		}
+
+		/// <inheritdoc />
+		public void AddIndex(PropertyDescriptor property)
+		{
+			_searchIndexes.Add(property);
+			OnListChanged(new ListChangedEventArgs(ListChangedType.PropertyDescriptorAdded, property));
+		}
+
+		/// <inheritdoc />
+		public void ApplySort(PropertyDescriptor property, ListSortDirection direction)
+		{
+			IEnumerable<T> sortedDict = null;
+			if (direction == ListSortDirection.Ascending)
+			{
+				sortedDict = this.OrderBy(e => property.GetValue(e));
+			}
+			else
+			{
+				sortedDict = this.OrderByDescending(e => property.GetValue(e));
+			}
+
+			ThreadSaveAction(() =>
+			{
+				var enumerable = sortedDict.ToArray();
+				for (var index = 0; index < enumerable.Length; index++)
+				{
+					var itemAt = enumerable[index];
+					if (itemAt.Equals(this[index]))
+					{
+						continue;
+					}
+
+					ReplaceItem(index, itemAt);
+				}
+			});
+		}
+
+		/// <inheritdoc />
+		public int Find(PropertyDescriptor property, object key)
+		{
+			for (var index = 0; index < this.Count; index++)
+			{
+				var item = this[index];
+				var findValue = property.GetValue(item);
+				if (findValue == key || findValue?.Equals(key) == true)
+				{
+					return index;
+				}
+			}
+
+			return -1;
+		}
+
+		/// <inheritdoc />
+		public void RemoveIndex(PropertyDescriptor property)
+		{
+			_searchIndexes.Remove(property);
+			OnListChanged(new ListChangedEventArgs(ListChangedType.PropertyDescriptorDeleted, property));
+		}
+
+		/// <inheritdoc />
+		public void RemoveSort()
+		{
+		}
+
+		/// <inheritdoc />
+		public bool AllowNew { get; }
+
+		/// <inheritdoc />
+		public bool AllowEdit { get; set; }
+
+		/// <inheritdoc />
+		public bool AllowRemove { get; set; }
+
+		/// <inheritdoc />
+		public bool SupportsChangeNotification { get; } = true;
+
+		/// <inheritdoc />
+		public bool SupportsSearching { get; }
+
+		/// <inheritdoc />
+		public bool SupportsSorting { get; }
+
+		/// <inheritdoc />
+		public bool IsSorted { get; }
+
+		/// <inheritdoc />
+		public PropertyDescriptor SortProperty { get; }
+
+		/// <inheritdoc />
+		public ListSortDirection SortDirection { get; } 
+		
+		/// <inheritdoc />
+		public event ListChangedEventHandler ListChanged;
+
+		protected virtual void OnListChanged(ListChangedEventArgs e)
+		{
+			ListChanged?.Invoke(this, e);
+		}
+
+		/// <inheritdoc />
+		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+		{
+			base.OnCollectionChanged(e);
+			var bindingCollectionHandler = ListChanged;
+			if (bindingCollectionHandler != null)
+			{
+				ListChangedEventArgs bindingCollectionArgs;
+				switch (e.Action)
+				{
+					case NotifyCollectionChangedAction.Add:
+						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.ItemAdded, e.NewStartingIndex);
+						break;
+					case NotifyCollectionChangedAction.Remove:
+						bindingCollectionArgs =
+							new ListChangedEventArgs(ListChangedType.ItemDeleted, e.NewStartingIndex);
+						break;
+					case NotifyCollectionChangedAction.Replace:
+						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.ItemChanged,
+							e.NewStartingIndex, e.OldStartingIndex);
+						break;
+					case NotifyCollectionChangedAction.Move:
+						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.ItemMoved, e.NewStartingIndex,
+							e.OldStartingIndex);
+						break;
+					case NotifyCollectionChangedAction.Reset:
+						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.Reset, 0);
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+
+				bindingCollectionHandler(this, bindingCollectionArgs);
+			}
+		}
+	}
+
+
+	/// <summary>
 	///     Defines a collection that implements the <see cref="INotifyCollectionChanged" /> event in a dispatcher thread save
 	///     manner.
-	///		All Write Operations are synchronized to the Dispatcher. All Read operations will occur in the calling thread.
+	///     All Write Operations are synchronized to the Dispatcher. All Read operations will occur in the calling thread.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 #if !WINDOWS_UWP
@@ -46,6 +211,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 #endif
 		IDisposable
 	{
+		protected static ConstructorInfo InitializerInfo;
 #if !WINDOWS_UWP
 		[NonSerialized]
 #endif
@@ -58,68 +224,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 #endif
 		private bool _batchCommit;
 
-		private class ThreadSaveObservableCollectionDebuggerProxy : IEnumerable<T>
+		static ThreadSaveObservableCollection()
 		{
-			private readonly ThreadSaveObservableCollection<T> _source;
-
-			public ThreadSaveObservableCollectionDebuggerProxy(ThreadSaveObservableCollection<T> source)
-			{
-				_source = source;
-			}
-
-			public IEnumerator<T> GetEnumerator()
-			{
-				return _source._base.GetEnumerator();
-			}
-
-			IEnumerator IEnumerable.GetEnumerator()
-			{
-				return ((IEnumerable)_source).GetEnumerator();
-			}
-
-			public IEnumerable<T> Items
-			{
-				get { return _source._base; }
-			}
-
-			public int Count
-			{
-				get { return _source.Count; }
-			}
-
-			public bool IsReadOnly
-			{
-				get { return _source.IsReadOnly; }
-			}
-
-			public object SyncRoot
-			{
-				get { return _source.Lock; }
-			}
-
-			public bool IsSynchronized
-			{
-				get { return _source.IsSynchronized; }
-			}
-
-			/// <summary>
-			///		Gets or Sets a if an Enumeration of this Collection should occur in a ThreadSave manner
-			/// </summary>
-			public bool ThreadSaveEnumeration
-			{
-				get { return _source.ThreadSaveEnumeration; }
-			}
-
-			/// <summary>
-			/// Gets or sets a value indicating whether this instance is read only optimistic.
-			/// </summary>
-			/// <value>
-			///   <c>true</c> if this instance is read only optimistic; otherwise, <c>false</c>.
-			/// </value>
-			public bool IsReadOnlyOptimistic
-			{
-				get { return _source.IsReadOnlyOptimistic; }
-			}
+			InitializerInfo = typeof(T).GetConstructors(BindingFlags.CreateInstance | BindingFlags.Public)
+				.FirstOrDefault(e => !e.GetParameters().Any());
 		}
 
 		private ThreadSaveObservableCollection(IList<T> collection, bool copy)
@@ -163,35 +271,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether [batch commit].
-		/// </summary>
-		/// <value>
-		///   <c>true</c> if [batch commit]; otherwise, <c>false</c>.
-		/// </value>
-		protected bool BatchCommit
-		{
-			get { return _batchCommit; }
-			set { _batchCommit = value; }
-		}
-
-		/// <summary>
-		///		Gets or Sets a if an Enumeration of this Collection should occur in a ThreadSave manner
-		/// </summary>
-		public bool ThreadSaveEnumeration { get; set; } = true;
-
-		/// <summary>
-		/// Gets or sets a value indicating whether this instance is read only optimistic.
-		/// </summary>
-		/// <value>
-		///   <c>true</c> if this instance is read only optimistic; otherwise, <c>false</c>.
-		/// </value>
-		public bool IsReadOnlyOptimistic { get; set; }
-
-		/// <summary>
-		/// Creates a new object that is a copy of the current instance.
+		///     Creates a new object that is a copy of the current instance.
 		/// </summary>
 		/// <returns>
-		/// A new object that is a copy of this instance.
+		///     A new object that is a copy of this instance.
 		/// </returns>
 		public object Clone()
 		{
@@ -241,12 +324,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				return 0;
 			}
 
-			var tempItem = (T)value;
+			var tempItem = (T) value;
 			var indexOf = -1;
 			_actorHelper.ThreadSaveAction(
 				() =>
 				{
-					indexOf = ((IList)_base).Add(tempItem);
+					indexOf = ((IList) _base).Add(tempItem);
 					SendPropertyChanged(nameof(Count));
 					SendPropertyChanged("Item[]");
 					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
@@ -258,27 +341,27 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public bool Contains(object value)
 		{
-			return ((IList)_base).Contains(value);
+			return ((IList) _base).Contains(value);
 		}
 
 		/// <inheritdoc />
 		public int IndexOf(object value)
 		{
-			return ((IList)_base).IndexOf(value);
+			return ((IList) _base).IndexOf(value);
 		}
 
 		/// <inheritdoc />
 		public void Insert(int index, object value)
 		{
 			CheckType(value);
-			Insert(index, (T)value);
+			Insert(index, (T) value);
 		}
 
 		/// <inheritdoc />
 		public void Remove(object value)
 		{
 			CheckType(value);
-			Remove((T)value);
+			Remove((T) value);
 		}
 
 		/// <inheritdoc />
@@ -318,7 +401,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					return;
 				}
 
-				_base[index] = (T)value;
+				_base[index] = (T) value;
 			}
 		}
 
@@ -419,7 +502,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public void CopyTo(Array array, int index)
 		{
-			((ICollection)_base).CopyTo(array, index);
+			((ICollection) _base).CopyTo(array, index);
 		}
 
 		/// <inheritdoc />
@@ -449,7 +532,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public bool TryTake(out T item)
 		{
-			item = default(T);
+			item = default;
 			if (!Monitor.IsEntered(Lock))
 			{
 				lock (Lock)
@@ -471,36 +554,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 		}
 
-		private IDictionary<string, ICollectionView> CollectionViews { get; set; }
-
-		/// <summary>
-		///		Obtains a ether new Collection view or a cached one
-		/// </summary>
-		/// <returns></returns>
-		public ICollectionView ObtainView(string key = "Default")
-		{
-			if (CollectionViews.ContainsKey(key))
-			{
-				return CollectionViews[key];
-			}
-
-			if (key == "Default")
-			{
-				return CollectionViews[key] = CollectionViewSource.GetDefaultView(this);
-			}
-			return CollectionViews[key] = new ListCollectionView(this);
-		}
-
 		/// <inheritdoc />
+		[MustUseReturnValue]
 		public IEnumerator<T> GetEnumerator()
 		{
 			if (ThreadSaveEnumeration)
 			{
 				IEnumerator<T> enumerator = null;
-				ThreadSaveAction(() =>
-				{
-					enumerator = ToArray().Cast<T>().GetEnumerator();
-				});
+				ThreadSaveAction(() => { enumerator = ToArray().Cast<T>().GetEnumerator(); });
 				return enumerator;
 			}
 
@@ -527,7 +588,32 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		/// Starts the batch commit.
+		///     Obtains a ether new Collection view or a cached one
+		/// </summary>
+		/// <returns></returns>
+		[MustUseReturnValue]
+		public ICollectionView ObtainView(string key = "Default")
+		{
+			if (CollectionViews.ContainsKey(key))
+			{
+				return CollectionViews[key];
+			}
+
+			ICollectionView source = null;
+			ThreadSaveAction(() =>
+			{
+				if (key == "Default")
+				{
+					source = CollectionViews[key] = CollectionViewSource.GetDefaultView(this);
+				}
+
+				source = CollectionViews[key] = new ListCollectionView(this);
+			});
+			return source;
+		}
+
+		/// <summary>
+		///     Starts the batch commit.
 		/// </summary>
 		protected virtual void StartBatchCommit()
 		{
@@ -535,7 +621,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///		Ends the batch commit.
+		///     Ends the batch commit.
 		/// </summary>
 		protected virtual void EndBatchCommit()
 		{
@@ -551,7 +637,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		///     else will be in Transaction
 		/// </param>
 		/// <param name="withLock">
-		///		When True the Source collection will be locked as long as the Transaction is running
+		///     When True the Source collection will be locked as long as the Transaction is running
 		/// </param>
 		[PublicAPI]
 		public void InTransaction(Func<ThreadSaveObservableCollection<T>, bool> action,
@@ -603,7 +689,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 							break;
 						case NotifyCollectionChangedAction.Replace:
-							ReplaceItem(item.NewStartingIndex, (T)item.NewItems[0]);
+							ReplaceItem(item.NewStartingIndex, (T) item.NewItems[0]);
 							break;
 						case NotifyCollectionChangedAction.Move:
 
@@ -626,7 +712,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///		Raises the <see cref="INotifyCollectionChanged.CollectionChanged"/> event
+		///     Raises the <see cref="INotifyCollectionChanged.CollectionChanged" /> event
 		/// </summary>
 		/// <param name="e"></param>
 		protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -653,8 +739,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///		Adds all items in the IEnumerable in one batch.
-		///		Some WPF Controls do not allow Ranges to be add. If an Error occurs call the <see cref="AddEach"/> method
+		///     Adds all items in the IEnumerable in one batch.
+		///     Some WPF Controls do not allow Ranges to be add. If an Error occurs call the <see cref="AddEach" /> method
 		/// </summary>
 		/// <param name="item">The item.</param>
 		public void AddRange(IEnumerable<T> item)
@@ -685,7 +771,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///		Adds all items in the IEnumerable individual.
+		///     Adds all items in the IEnumerable individual.
 		/// </summary>
 		/// <param name="collection">The item.</param>
 		public void AddEach(IEnumerable<T> collection)
@@ -735,7 +821,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///		Inserts an Item on the given index
+		///     Inserts an Item on the given index
 		/// </summary>
 		/// <param name="index"></param>
 		/// <param name="newItem"></param>
@@ -764,6 +850,99 @@ namespace JPB.WPFBase.MVVM.ViewModel
 						new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
 							oldItem, newItem, index));
 				});
+		}
+
+	
+
+		/// <summary>
+		///     Gets or sets a value indicating whether [batch commit].
+		/// </summary>
+		/// <value>
+		///     <c>true</c> if [batch commit]; otherwise, <c>false</c>.
+		/// </value>
+		protected bool BatchCommit
+		{
+			get { return _batchCommit; }
+			set { _batchCommit = value; }
+		}
+
+		/// <summary>
+		///     Gets or Sets a if an Enumeration of this Collection should occur in a ThreadSave manner
+		/// </summary>
+		public bool ThreadSaveEnumeration { get; set; } = true;
+
+		/// <summary>
+		///     Gets or sets a value indicating whether this instance is read only optimistic.
+		/// </summary>
+		/// <value>
+		///     <c>true</c> if this instance is read only optimistic; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsReadOnlyOptimistic { get; set; }
+
+		private IDictionary<string, ICollectionView> CollectionViews { get; }
+
+		private class ThreadSaveObservableCollectionDebuggerProxy : IEnumerable<T>
+		{
+			private readonly ThreadSaveObservableCollection<T> _source;
+
+			public ThreadSaveObservableCollectionDebuggerProxy(ThreadSaveObservableCollection<T> source)
+			{
+				_source = source;
+			}
+
+			public IEnumerator<T> GetEnumerator()
+			{
+				return _source._base.GetEnumerator();
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return ((IEnumerable) _source).GetEnumerator();
+			}
+
+			public IEnumerable<T> Items
+			{
+				get { return _source._base; }
+			}
+
+			public int Count
+			{
+				get { return _source.Count; }
+			}
+
+			public bool IsReadOnly
+			{
+				get { return _source.IsReadOnly; }
+			}
+
+			public object SyncRoot
+			{
+				get { return _source.Lock; }
+			}
+
+			public bool IsSynchronized
+			{
+				get { return _source.IsSynchronized; }
+			}
+
+			/// <summary>
+			///     Gets or Sets a if an Enumeration of this Collection should occur in a ThreadSave manner
+			/// </summary>
+			public bool ThreadSaveEnumeration
+			{
+				get { return _source.ThreadSaveEnumeration; }
+			}
+
+			/// <summary>
+			///     Gets or sets a value indicating whether this instance is read only optimistic.
+			/// </summary>
+			/// <value>
+			///     <c>true</c> if this instance is read only optimistic; otherwise, <c>false</c>.
+			/// </value>
+			public bool IsReadOnlyOptimistic
+			{
+				get { return _source.IsReadOnlyOptimistic; }
+			}
 		}
 	}
 }

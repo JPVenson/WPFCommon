@@ -24,18 +24,27 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		private readonly object _lockRoot = new object();
 		private int _workerCount;
 
-		protected AsyncErrorProviderBase(Dispatcher dispatcher, IErrorCollectionBase errors) : base(dispatcher, errors)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dispatcher"></param>
+		/// <param name="errors"></param>
+		protected AsyncErrorProviderBase(Dispatcher dispatcher, IErrorCollectionBase errors) 
+			: base(dispatcher, errors)
 		{
 			ErrorMapper = new ConcurrentDictionary<string, HashSet<IValidation>>();
 
 			PropertyChanged += AsyncErrorProviderBase_PropertyChanged;
-			Load();
+			LoadErrorMapperData();
 			AsyncValidationOption = new AsyncValidationOption
 			{
 				AsyncState = AsyncState.AsyncSharedPerCall,
 				RunState = AsyncRunState.CurrentPlusOne
 			};
 		}
+
+		/// <inheritdoc />
+		public override IErrorCollectionBase UserErrors { get; set; }
 
 		protected AsyncErrorProviderBase(IErrorCollectionBase errors) 
 			: this(null, errors)
@@ -87,8 +96,12 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			get { return HasError; }
 		}
 
-		private void Load()
+		/// <summary>
+		///		Fill the ErrorMapper with all known UserErrors
+		/// </summary>
+		public void LoadErrorMapperData()
 		{
+			UserErrors.CollectionChanged -= UserErrorsCollectionChanged;
 			UserErrors.CollectionChanged += UserErrorsCollectionChanged;
 
 			foreach (var validation in UserErrors.SelectMany(f => f.ErrorIndicator).Distinct())
