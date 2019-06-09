@@ -333,7 +333,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					SendPropertyChanged(nameof(Count));
 					SendPropertyChanged("Item[]");
 					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
-						tempItem));
+						tempItem, indexOf));
 				});
 			return indexOf;
 		}
