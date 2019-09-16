@@ -61,11 +61,16 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
                 "Bitte wähle mindestens ein Item aus", "Input", s =>
                 {
                     if (s.Input == null)
-                        return true;
+                    {
+	                    return true;
+                    }
+
                     if (s.Input is List<ListBoxItemWrapper>)
                     {
                         if (!(s.Input as List<ListBoxItemWrapper>).Any())
-                            return true;
+                        {
+	                        return true;
+                        }
                     }
                     return false;
                 }));

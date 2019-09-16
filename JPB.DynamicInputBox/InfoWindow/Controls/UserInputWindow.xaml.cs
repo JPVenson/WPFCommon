@@ -23,7 +23,9 @@ namespace JPB.DynamicInputBox.InfoWindow.Controls
         {
             var vm = (DataContext as UserInputViewModel);
             if (!vm.IsClosing)
-                vm.IsClosing = true;
+            {
+	            vm.IsClosing = true;
+            }
         }
     }
 }

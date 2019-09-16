@@ -271,6 +271,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
+		///		Returns the Underlying Collection for Unlocked Access
+		/// </summary>
+		/// <returns></returns>
+		public IList<T> GetUnderlyingCollection()
+		{
+			return _base;
+		}
+
+		/// <summary>
 		///     Creates a new object that is a copy of the current instance.
 		/// </summary>
 		/// <returns>

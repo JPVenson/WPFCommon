@@ -1,16 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.12.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{80491FCE-3DFE-4509-83B9-86167E2250C2}</ProjectGuid>
+    <ProjectGuid>{E7034029-2ADC-409A-B01D-66EFD7BD9409}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JPB.WpfBase.Tests</RootNamespace>
-    <AssemblyName>JPB.WpfBase.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <RootNamespace>JPB.ErrorValidation.Tests</RootNamespace>
+    <AssemblyName>JPB.ErrorValidation.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -31,14 +35,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,26 +49,27 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MVVM\Commanding\DelegateCommandTests.cs" />
-    <Compile Include="MVVM\ViewModel\ApplicationBaseTest.cs" />
-    <Compile Include="MVVM\ViewModel\AsyncViewModel\AsyncViewModelBaseTests.cs" />
-    <Compile Include="MVVM\ViewModel\Memento\MementoTests.cs" />
-    <Compile Include="MVVM\ViewModel\Memento\Models\MementoViewModel.cs" />
-    <Compile Include="MVVM\ViewModel\ThreadSaveCollection\ThreadSaveObservableCollectionTests.cs" />
-    <Compile Include="WpfBootstrapper.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
-      <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
-      <Name>JPB.WPFBase</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <ProjectReference Include="..\JPB.ErrorValidation\JPB.ErrorValidation.csproj">
+      <Project>{795AE2CF-4B7A-4C3B-8A29-618B727FB252}</Project>
+      <Name>JPB.ErrorValidation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
+      <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
+      <Name>JPB.WPFBase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.3.12.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.12.0\build\NUnit.props'))" />
+  </Target>
 </Project>

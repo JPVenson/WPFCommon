@@ -29,11 +29,16 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             else
             {
                 if (!(input is string))
-                    throw new ArgumentException("Can not parse text!");
+                {
+	                throw new ArgumentException("Can not parse text!");
+                }
 
                 string lowertext = text.ToLower();
                 if (!lowertext.Contains("#q"))
-                    throw new ArgumentException("Can not parse text!");
+                {
+	                throw new ArgumentException("Can not parse text!");
+                }
+
                 List<string> allquestions = text.Split(new[] { "#Q", "#q" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 text = allquestions.ElementAt(0);
                 allquestions.RemoveAt(0);
@@ -48,13 +53,20 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             {
                 item.PropertyChanged += (sender, args) =>
                 {
-                    if (args.PropertyName != "IsChecked") return;
+                    if (args.PropertyName != "IsChecked")
+                    {
+	                    return;
+                    }
 
                     var listBoxItemWrapper = (sender as ListBoxItemWrapper);
                     if (listBoxItemWrapper.IsChecked)
-                        Output.Add(listBoxItemWrapper);
+                    {
+	                    Output.Add(listBoxItemWrapper);
+                    }
                     else
-                        Output.Remove(listBoxItemWrapper);
+                    {
+	                    Output.Remove(listBoxItemWrapper);
+                    }
 
                     base.ForceRefresh();
                 };

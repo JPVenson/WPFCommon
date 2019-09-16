@@ -8,8 +8,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using JPB.ErrorValidation.ValidationTyps;
+using JPB.Tasking.TaskManagement;
 using JPB.Tasking.TaskManagement.Threading;
 
 namespace JPB.ErrorValidation.ViewModelProvider.Base
@@ -21,7 +23,6 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		ErrorProviderBase, INotifyDataErrorInfo
 	{
 		private readonly MultiTaskDispatcher _errorTaskDispatcher = new MultiTaskDispatcher(false, 2);
-		private readonly object _lockRoot = new object();
 		private int _workerCount;
 
 		/// <summary>
@@ -67,6 +68,38 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		public bool IsValidating
 		{
 			get { return _workerCount > 0; }
+		}
+
+		/// <summary>
+		///		Creates an awaitable object that will be resolved as soon as all running validations are finished.
+		/// </summary>
+		/// <returns></returns>
+		public async Task AwaitRunningValidation()
+		{
+			if (!IsValidating)
+			{
+				await Task.CompletedTask;
+				return;
+			}
+
+			var manualResetEvent = new ManualResetEventSlim();
+			void AddWaiter()
+			{
+				_errorTaskDispatcher.TryAdd(() =>
+				{
+					if (_errorTaskDispatcher.ConcurrentQueue.Count > 2)
+					{
+						AddWaiter();
+					}
+					else
+					{
+						manualResetEvent.Set();
+					}
+				}, "WaitForComplete");
+			}
+
+			AddWaiter();
+			await manualResetEvent.WaitHandle.WaitOneAsync(TimeSpan.MaxValue);
 		}
 
 		/// <summary>
@@ -146,9 +179,12 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		{
 			if (ErrorMapper != null)
 			{
-				foreach (var errorMap in ErrorMapper)
+				using (var async = AsyncHelper.Wait)
 				{
-					ValidateAsync(errorMap.Key);
+					foreach (var errorMap in ErrorMapper)
+					{
+						async.Run(ValidateAsync(errorMap.Key));
+					}
 				}
 			}
 		}
@@ -158,28 +194,28 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		/// </summary>
 		/// <typeparam name="TProp">The type of the property.</typeparam>
 		/// <param name="property">The property.</param>
-		public void ScheduleErrorUpdate<TProp>(Expression<Func<TProp>> property)
+		public async Task ScheduleErrorUpdate<TProp>(Expression<Func<TProp>> property)
 		{
 			// ReSharper disable once ExplicitCallerInfoArgument
-			ScheduleErrorUpdate(GetPropertyName(property));
+			await ScheduleErrorUpdate(GetPropertyName(property));
 		}
 
 		/// <summary>
 		///   Schedules a new Update for the Property
 		/// </summary>
 		/// <param name="propertyName"></param>
-		public void ScheduleErrorUpdate([CallerMemberName] string propertyName = null)
+		public async Task ScheduleErrorUpdate([CallerMemberName] string propertyName = null)
 		{
 			if (propertyName != null && ErrorMapper.ContainsKey(propertyName))
 			{
-				ValidateAsync(propertyName);
+				await ValidateAsync(propertyName);
 			}
 		}
 
 		private void AsyncErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
+			AsyncHelper.WaitSingle(ScheduleErrorUpdate(e.PropertyName));
 			// ReSharper disable once ExplicitCallerInfoArgument
-			ScheduleErrorUpdate(e.PropertyName);
 		}
 
 		/// <summary>
@@ -191,7 +227,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			ErrorsChanged?.Invoke(this, e);
 		}
 
-		private void RunAsyncTask(Func<IValidation[]> gerValidations,
+		private void RunAsyncTask(Func<Task<IValidation[]>> gerValidations,
 			AsyncRunState validation2Key,
 			Action<IValidation[]> then,
 			string key)
@@ -203,7 +239,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 					{
 						_errorTaskDispatcher.TryAdd(() =>
 						{
-							var exec = gerValidations();
+							var exec = AsyncHelper.WaitSingle(gerValidations());
 							BeginThreadSaveAction(() => { then(exec); });
 						}, key);
 					}
@@ -216,14 +252,14 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				case AsyncRunState.CurrentPlusOne:
 					_errorTaskDispatcher.TryAdd(() =>
 					{
-						var exec = gerValidations();
+						var exec = AsyncHelper.WaitSingle(gerValidations());
 						BeginThreadSaveAction(() => { then(exec); });
 					}, key);
 					break;
 				case AsyncRunState.OnlyOnePerTime:
 					_errorTaskDispatcher.TryAdd(() =>
 					{
-						var exec = gerValidations();
+						var exec = AsyncHelper.WaitSingle(gerValidations());
 						BeginThreadSaveAction(() => { then(exec); });
 					}, key, 1);
 					break;
@@ -243,11 +279,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			}
 
 			handler.HandleUneffected(newErrors, processed);
-
-			lock (_lockRoot)
-			{
-				_workerCount -= processed.Length;
-			}
+			Interlocked.Add(ref _workerCount, processed.Length * -1);
 
 			BeginThreadSaveAction(() =>
 			{
@@ -267,17 +299,20 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				validation.Select(f => f.GetHashCode().ToString()).Aggregate((e, f) => e + f));
 		}
 
-		private void RunSync(IValidation[] validation)
+		private async Task RunSync(IValidation[] validation)
 		{
-			HandleErrors(ObManage(validation, this), validation);
+			HandleErrors(await ObManage(validation, this), validation);
 		}
 
 		private void RunSyncToDispatcher(IValidation[] validation)
 		{
-			BeginThreadSaveAction(() => { RunSync(validation); });
+			BeginThreadSaveAction(() =>
+			{
+				AsyncHelper.WaitSingle(RunSync(validation));
+			});
 		}
 
-		private void RunAuto(IValidation[] validation, AsyncRunState validation2Key)
+		private async Task RunAuto(IValidation[] validation, AsyncRunState validation2Key)
 		{
 			if (Thread.CurrentThread == Dispatcher.Thread)
 			{
@@ -285,11 +320,11 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			}
 			else
 			{
-				RunSync(validation);
+				await RunSync(validation);
 			}
 		}
 
-		private void HandleErrorEnumeration(IEnumerable<IValidation> elements, AsyncState asyncState,
+		private async Task HandleErrorEnumeration(IEnumerable<IValidation> elements, AsyncState asyncState,
 			AsyncRunState asyncRunState)
 		{
 			switch (asyncState)
@@ -301,7 +336,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				}
 				case AsyncState.Sync:
 				{
-					RunSync(elements.ToArray());
+					await RunSync(elements.ToArray());
 					break;
 				}
 				case AsyncState.SyncToDispatcher:
@@ -311,7 +346,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				}
 				case AsyncState.NoPreference:
 				{
-					RunAuto(elements.ToArray(), asyncRunState);
+					await RunAuto(elements.ToArray(), asyncRunState);
 					break;
 				}
 				case AsyncState.Async:
@@ -328,7 +363,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			}
 		}
 
-		private void ValidateAsync(string propertyName)
+		private async Task ValidateAsync(string propertyName)
 		{
 			HashSet<IValidation> errorJob;
 
@@ -340,17 +375,14 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			errorJob.Clear();
 
 			var errors = ProduceValidations(propertyName).ToList();
-			lock (_lockRoot)
-			{
-				_workerCount += errors.Count;
-			}
+			Interlocked.Add(ref _workerCount, errors.Count);
 
 			BeginThreadSaveAction(() => SendPropertyChanged(() => IsValidating));
 
 			var nonAsync = errors.Where(f => !(f is IAsyncValidation)).ToArray();
 			if (nonAsync.Any())
 			{
-				HandleErrorEnumeration(nonAsync, AsyncValidationOption.AsyncState, AsyncValidationOption.RunState);
+				await HandleErrorEnumeration(nonAsync, AsyncValidationOption.AsyncState, AsyncValidationOption.RunState);
 			}
 
 			foreach (
@@ -359,7 +391,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			{
 				foreach (var validation2 in validation.GroupBy(f => f.RunState))
 				{
-					HandleErrorEnumeration(validation2, validation.Key, validation2.Key);
+					await HandleErrorEnumeration(validation2, validation.Key, validation2.Key);
 				}
 			}
 		}

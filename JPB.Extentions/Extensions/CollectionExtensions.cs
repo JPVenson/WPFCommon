@@ -30,9 +30,14 @@ namespace JPB.Extentions.Extensions
         public static void RemoveWhere<T>(this IList<T> source, Func<T, bool> predicate)
         {
             if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            {
+	            throw new ArgumentNullException(nameof(source));
+            }
+
             if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
+            {
+	            throw new ArgumentNullException(nameof(predicate));
+            }
 
             var elements = source.Where(predicate).ToArray();
 

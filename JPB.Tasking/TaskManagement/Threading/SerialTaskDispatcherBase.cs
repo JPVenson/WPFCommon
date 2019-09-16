@@ -163,7 +163,9 @@ namespace JPB.Tasking.TaskManagement.Threading
 			{
 				_continiusWorker.Set();
 				if (_isWorking)
+				{
 					return;
+				}
 
 				_isWorking = true;
 				_thread = new Thread(() =>

@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,6 +13,28 @@ using JetBrains.Annotations;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
+	internal class NotificationCollector : IDisposable
+	{
+		private readonly ViewModelBase _vm;
+
+		public NotificationCollector(ViewModelBase vm)
+		{
+			Notifications = new HashSet<string>();
+			_vm = vm;
+		}
+
+		public HashSet<string> Notifications { get; private set; }
+
+		public void Dispose()
+		{
+			_vm.DeferredNotification = null;
+			foreach (var notification in Notifications)
+			{
+				_vm.SendPropertyChanged(notification);
+			}
+		}
+	}
+
 	/// <summary>
 	///     Base MVVM View-Model
 	/// </summary>
@@ -29,6 +52,29 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public ViewModelBase()
 		{
+		}
+
+		internal NotificationCollector DeferredNotification { get; set; }
+
+		/// <summary>
+		///		Can be used to Defer all calls of INotifyProperty changed until the returned IDisposable is Disposed
+		/// </summary>
+		/// <returns></returns>
+		public IDisposable DeferNotification()
+		{
+			if (DeferredNotification != null)
+			{
+				return DeferredNotification;
+			}
+			return DeferredNotification = new NotificationCollector(this);
+		}
+		/// <summary>
+		///		Resumes the Notification push
+		/// </summary>
+		/// <returns></returns>
+		public void ResumeNotification()
+		{
+			DeferredNotification?.Dispose();
 		}
 
 		/// <summary>
@@ -102,6 +148,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		[PublicAPI]
 		protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
 		{
+			if (DeferredNotification != null)
+			{
+				DeferredNotification.Notifications.Add(e.PropertyName);
+				return;
+			}
+
 			var handler = PropertyChanged;
 			if (handler != null)
 			{

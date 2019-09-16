@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using JPB.ErrorValidation.ValidationRules;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.ErrorValidation.ViewModelProvider;
@@ -121,9 +122,9 @@ namespace WpfApplication1
 					s => s.ToValidationString != null && s.ToValidationString.Length > 5)));
 			Add(new Error<TestWindowViewModel>("Must be Int", "ToValidationString",
 				s => !int.TryParse(s.ToValidationString, out vc_attributes)));
-			Add(new AsyncError<TestWindowViewModel>("Wait", "ToValidationString", s =>
+			Add(new AsyncError<TestWindowViewModel>("Wait", "ToValidationString", async s =>
 			{
-				Thread.Sleep(1000);
+				await Task.Delay(1000);
 				return false;
 			})
 			{

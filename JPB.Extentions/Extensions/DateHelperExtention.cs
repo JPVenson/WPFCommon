@@ -22,7 +22,9 @@ namespace JPB.Extentions.Extensions
                     currentCulture.DateTimeFormat.CalendarWeekRule,
                     currentCulture.DateTimeFormat.FirstDayOfWeek);
                 if (testCalendarWeek == 2)
-                    calendarWeek = 1;
+                {
+	                calendarWeek = 1;
+                }
             }
 
             //var year = date.Year;

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using JPB.ErrorValidation.ValidationTyps;
+using JPB.Tasking.TaskManagement;
 using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ViewModelProvider
@@ -32,7 +34,6 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			ValidateSelf
 		}
 
-		private string _error;
 		private IErrorCollectionBase _userErrors;
 
 		protected ErrorProviderBase(Dispatcher dispatcher, IErrorCollectionBase errors)
@@ -120,7 +121,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		[Browsable(false)]
 		public IValidation[] GetError(string columnName, object obj)
 		{
-			return ObManage(columnName, obj);
+			return AsyncHelper.WaitSingle(ObManage(columnName, obj));
 		}
 
 		private void InitErrorProvider(IErrorCollectionBase errors)
@@ -144,9 +145,9 @@ namespace JPB.ErrorValidation.ViewModelProvider
 
 		private void HandleUnboundProperties(string propName)
 		{
-			ObManage(
+			AsyncHelper.WaitSingle(ObManage(
 				UserErrors.Where(f =>
-					f.Unbound && (string.IsNullOrWhiteSpace(propName) || f.ErrorIndicator.Contains(propName))), this);
+					f.Unbound && (string.IsNullOrWhiteSpace(propName) || f.ErrorIndicator.Contains(propName))), this));
 		}
 
 		/// <summary>
@@ -166,7 +167,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		/// <param name="errorIndicator"></param>
 		/// <param name="obj"></param>
 		/// <returns></returns>
-		protected IValidation[] ObManage(string errorIndicator, object obj)
+		protected Task<IValidation[]> ObManage(string errorIndicator, object obj)
 		{
 			return ObManage(ProduceValidations(errorIndicator), obj);
 		}
@@ -187,7 +188,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		/// <param name="errorsForField"></param>
 		/// <param name="obj"></param>
 		/// <returns></returns>
-		protected IValidation[] ObManage(IEnumerable<IValidation> errorsForField, object obj)
+		protected async Task<IValidation[]> ObManage(IEnumerable<IValidation> errorsForField, object obj)
 		{
 			if (!Validate)
 			{
@@ -208,7 +209,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 				case ValidationLogic.RunThroughAll:
 					foreach (var error in forField)
 					{
-						if (ManageValidationRule(obj, error))
+						if (await ManageValidationRule(obj, error))
 						{
 							errorsOfThisRun.Add(error);
 						}
@@ -218,7 +219,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 				case ValidationLogic.BreakAtFirstFail:
 					foreach (var item in forField)
 					{
-						if (ManageValidationRule(obj, item))
+						if (await ManageValidationRule(obj, item))
 						{
 							errorsOfThisRun.Add(item);
 							break;
@@ -241,7 +242,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			{
 				foreach (var error in forField.Except(errorsOfThisRun).Where(s => ActiveValidationCases.Contains(s)))
 				{
-					if (ManageValidationRule(obj, error))
+					if (await ManageValidationRule(obj, error))
 					{
 						errorsOfThisRun.Add(error);
 					}
@@ -255,12 +256,21 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			return errorsOfThisRun.ToArray();
 		}
 
-		protected bool ManageValidationRule(object obj, IValidation item)
+		protected async Task<bool> ManageValidationRule(object obj, IValidation item)
 		{
 			bool isError;
 			try
 			{
-				isError = item.Condition(obj);
+				if (item is IAsyncValidation asyncValidation)
+				{
+					var asyncValidationAsyncCondition = asyncValidation.AsyncCondition(obj);
+					isError = await asyncValidationAsyncCondition || asyncValidationAsyncCondition.IsFaulted;
+
+				}
+				else
+				{
+					isError = item.Condition(obj);
+				}
 			}
 			catch (Exception)
 			{

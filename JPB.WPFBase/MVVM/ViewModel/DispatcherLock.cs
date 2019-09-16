@@ -16,7 +16,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		private readonly Dispatcher _currentDispatcher;
-
+		
 		internal static AsyncLocal<DispatcherLock> Current;
 
 		/// <summary>

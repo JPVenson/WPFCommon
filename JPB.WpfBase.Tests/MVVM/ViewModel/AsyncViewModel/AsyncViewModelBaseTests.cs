@@ -83,7 +83,9 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.AsyncViewModel
 		public static Task WaitOneAsync(WaitHandle waitHandle, Action then)
 		{
 			if (waitHandle == null)
+			{
 				throw new ArgumentNullException("waitHandle");
+			}
 
 			var tcs = new TaskCompletionSource<bool>();
 			var rwh = ThreadPool.RegisterWaitForSingleObject(waitHandle,

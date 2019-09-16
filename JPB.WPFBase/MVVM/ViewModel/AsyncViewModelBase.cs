@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using JetBrains.Annotations;
@@ -34,7 +35,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		protected AsyncViewModelBase(Dispatcher dispatcher)
 			: base(dispatcher)
 		{
-			Dispatcher.ShutdownStarted += DispatcherShutdownStarted;
+			WeakEventManager<Dispatcher, EventArgs>.AddHandler(Dispatcher, "ShutdownStarted", DispatcherShutdownStarted);
 			Init();
 		}
 
@@ -435,7 +436,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			if (task != null)
 			{
-				lock (_namedTasks)
+				lock (Lock)
 				{
 					_namedTasks.Add(new Tuple<string, Task>(taskName, task));
 				}
@@ -474,7 +475,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 			finally
 			{
-				lock (_namedTasks)
+				lock (Lock)
 				{
 					var fod = _namedTasks.FirstOrDefault(e => e.Item1 == taskName);
 					_namedTasks.Remove(fod);

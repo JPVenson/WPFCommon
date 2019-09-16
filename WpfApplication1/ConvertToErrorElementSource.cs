@@ -43,12 +43,24 @@ namespace WpfApplication1
             if (Type == null)
             {
                 IXamlTypeResolver typeResolver = serviceProvider.GetService(typeof(IXamlTypeResolver)) as IXamlTypeResolver;
-                if (typeResolver == null) throw new InvalidOperationException("EDF Type markup extension used without XAML context");
-                if (TypeName == null) throw new InvalidOperationException("EDF Type markup extension used without Type or TypeName");
+                if (typeResolver == null)
+                {
+	                throw new InvalidOperationException("EDF Type markup extension used without XAML context");
+                }
+
+                if (TypeName == null)
+                {
+	                throw new InvalidOperationException("EDF Type markup extension used without Type or TypeName");
+                }
+
                 Type = ResolveGenericTypeName(TypeName, (name) =>
                 {
                     Type result = typeResolver.Resolve(name);
-                    if (result == null) throw new Exception("EDF Type markup extension could not resolve type " + name);
+                    if (result == null)
+                    {
+	                    throw new Exception("EDF Type markup extension could not resolve type " + name);
+                    }
+
                     return result;
                 });
             }
@@ -58,7 +70,9 @@ namespace WpfApplication1
         public static Type ResolveGenericTypeName(string name, Func<string, Type> resolveSimpleName)
         {
             if (name.Contains('{'))
-                name = name.Replace('{', '<').Replace('}', '>');  // Note:  For convenience working with XAML, we allow {} instead of <> for generic type parameters
+            {
+	            name = name.Replace('{', '<').Replace('}', '>');  // Note:  For convenience working with XAML, we allow {} instead of <> for generic type parameters
+            }
 
             if (name.Contains('<'))
             {
@@ -72,7 +86,9 @@ namespace WpfApplication1
                     string genericTypeName = match.Groups["genericTypeName"].Value + "`" + typeArgs.Length;
                     Type genericType = resolveSimpleName(genericTypeName);
                     if (genericType != null && !typeArgs.Contains(null))
-                        return genericType.MakeGenericType(typeArgs);
+                    {
+	                    return genericType.MakeGenericType(typeArgs);
+                    }
                 }
             }
             return resolveSimpleName(name);

@@ -75,11 +75,17 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
         public string ParsexQuestionText(object input)
         {
             if (!(input is string))
-                throw new ArgumentException("Can not parse text!");
+            {
+	            throw new ArgumentException("Can not parse text!");
+            }
+
             var text = (input as string);
             string lowertext = text.ToLower();
             if (!lowertext.Contains("#q"))
-                throw new ArgumentException("Can not parse text!");
+            {
+	            throw new ArgumentException("Can not parse text!");
+            }
+
             List<string> allquestions = text.Split(new[] { "#Q", "#q" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             text = allquestions.ElementAt(0);
             allquestions.RemoveAt(0);

@@ -5,6 +5,13 @@ using JPB.ErrorValidation.ValidationTyps;
 namespace JPB.ErrorValidation.ValidationRules
 {
 	/// <summary>
+	///		Defines a collection that is left empty
+	/// </summary>
+	public class NoErrors : ErrorCollection<object>
+	{
+	}
+
+	/// <summary>
 	///     Defines a simple Collection of Errors where duplicates can occur
 	/// </summary>
 	public class ErrorCollection : ErrorCollectionWrapper

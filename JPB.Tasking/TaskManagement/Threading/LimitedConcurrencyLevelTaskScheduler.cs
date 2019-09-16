@@ -26,7 +26,11 @@ namespace JPB.Tasking.TaskManagement.Threading
         // Creates a new instance with the specified degree of parallelism.  
         public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
         {
-            if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException("maxDegreeOfParallelism");
+            if (maxDegreeOfParallelism < 1)
+            {
+	            throw new ArgumentOutOfRangeException("maxDegreeOfParallelism");
+            }
+
             _maxDegreeOfParallelism = maxDegreeOfParallelism;
         }
 
@@ -91,23 +95,37 @@ namespace JPB.Tasking.TaskManagement.Threading
         protected override sealed bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
         {
             // If this thread isn't already processing a task, we don't support inlining 
-            if (!_currentThreadIsProcessingItems) return false;
+            if (!_currentThreadIsProcessingItems)
+            {
+	            return false;
+            }
 
             // If the task was previously queued, remove it from the queue 
             if (taskWasPreviouslyQueued)
                 // Try to run the task.  
-                if (TryDequeue(task))
-                    return base.TryExecuteTask(task);
-                else
-                    return false;
+            {
+	            if (TryDequeue(task))
+	            {
+		            return base.TryExecuteTask(task);
+	            }
+	            else
+	            {
+		            return false;
+	            }
+            }
             else
-                return base.TryExecuteTask(task);
+            {
+	            return base.TryExecuteTask(task);
+            }
         }
 
         // Attempt to remove a previously scheduled task from the scheduler.  
         protected override sealed bool TryDequeue(Task task)
         {
-            lock (_tasks) return _tasks.Remove(task);
+            lock (_tasks)
+            {
+	            return _tasks.Remove(task);
+            }
         }
 
         // Gets the maximum concurrency level supported by this scheduler.  
@@ -123,12 +141,21 @@ namespace JPB.Tasking.TaskManagement.Threading
             try
             {
                 Monitor.TryEnter(_tasks, ref lockTaken);
-                if (lockTaken) return _tasks;
-                else throw new NotSupportedException();
+                if (lockTaken)
+                {
+	                return _tasks;
+                }
+                else
+                {
+	                throw new NotSupportedException();
+                }
             }
             finally
             {
-                if (lockTaken) Monitor.Exit(_tasks);
+                if (lockTaken)
+                {
+	                Monitor.Exit(_tasks);
+                }
             }
         }
     }

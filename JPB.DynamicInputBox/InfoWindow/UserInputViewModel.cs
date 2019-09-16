@@ -96,13 +96,23 @@ namespace JPB.DynamicInputBox.InfoWindow
             {
                 _index = value;
                 if (Index + 1 < InputQuestions.Count)
-                    ContinueText = Localisation["GoTo"] + (Index + 1);
+                {
+	                ContinueText = Localisation["GoTo"] + (Index + 1);
+                }
                 else
-                    ContinueText = Localisation["Quit"];
+                {
+	                ContinueText = Localisation["Quit"];
+                }
+
                 if ((Index - 1) >= 0)
-                    PreviousText = Localisation["GoTo"] + (Index - 1);
+                {
+	                PreviousText = Localisation["GoTo"] + (Index - 1);
+                }
                 else
-                    PreviousText = Localisation["Back"];
+                {
+	                PreviousText = Localisation["Back"];
+                }
+
                 SendPropertyChanged(() => Index);
             }
         }
@@ -169,14 +179,22 @@ namespace JPB.DynamicInputBox.InfoWindow
             var vm = SelectedStep.DataContext as IQuestionAbstrViewModelBase;
 
             if (Returnlist.Invoke().Count > Index)
-                Returnlist.Invoke()[Index] = (vm.Input);
+            {
+	            Returnlist.Invoke()[Index] = (vm.Input);
+            }
             else
-                Returnlist.Invoke().Add(vm.Input);
+            {
+	            Returnlist.Invoke().Add(vm.Input);
+            }
 
             if (Index + 1 >= InputQuestions.Count)
-                AbortCommand.Execute(null);
+            {
+	            AbortCommand.Execute(null);
+            }
             else
-                MoveNext();
+            {
+	            MoveNext();
+            }
         }
 
         /// <summary>
@@ -202,9 +220,14 @@ namespace JPB.DynamicInputBox.InfoWindow
         {
             var vm = ((IQuestionAbstrViewModelBase)SelectedStep.DataContext);
             if (Returnlist.Invoke().Count > Index)
-                Returnlist.Invoke()[Index] = (vm.Input);
+            {
+	            Returnlist.Invoke()[Index] = (vm.Input);
+            }
             else
-                Returnlist.Invoke().Add(vm.Input);
+            {
+	            Returnlist.Invoke().Add(vm.Input);
+            }
+
             MoveBack();
         }
 
@@ -261,7 +284,9 @@ namespace JPB.DynamicInputBox.InfoWindow
         private void Abort(object sender)
         {
             if (!IsClosing)
-                _abort.Invoke();
+            {
+	            _abort.Invoke();
+            }
         }
 
         /// <summary>

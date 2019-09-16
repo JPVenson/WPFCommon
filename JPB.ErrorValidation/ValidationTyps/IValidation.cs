@@ -29,7 +29,7 @@ namespace JPB.ErrorValidation.ValidationTyps
 		///		Set this to true to simulate a Virtual call the the underlying Error provider.
 		///		Unbound Properties are only executed when Explicitly called by the INotifyPropertyChanged event
 		/// </summary>
-		bool Unbound { get; set; }
+		bool Unbound { get; }
 	}
 
 	public interface IValidation<T> : IValidation

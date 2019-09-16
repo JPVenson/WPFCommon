@@ -24,7 +24,9 @@ namespace JPB.DynamicInputBox.InfoWindow
             for (int i = 0; i < source.Count(); i++)
             {
                 if (element.Equals(source.ElementAt(i)))
-                    return i;
+                {
+	                return i;
+                }
             }
             return -1;
         }
@@ -42,9 +44,15 @@ namespace JPB.DynamicInputBox.InfoWindow
 
             if (!(item == null))
             {
-                if (list != null) list.Add(item);
+                if (list != null)
+                {
+	                list.Add(item);
+                }
             }
-            else if (list1 != null) list1.Add(new T());
+            else if (list1 != null)
+            {
+	            list1.Add(new T());
+            }
         }
 
         /// <summary cref="Can be Null">
@@ -151,21 +159,37 @@ namespace JPB.DynamicInputBox.InfoWindow
             Func<T, IEnumerable<T>> additionalAddingAction)
         {
             if (SelectetItem == null)
-                return default(T);
+            {
+	            return default(T);
+            }
+
             T buff = sourcelist.FirstOrDefault(s => s.Equals(SelectetItem));
             int index = sourcelist.IndexOf(buff);
             if (buff == null && index != -1)
-                throw new ArgumentException("Not found");
+            {
+	            throw new ArgumentException("Not found");
+            }
+
             sourcelist = additionalAddingAction.Invoke(buff);
             T buffer = default(T);
             if (!sourcelist.Any())
-                return buffer;
+            {
+	            return buffer;
+            }
+
             if (index == sourcelist.Count())
-                buffer = sourcelist.Last();
+            {
+	            buffer = sourcelist.Last();
+            }
             else if (index == 0)
-                buffer = sourcelist.Last();
+            {
+	            buffer = sourcelist.Last();
+            }
             else if (index <= sourcelist.Count())
-                buffer = sourcelist.ElementAt(index);
+            {
+	            buffer = sourcelist.ElementAt(index);
+            }
+
             return buffer;
         }
 
@@ -194,22 +218,36 @@ namespace JPB.DynamicInputBox.InfoWindow
             int index = -1;
             for (int i = 0; i < sourcelist.Count; i++)
             {
-                if (sourcelist.ElementAt(i).Equals(Selectetitem)) continue;
+                if (sourcelist.ElementAt(i).Equals(Selectetitem))
+                {
+	                continue;
+                }
+
                 index = i;
                 buff = sourcelist.ElementAt(index);
                 break;
             }
 
             if (buff == null || index == -1)
-                throw new ArgumentException("Not found");
+            {
+	            throw new ArgumentException("Not found");
+            }
+
             sourcelist.Remove(buff);
             T buffer = default(T);
             if (index == sourcelist.Count())
-                buffer = sourcelist.Last();
+            {
+	            buffer = sourcelist.Last();
+            }
             else if (index == 0)
-                buffer = sourcelist.Last();
+            {
+	            buffer = sourcelist.Last();
+            }
             else if (index <= sourcelist.Count())
-                buffer = sourcelist.ElementAt(index);
+            {
+	            buffer = sourcelist.ElementAt(index);
+            }
+
             Selectetitem = buffer;
         }
 
@@ -232,23 +270,38 @@ namespace JPB.DynamicInputBox.InfoWindow
         public static T RemoveAndSetSelectetItem<T>(this ICollection<T> sourcelist, T Selectetitem, bool SetToLast)
         {
             if (Selectetitem == null)
-                return default(T);
+            {
+	            return default(T);
+            }
+
             T buff = sourcelist.FirstOrDefault(s => s.Equals(Selectetitem));
             if (buff == null)
-                throw new ArgumentException("Not found");
+            {
+	            throw new ArgumentException("Not found");
+            }
+
             sourcelist.Remove(buff);
             T buffer = default(T);
             if (sourcelist.IndexOf(buff) < sourcelist.Count && SetToLast && sourcelist.Any())
-                buffer = sourcelist.Last();
+            {
+	            buffer = sourcelist.Last();
+            }
+
             return buffer;
         }
 
         public static T RemoveAndSetSelectetItem<T>(this ICollection<T> sourcelist, IEnumerable<T> listtoremove)
         {
             if (listtoremove == null && !listtoremove.Any())
-                return default(T);
+            {
+	            return default(T);
+            }
+
             foreach (T item in listtoremove)
-                sourcelist.Remove(item);
+            {
+	            sourcelist.Remove(item);
+            }
+
             return sourcelist.Last();
         }
 
@@ -257,9 +310,15 @@ namespace JPB.DynamicInputBox.InfoWindow
             Action<T> additionalAddingAction)
         {
             if (listtoremove == null && !listtoremove.Any())
-                return default(T);
+            {
+	            return default(T);
+            }
+
             foreach (T item in listtoremove)
-                additionalAddingAction(item);
+            {
+	            additionalAddingAction(item);
+            }
+
             return sourcelist.Last();
         }
     }

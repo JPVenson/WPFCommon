@@ -36,7 +36,10 @@ namespace JPB.DynamicInputBox.InfoWindow.IQuestionModelImp
             if (!(Question is IWaiterWrapper<object>))
             {
                 if (!(Question is Func<object>))
-                    throw new ArgumentException("can not parse parameter");
+                {
+	                throw new ArgumentException("can not parse parameter");
+                }
+
                 Question = PreEncapsulateAction(Question as Func<object>);
             }
         }

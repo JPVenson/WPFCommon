@@ -60,9 +60,15 @@ namespace JPB.DynamicInputBox
         public static T ReparseList<T>(IEnumerable<T> input, object selected)
         {
             if (selected is IListBoxItemWrapper)
-                return input.ElementAt((selected as IListBoxItemWrapper).Index);
+            {
+	            return input.ElementAt((selected as IListBoxItemWrapper).Index);
+            }
+
             if (selected is IEnumerable<IListBoxItemWrapper>)
-                return input.ElementAt((selected as IEnumerable<IListBoxItemWrapper>).First().Index);
+            {
+	            return input.ElementAt((selected as IEnumerable<IListBoxItemWrapper>).First().Index);
+            }
+
             return default(T);
         }
 
@@ -71,7 +77,10 @@ namespace JPB.DynamicInputBox
             var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns,
                 new List<InputMode> { InputMode.ShowProgress }))
-                return returns.FirstOrDefault();
+            {
+	            return returns.FirstOrDefault();
+            }
+
             return null;
         }
 
@@ -80,7 +89,10 @@ namespace JPB.DynamicInputBox
             var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns,
                 new List<InputMode> { InputMode.ShowProgress }))
-                return returns.FirstOrDefault();
+            {
+	            return returns.FirstOrDefault();
+            }
+
             return null;
         }
 
@@ -88,7 +100,10 @@ namespace JPB.DynamicInputBox
         {
             var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns, new List<InputMode> { InputMode.Text }))
-                return returns.FirstOrDefault() as string;
+            {
+	            return returns.FirstOrDefault() as string;
+            }
+
             return null;
         }
 
@@ -132,7 +147,10 @@ namespace JPB.DynamicInputBox
             IWaiterWrapper<T> wrapper = new WaiterWrapperImpl<T>(values, header);
             var showInput = ShowInput<T>(wrapper);
             if (showInput is T)
-                return (T)showInput;
+            {
+	            return (T)showInput;
+            }
+
             return default(T);
         }
 
@@ -142,7 +160,10 @@ namespace JPB.DynamicInputBox
         {
             var returns = new ObservableCollection<object>();
             if (WindowThread(new List<object> { inputQuestion }, () => returns, new List<InputMode> { modus }))
-                return returns.FirstOrDefault();
+            {
+	            return returns.FirstOrDefault();
+            }
+
             return null;
         }
 
