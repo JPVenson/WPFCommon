@@ -57,7 +57,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				lock (Lock)
 				{
-					return _namedTasks.AsReadOnly();
+					return _namedTasks.ToArray();
 				}
 			}
 		}
