@@ -325,6 +325,9 @@
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\WeakMementoDataStamp.cs">
       <Link>MVVM\ViewModel\Memento\WeakMementoDataStamp.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\NotificationCollector.cs">
+      <Link>MVVM\ViewModel\NotificationCollector.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveObservableCollection.cs">
       <Link>MVVM\ViewModel\ThreadSaveObservableCollection.cs</Link>
     </Compile>
@@ -333,6 +336,9 @@
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ViewModelBase.cs">
       <Link>MVVM\ViewModel\ViewModelBase.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ViewModelBaseINPCCommonNames.cs">
+      <Link>MVVM\ViewModel\ViewModelBaseINPCCommonNames.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

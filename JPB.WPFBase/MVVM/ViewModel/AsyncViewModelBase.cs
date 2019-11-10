@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -26,7 +28,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	{
 		private const string AnonymousTask = "AnonymousTask";
 
-		private List<Tuple<string, Task>> _namedTasks;
+		private IList<Tuple<string, Task>> _namedTasks;
 
 		/// <summary>
 		///     Creates a new <c>AsyncViewModelBase</c> with the given Dispatcher
@@ -35,7 +37,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		protected AsyncViewModelBase(Dispatcher dispatcher)
 			: base(dispatcher)
 		{
-			WeakEventManager<Dispatcher, EventArgs>.AddHandler(Dispatcher, "ShutdownStarted", DispatcherShutdownStarted);
+			WeakEventManager<Dispatcher, EventArgs>
+				.AddHandler(Dispatcher, "ShutdownStarted", DispatcherShutdownStarted);
 			Init();
 		}
 
@@ -161,7 +164,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		protected virtual void StartWork()
 		{
-			IsWorking = true;
+			lock (Lock)
+			{
+				IsWorking = _namedTasks.Count > 0;
+			}
 		}
 
 		/// <summary>
@@ -169,11 +175,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		protected virtual void EndWork()
 		{
-			IsWorking = TaskList.Any();
+			lock (Lock)
+			{
+				IsWorking = _namedTasks.Count > 0;
+			}
 		}
 
 		/// <summary>
-		///     Override this to handle exceptions thrown by any Task worker function
+		///     Override this to handle exceptions thrown by any Task worker function.
+		///		If Returns true the exception will not be bubbled to its originator context.
 		/// </summary>
 		/// <param name="exception"></param>
 		/// <returns>
@@ -448,7 +458,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					StartWork();
 				}
 
-				task.ContinueWith(s => GeneralContinue(s, continueWith, taskName, setWorking), TaskContinuationOptions.AttachedToParent);
+				var executionContext = ExecutionContext.Capture();
+				task.ContinueWith(s => 
+					GeneralContinue(s, 
+						continueWith, 
+						taskName,
+						executionContext,
+						setWorking
+					), 
+					TaskContinuationOptions.AttachedToParent);
 				OnTaskCreated(task);
 
 				return task;
@@ -457,7 +475,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			return null;
 		}
 
-		private void GeneralContinue(Task s, Action<Task> continueWith, string taskName, bool setWOrking = true)
+		private void GeneralContinue(Task s, Action<Task> continueWith, 
+			string taskName,
+			ExecutionContext executionContext,
+			bool setWorking)
 		{
 			try
 			{
@@ -467,8 +488,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					{
 						return;
 					}
-
-					s.Exception?.Handle(OnTaskException);
+					ExecutionContext.Run(executionContext, state =>
+					{
+						var ex = state as AggregateException;
+						ex?.Handle(OnTaskException);
+					}, s.Exception);
 				}
 
 				continueWith?.Invoke(s);
@@ -481,7 +505,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					_namedTasks.Remove(fod);
 				}
 
-				if (setWOrking)
+				if (setWorking)
 				{
 					EndWork();
 				}
@@ -514,7 +538,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <summary>
 		///		The scope for Awaiting multiple Tasks
 		/// </summary>
-		/// <seealso cref="System.Collections.Generic.IEnumerable{System.Threading.Tasks.Task}" />
+		/// <seealso cref="Task" />
 		/// <seealso cref="System.IDisposable" />
 		public class AwaitMultiple : IEnumerable<Task>, IDisposable
 		{

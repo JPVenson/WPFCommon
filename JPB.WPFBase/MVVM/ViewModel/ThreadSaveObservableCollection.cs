@@ -28,7 +28,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	/// <typeparam name="T"></typeparam>
 	public class BindingListThreadSaveObservableCollection<T> : ThreadSaveObservableCollection<T>,
 		IBindingList
-
 	{
 		private readonly IList<PropertyDescriptor> _searchIndexes = new List<PropertyDescriptor>();
 

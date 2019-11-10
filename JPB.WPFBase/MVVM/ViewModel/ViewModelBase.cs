@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,28 +12,6 @@ using JetBrains.Annotations;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
-	internal class NotificationCollector : IDisposable
-	{
-		private readonly ViewModelBase _vm;
-
-		public NotificationCollector(ViewModelBase vm)
-		{
-			Notifications = new HashSet<string>();
-			_vm = vm;
-		}
-
-		public HashSet<string> Notifications { get; private set; }
-
-		public void Dispose()
-		{
-			_vm.DeferredNotification = null;
-			foreach (var notification in Notifications)
-			{
-				_vm.SendPropertyChanged(notification);
-			}
-		}
-	}
-
 	/// <summary>
 	///     Base MVVM View-Model
 	/// </summary>
@@ -60,6 +37,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		///		Can be used to Defer all calls of INotifyProperty changed until the returned IDisposable is Disposed
 		/// </summary>
 		/// <returns></returns>
+		[NotNull]
+		[MustUseReturnValue]
+		[PublicAPI]
 		public IDisposable DeferNotification()
 		{
 			if (DeferredNotification != null)
@@ -68,10 +48,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 			return DeferredNotification = new NotificationCollector(this);
 		}
+
 		/// <summary>
 		///		Resumes the Notification push
 		/// </summary>
 		/// <returns></returns>
+		[PublicAPI]
 		public void ResumeNotification()
 		{
 			DeferredNotification?.Dispose();
@@ -85,8 +67,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns></returns>
 		[PublicAPI]
 		protected virtual bool RaiseAcceptPendingChange(
-			string propertyName,
-			object newValue)
+			[CanBeNull]string propertyName,
+			[CanBeNull]object newValue)
 		{
 			var e = new AcceptPendingChangeEventArgs(propertyName, newValue);
 			var handler = PendingChange;
@@ -150,7 +132,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			if (DeferredNotification != null)
 			{
-				DeferredNotification.Notifications.Add(e.PropertyName);
+				DeferredNotification.SendNotifications.Add(e.PropertyName);
 				return;
 			}
 

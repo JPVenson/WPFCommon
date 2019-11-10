@@ -285,7 +285,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 				return true;
 			}
 
-			//Error is Kown
+			//Error is known
 			if (ActiveValidationCases.Contains(item))
 			{
 				if (!isError)

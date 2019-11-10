@@ -31,6 +31,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// Shorthand for <code>DispatcherLock.CatpureDispatcher()</code>
 		/// </summary>
 		/// <returns></returns>
+		[PublicAPI]
+		[MustUseReturnValue]
 		protected IDisposable Catch()
 		{
 			return DispatcherLock.CaptureDispatcher();
@@ -60,7 +62,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		///		The action will be executed with <seealso cref="DispatcherPriority.DataBind"/>
 		/// </summary>
 		/// <param name="action">The action.</param>
-		public void ThreadSaveAction(Action action)
+		public void ThreadSaveAction([NotNull]Action action)
 		{
 			try
 			{
@@ -91,7 +93,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		///		The action will be executed with <seealso cref="DispatcherPriority.DataBind"/>
 		/// </summary>
 		/// <param name="action">The action.</param>
-		public DispatcherOperationLite BeginThreadSaveAction(Action action)
+		[CanBeNull]
+		[PublicAPI]
+		public DispatcherOperationLite BeginThreadSaveAction([NotNull]Action action)
 		{
 			if (Dispatcher.HasShutdownStarted)
 			{
