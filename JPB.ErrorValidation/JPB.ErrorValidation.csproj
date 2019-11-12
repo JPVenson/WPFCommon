@@ -54,6 +54,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorAggregator.cs" />
     <Compile Include="IErrorCollectionBase.cs" />
     <Compile Include="IErrorValidatorBase.cs" />
     <Compile Include="ValidationRules\ErrorCollectionWrapper.cs" />

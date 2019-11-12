@@ -4,7 +4,7 @@ using JPB.ErrorValidation.ValidationTyps;
 namespace JPB.ErrorValidation
 {
 	/// <summary>
-	///		A Generic not WPF related Interface for a Validator that can be loaded into the 
+	///		A Generic not WPF related Interface for a Validator
 	/// </summary>
 	public interface IErrorValidatorBase
 	{

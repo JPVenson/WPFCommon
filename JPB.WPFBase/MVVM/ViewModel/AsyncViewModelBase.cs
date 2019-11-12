@@ -28,7 +28,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	{
 		private const string AnonymousTask = "AnonymousTask";
 
-		private IList<Tuple<string, Task>> _namedTasks;
+		private IDictionary<Task, string> _namedTasks;
 
 		/// <summary>
 		///     Creates a new <c>AsyncViewModelBase</c> with the given Dispatcher
@@ -54,15 +54,18 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <summary>
 		///     A Collection of all currently running Tasks
 		/// </summary>
+		[Obsolete("Please use the Tasks list instead")]
 		protected IReadOnlyCollection<Tuple<string, Task>> TaskList
 		{
 			get
 			{
-				lock (Lock)
-				{
-					return _namedTasks.ToArray();
-				}
+				return _namedTasks.Select(f => Tuple.Create(f.Value, f.Key)).ToArray();
 			}
+		}
+
+		protected IDictionary<Task, string> Tasks
+		{
+			get { return _namedTasks; }
 		}
 
 		#region IsNotWorking property
@@ -95,7 +98,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </returns>
 		public bool this[string index]
 		{
-			get { return TaskList.All(s => s.Item1 != index); }
+			get { return Tasks.All(s => s.Value != index); }
 		}
 
 		/// <summary>
@@ -103,7 +106,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		protected void Init()
 		{
-			_namedTasks = new List<Tuple<string, Task>>();
+			_namedTasks = new ConcurrentDictionary<Task, string>();
 			AsyncViewModelBaseOptions = AsyncViewModelBaseOptions.DefaultOptions;
 		}
 
@@ -111,12 +114,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			try
 			{
-				foreach (var namedTask in TaskList)
+				foreach (var namedTask in Tasks)
 				{
-					if (namedTask.Item2.Status == TaskStatus.Running)
+					if (namedTask.Key.Status == TaskStatus.Running)
 					{
 #if !WINDOWS_UWP
-						namedTask.Item2.Dispose();
+						namedTask.Key.Dispose();
 #endif
 					}
 				}
@@ -164,10 +167,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		protected virtual void StartWork()
 		{
-			lock (Lock)
-			{
-				IsWorking = _namedTasks.Count > 0;
-			}
 		}
 
 		/// <summary>
@@ -175,10 +174,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		protected virtual void EndWork()
 		{
-			lock (Lock)
-			{
-				IsWorking = _namedTasks.Count > 0;
-			}
 		}
 
 		/// <summary>
@@ -446,26 +441,24 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			if (task != null)
 			{
-				lock (Lock)
-				{
-					_namedTasks.Add(new Tuple<string, Task>(taskName, task));
-				}
+				_namedTasks.Add(task, taskName);
 
 				SendPropertyChanged(() => IsWorkingTask);
 				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
 				if (setWorking)
 				{
-					StartWork();
+					IsWorking = _namedTasks.Count > 0;
 				}
+				StartWork();
 
 				var executionContext = ExecutionContext.Capture();
-				task.ContinueWith(s => 
-					GeneralContinue(s, 
-						continueWith, 
+				task.ContinueWith(s =>
+					GeneralContinue(task, s,
+						continueWith,
 						taskName,
 						executionContext,
 						setWorking
-					), 
+					),
 					TaskContinuationOptions.AttachedToParent);
 				OnTaskCreated(task);
 
@@ -475,16 +468,18 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			return null;
 		}
 
-		private void GeneralContinue(Task s, Action<Task> continueWith, 
+		private void GeneralContinue(Task sourceTask,
+			Task continueTask,
+			Action<Task> continueWith,
 			string taskName,
 			ExecutionContext executionContext,
 			bool setWorking)
 		{
 			try
 			{
-				if (s.IsFaulted)
+				if (continueTask.IsFaulted)
 				{
-					if (OnTaskException(s.Exception))
+					if (OnTaskException(continueTask.Exception))
 					{
 						return;
 					}
@@ -492,28 +487,45 @@ namespace JPB.WPFBase.MVVM.ViewModel
 					{
 						var ex = state as AggregateException;
 						ex?.Handle(OnTaskException);
-					}, s.Exception);
+					}, continueTask.Exception);
 				}
 
-				continueWith?.Invoke(s);
+				continueWith?.Invoke(continueTask);
 			}
 			finally
 			{
-				lock (Lock)
+				var couldRemove = false;
+				for (int i = 0; i < 3; i++)
 				{
-					var fod = _namedTasks.FirstOrDefault(e => e.Item1 == taskName);
-					_namedTasks.Remove(fod);
+					if (_namedTasks.Remove(sourceTask))
+					{
+						couldRemove = true;
+						break;
+					}
+				}
+
+				if (!couldRemove || _namedTasks.ContainsKey(sourceTask))
+				{
+					throw new InvalidOperationException("Could not remove the task from the list of all Tasks")
+					{
+						Data =
+						{
+							{"Task", sourceTask },
+							{"Key", taskName },
+						}
+					};
 				}
 
 				if (setWorking)
 				{
-					EndWork();
+					IsWorking = _namedTasks.Count > 0;
 				}
+				EndWork();
 
 				SendPropertyChanged(() => IsWorkingTask);
 				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
 
-				OnTaskDone(s);
+				OnTaskDone(continueTask);
 			}
 		}
 
@@ -615,7 +627,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </value>
 		public bool IsWorkingTask
 		{
-			get { return TaskList.Any(); }
+			get { return Tasks.Any(); }
 		}
 
 		#endregion
