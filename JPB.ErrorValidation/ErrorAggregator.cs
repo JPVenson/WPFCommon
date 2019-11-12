@@ -39,6 +39,15 @@ namespace JPB.ErrorValidation
 
 		private HashSet<WeakReference<INotifyDataErrorInfo>> Provider { get; set; }
 
+		public IEnumerable<INotifyDataErrorInfo> GetProvider()
+		{
+			return Provider.Select(f =>
+			{
+				f.TryGetTarget(out var target);
+				return target;
+			}).Where(e => e != null);
+		}
+
 		public IEnumerable GetErrors(string propertyName)
 		{
 			if (propertyName == nameof(ErrorBindingRoot))
@@ -75,8 +84,7 @@ namespace JPB.ErrorValidation
 					.Where(f => typeof(INotifyDataErrorInfo).IsAssignableFrom(f.PropertyType));
 				foreach (var propertyInfo in propertyInfos)
 				{
-					var notifyDataErrorInfo = propertyInfo.GetValue(item) as INotifyDataErrorInfo;
-					if (notifyDataErrorInfo != null)
+					if (propertyInfo.GetValue(item) is INotifyDataErrorInfo notifyDataErrorInfo)
 					{
 						stack.Push(notifyDataErrorInfo);
 					}
