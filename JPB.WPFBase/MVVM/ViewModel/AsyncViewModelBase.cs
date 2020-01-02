@@ -96,6 +96,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		///     when a task with the name of <paramref name="index" /> exists otherwise
 		///     <value>False</value>
 		/// </returns>
+
+		[Obsolete("Please use the Tasks list instead")]
 		public bool this[string index]
 		{
 			get { return Tasks.All(s => s.Value != index); }
@@ -151,15 +153,16 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			if (taskName == AnonymousTask)
 			{
-				return this[taskName];
+				return Tasks.Values.Any(e => e == taskName);
 			}
 
 			if (!taskName.StartsWith("Can"))
 			{
-				return this[taskName];
+				return Tasks.Values.Any(e => e == taskName);
 			}
 
-			return this[taskName.Remove(0, 3)];
+			taskName = taskName.Remove(0, 3);
+			return Tasks.Values.Any(e => e == taskName);
 		}
 
 		/// <summary>
@@ -730,12 +733,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		private Task<T> CreateNewAsyncTask<T>(Func<T> delegateTask)
 		{
-			var hasLock = DispatcherLock.Current;
+			var hasLock = DispatcherLock.Current?.Value;
 			return AsyncViewModelBaseOptions.TaskFactory.StartNew(() =>
 			{
 				if (hasLock != null)
 				{
-					DispatcherLock.Current = hasLock;
+					DispatcherLock.Current.Value = hasLock;
 				}
 				return delegateTask.Invoke();
 			});
@@ -761,12 +764,12 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		private Task<T> CreateNewTaskAsync<T>(Func<Task<T>> delegateTask)
 		{
-			var hasLock = DispatcherLock.Current;
+			var hasLock = DispatcherLock.Current?.Value;
 			return AsyncViewModelBaseOptions.TaskFactory.StartNew(async () =>
 			{
 				if (hasLock != null)
 				{
-					DispatcherLock.Current = hasLock;
+					DispatcherLock.Current.Value = hasLock;
 				}
 
 				var invoke = await delegateTask();

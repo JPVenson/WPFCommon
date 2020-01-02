@@ -22,6 +22,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				_vm.SendPropertyChanged(notification);
 			}
+			SendNotifications.Clear();
 		}
 	}
 }

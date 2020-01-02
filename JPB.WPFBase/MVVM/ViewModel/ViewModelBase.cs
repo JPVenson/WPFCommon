@@ -35,7 +35,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		internal NotificationCollector DeferredNotification { get; set; }
 
 		/// <summary>
-		///		Can be used to Defer all calls of INotifyProperty changed until the returned IDisposable is Disposed
+		///		Can be used to Defer all calls of INotifyProperty changed until the returned IDisposable is Disposed.
+		///		If there is already an notification gathering in process, the same handle will be returned
 		/// </summary>
 		/// <returns></returns>
 		[NotNull]
@@ -75,8 +76,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			var handler = PendingChange;
 			if (handler != null)
 			{
-				handler(this, e);
-				return !e.CancelPendingChange;
+				foreach (var @delegate in handler.GetInvocationList())
+				{
+					@delegate.DynamicInvoke(this, e);
+					if (e.CancelPendingChange)
+					{
+						return false;
+					}
+				}
 			}
 
 			return true;
