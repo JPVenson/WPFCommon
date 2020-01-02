@@ -80,7 +80,7 @@
     <Compile Include="Converter\TypedParamValueConverter.cs" />
     <Compile Include="Converter\TypedValueConverter.cs" />
     <Compile Include="Converter\VisibilityBooleanConverter.cs" />
-    <Compile Include="Logger\DispatcherStatusMonitor.cs" />
+    <Compile Include="Logger\DispatcherLogger\DispatcherStatusMonitor.cs" />
     <Compile Include="MVVM\DelegateCommand\AsyncDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\AutoDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\DelegateCommand.cs" />

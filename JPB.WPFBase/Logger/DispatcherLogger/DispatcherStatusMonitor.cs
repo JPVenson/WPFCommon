@@ -18,7 +18,11 @@ namespace JPB.WPFBase.Logger
 		private readonly Dispatcher _dispatcher;
 		private readonly EventDispatcherLimited _actionDispatcher;
 
-		/// <inheritdoc />
+		/// <summary>
+		///		Creates a new Dispatcher Status Monitor
+		/// </summary>
+		/// <param name="dispatcher"></param>
+		/// <param name="callback"></param>
 		public DispatcherStatusMonitor(Dispatcher dispatcher, Action<IDispatcherStatusOperationMessage> callback)
 		{
 			_dispatcher = dispatcher;
@@ -182,8 +186,14 @@ namespace JPB.WPFBase.Logger
 		/// <summary>
 		///		Starts observing the current dispatcher
 		/// </summary>
-		public void Start()
+		public void Start(TimeSpan? observerFrame = null)
 		{
+			var absolutObserverFrame = observerFrame ?? TimeSpan.FromSeconds(1);
+			if (absolutObserverFrame.Ticks < 1)
+			{
+				throw new ArgumentException("The observerFrame cannot be less then 1 tick", "observerFrame");
+			}
+
 			_stopRequested = new CancellationTokenSource();
 			_dispatcherOperations = new ConcurrentDictionary<DispatcherOperation, DispatcherOperationStatusMessage[]>();
 			_dispatcher.Hooks.DispatcherInactive += Hooks_DispatcherInactive;
@@ -195,7 +205,7 @@ namespace JPB.WPFBase.Logger
 
 			Task.Factory.StartNew(() =>
 			{
-				while (!_stopRequested.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(1)))
+				while (!_stopRequested.Token.WaitHandle.WaitOne(absolutObserverFrame))
 				{
 					var operationsSnapshot = _dispatcherOperations.ToArray();
 					if (operationsSnapshot.Length == 0)
