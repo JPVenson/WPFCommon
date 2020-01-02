@@ -86,11 +86,14 @@
     <Compile Include="MVVM\DelegateCommand\DelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\StrictDelegateCommand.cs" />
     <Compile Include="MVVM\DelegateCommand\DelegateCommandBase.cs" />
+    <Compile Include="MVVM\DelegateCommand\UiDelegateCommand.cs" />
     <Compile Include="MVVM\ViewModel\AcceptPendingChangeEventArgs.cs" />
     <Compile Include="MVVM\ViewModel\AcceptPendingChangeHandler.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBaseOptions.cs" />
+    <Compile Include="MVVM\ViewModel\BindingListThreadSaveObservableCollection.cs" />
     <Compile Include="MVVM\ViewModel\DispatcherLock.cs" />
+    <Compile Include="MVVM\ViewModel\DispatcherOperationLite.cs" />
     <Compile Include="MVVM\ViewModel\IAcceptPendingChange.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Attributes\IgnoreMementoAttribute.cs" />
     <Compile Include="MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs" />
@@ -113,6 +116,8 @@
     <Compile Include="MVVM\ViewModel\Memento\UiMementoProxy.cs" />
     <Compile Include="MVVM\ViewModel\Memento\WeakMementoDataStamp.cs" />
     <Compile Include="MVVM\ViewModel\NotificationCollector.cs" />
+    <Compile Include="MVVM\ViewModel\Progress\PercentProgressInfo.cs" />
+    <Compile Include="MVVM\ViewModel\Progress\TextProgressInfo.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveEnumerator.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveObservableCollection.cs" />
     <Compile Include="MVVM\ViewModel\ThreadSaveViewModelActor.cs" />
@@ -130,7 +135,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <Folder Include="Resources\Styles\" />
+    <Folder Include="Resources\Templates\DataTemplates\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

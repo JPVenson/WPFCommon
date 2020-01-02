@@ -57,6 +57,9 @@
     <Compile Include="ErrorAggregator.cs" />
     <Compile Include="IErrorCollectionBase.cs" />
     <Compile Include="IErrorValidatorBase.cs" />
+    <Compile Include="Resources\Selectors\ErrorContentSelector.cs" />
+    <Compile Include="Resources\Templates\ErrorTemplateStyle.cs" />
+    <Compile Include="Resources\Templates\IsValidatingAdorner.cs" />
     <Compile Include="ValidationRules\ErrorCollectionWrapper.cs" />
     <Compile Include="ValidationRules\ErrorHashSet.cs" />
     <Compile Include="ValidationRules\ThreadSaveValidationRuleBase.cs" />
@@ -92,6 +95,23 @@
       <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
       <Name>JPB.WPFBase</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Templates\DataTemplates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Resources\Templates\DefaultErrorResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Templates\CommonErrorControls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Templates\CommonErrorResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

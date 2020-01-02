@@ -20,50 +20,50 @@ namespace WpfApplication1
 		{
 			ThreadSaveObservableCollection = new ThreadSaveObservableCollection<string>();
 
-			SimpleWork(() =>
-			{
-				while (true)
-				{
-					try
-					{
-						Thread.Sleep(250);
-						foreach (var item in ThreadSaveObservableCollection)
-						{
-							Console.WriteLine("LOG " + item);
-						}
-					}
-					catch (Exception e)
-					{
-						Console.WriteLine(e);
-						throw;
-					}
-				}
-			});
+			//SimpleWork(() =>
+			//{
+			//	while (true)
+			//	{
+			//		try
+			//		{
+			//			Thread.Sleep(250);
+			//			foreach (var item in ThreadSaveObservableCollection)
+			//			{
+			//				Console.WriteLine("LOG " + item);
+			//			}
+			//		}
+			//		catch (Exception e)
+			//		{
+			//			Console.WriteLine(e);
+			//			throw;
+			//		}
+			//	}
+			//});
 
-			SimpleWork(() =>
-			{
-				var x = 0;
-				while (true)
-				{
-					Thread.Sleep(1);
-					var count = ThreadSaveObservableCollection.Count();
-					ThreadSaveObservableCollection.Add("Test Nr " + x++);
-				}
-			});
+			//SimpleWork(() =>
+			//{
+			//	var x = 0;
+			//	while (true)
+			//	{
+			//		Thread.Sleep(1);
+			//		var count = ThreadSaveObservableCollection.Count();
+			//		ThreadSaveObservableCollection.Add("Test Nr " + x++);
+			//	}
+			//});
 
-			SimpleWork(() =>
-			{
-				while (true)
-				{
-					Thread.Sleep(2);
-					var count = ThreadSaveObservableCollection.Count();
-					if (count > 0)
-					{
-						var elementAt = ThreadSaveObservableCollection.FirstOrDefault();
-						ThreadSaveObservableCollection.Remove(elementAt);
-					}
-				}
-			});
+			//SimpleWork(() =>
+			//{
+			//	while (true)
+			//	{
+			//		Thread.Sleep(2);
+			//		var count = ThreadSaveObservableCollection.Count();
+			//		if (count > 0)
+			//		{
+			//			var elementAt = ThreadSaveObservableCollection.FirstOrDefault();
+			//			ThreadSaveObservableCollection.Remove(elementAt);
+			//		}
+			//	}
+			//});
 		}
 
 		public ThreadSaveObservableCollection<string> ThreadSaveObservableCollection

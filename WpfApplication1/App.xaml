@@ -1,8 +1,8 @@
 ﻿<Application x:Class="WpfApplication1.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:templates="clr-namespace:JPB.ErrorValidation.Resources.Templates;assembly=JPB.ErrorValidation"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
     </Application.Resources>
 </Application>

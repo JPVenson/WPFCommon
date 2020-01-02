@@ -2,6 +2,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -208,7 +209,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns></returns>
 		public static PropertyInfo GetProperty<TProperty>(Expression<Func<TProperty>> property)
 		{
-			var lambda = (LambdaExpression) property;
+			var lambda = (LambdaExpression)property;
 
 			MemberExpression memberExpression;
 			var body = lambda.Body as UnaryExpression;
@@ -216,11 +217,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			if (body != null)
 			{
 				var unaryExpression = body;
-				memberExpression = (MemberExpression) unaryExpression.Operand;
+				memberExpression = (MemberExpression)unaryExpression.Operand;
 			}
 			else
 			{
-				memberExpression = (MemberExpression) lambda.Body;
+				memberExpression = (MemberExpression)lambda.Body;
 			}
 
 			return memberExpression.Member as PropertyInfo;
@@ -235,7 +236,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns></returns>
 		public static PropertyInfo GetProperty<TProperty, TObject>(Expression<Func<TObject, TProperty>> property)
 		{
-			var lambda = (LambdaExpression) property;
+			var lambda = (LambdaExpression)property;
 
 			MemberExpression memberExpression;
 			var body = lambda.Body as UnaryExpression;
@@ -243,11 +244,11 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			if (body != null)
 			{
 				var unaryExpression = body;
-				memberExpression = (MemberExpression) unaryExpression.Operand;
+				memberExpression = (MemberExpression)unaryExpression.Operand;
 			}
 			else
 			{
-				memberExpression = (MemberExpression) lambda.Body;
+				memberExpression = (MemberExpression)lambda.Body;
 			}
 
 			return memberExpression.Member as PropertyInfo;
@@ -256,13 +257,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		#region INotifyPropertyChanged Members
 
 		/// <inheritdoc />
-		public event PropertyChangedEventHandler PropertyChanged;
+		public virtual event PropertyChangedEventHandler PropertyChanged;
 
 		/// <inheritdoc />
-		public event PropertyChangingEventHandler PropertyChanging;
+		public virtual event PropertyChangingEventHandler PropertyChanging;
 
 		/// <inheritdoc />
-		public event AcceptPendingChangeHandler PendingChange;
+		public virtual event AcceptPendingChangeHandler PendingChange;
 
 		#endregion
 	}

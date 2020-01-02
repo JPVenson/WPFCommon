@@ -23,170 +23,6 @@ using JetBrains.Annotations;
 namespace JPB.WPFBase.MVVM.ViewModel
 {
 	/// <summary>
-	///     Extends the <see cref="ThreadSaveObservableCollection{T}" /> with the IBindingList interface
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class BindingListThreadSaveObservableCollection<T> : ThreadSaveObservableCollection<T>,
-		IBindingList
-	{
-		private readonly IList<PropertyDescriptor> _searchIndexes = new List<PropertyDescriptor>();
-
-		/// <summary>
-		/// </summary>
-		public BindingListThreadSaveObservableCollection()
-		{
-			AllowNew = InitializerInfo != null;
-		}
-
-		/// <inheritdoc />
-		public object AddNew()
-		{
-			if (InitializerInfo == null)
-			{
-				throw new NotSupportedException($"AllowNew for type '{typeof(T)}' is invalid");
-			}
-
-			return InitializerInfo.Invoke(null);
-		}
-
-		/// <inheritdoc />
-		public void AddIndex(PropertyDescriptor property)
-		{
-			_searchIndexes.Add(property);
-			OnListChanged(new ListChangedEventArgs(ListChangedType.PropertyDescriptorAdded, property));
-		}
-
-		/// <inheritdoc />
-		public void ApplySort(PropertyDescriptor property, ListSortDirection direction)
-		{
-			IEnumerable<T> sortedDict = null;
-			if (direction == ListSortDirection.Ascending)
-			{
-				sortedDict = this.OrderBy(e => property.GetValue(e));
-			}
-			else
-			{
-				sortedDict = this.OrderByDescending(e => property.GetValue(e));
-			}
-
-			ThreadSaveAction(() =>
-			{
-				var enumerable = sortedDict.ToArray();
-				for (var index = 0; index < enumerable.Length; index++)
-				{
-					var itemAt = enumerable[index];
-					if (itemAt.Equals(this[index]))
-					{
-						continue;
-					}
-
-					ReplaceItem(index, itemAt);
-				}
-			});
-		}
-
-		/// <inheritdoc />
-		public int Find(PropertyDescriptor property, object key)
-		{
-			for (var index = 0; index < this.Count; index++)
-			{
-				var item = this[index];
-				var findValue = property.GetValue(item);
-				if (findValue == key || findValue?.Equals(key) == true)
-				{
-					return index;
-				}
-			}
-
-			return -1;
-		}
-
-		/// <inheritdoc />
-		public void RemoveIndex(PropertyDescriptor property)
-		{
-			_searchIndexes.Remove(property);
-			OnListChanged(new ListChangedEventArgs(ListChangedType.PropertyDescriptorDeleted, property));
-		}
-
-		/// <inheritdoc />
-		public void RemoveSort()
-		{
-		}
-
-		/// <inheritdoc />
-		public bool AllowNew { get; }
-
-		/// <inheritdoc />
-		public bool AllowEdit { get; set; }
-
-		/// <inheritdoc />
-		public bool AllowRemove { get; set; }
-
-		/// <inheritdoc />
-		public bool SupportsChangeNotification { get; } = true;
-
-		/// <inheritdoc />
-		public bool SupportsSearching { get; }
-
-		/// <inheritdoc />
-		public bool SupportsSorting { get; }
-
-		/// <inheritdoc />
-		public bool IsSorted { get; }
-
-		/// <inheritdoc />
-		public PropertyDescriptor SortProperty { get; }
-
-		/// <inheritdoc />
-		public ListSortDirection SortDirection { get; } 
-		
-		/// <inheritdoc />
-		public event ListChangedEventHandler ListChanged;
-
-		protected virtual void OnListChanged(ListChangedEventArgs e)
-		{
-			ListChanged?.Invoke(this, e);
-		}
-
-		/// <inheritdoc />
-		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-		{
-			base.OnCollectionChanged(e);
-			var bindingCollectionHandler = ListChanged;
-			if (bindingCollectionHandler != null)
-			{
-				ListChangedEventArgs bindingCollectionArgs;
-				switch (e.Action)
-				{
-					case NotifyCollectionChangedAction.Add:
-						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.ItemAdded, e.NewStartingIndex);
-						break;
-					case NotifyCollectionChangedAction.Remove:
-						bindingCollectionArgs =
-							new ListChangedEventArgs(ListChangedType.ItemDeleted, e.NewStartingIndex);
-						break;
-					case NotifyCollectionChangedAction.Replace:
-						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.ItemChanged,
-							e.NewStartingIndex, e.OldStartingIndex);
-						break;
-					case NotifyCollectionChangedAction.Move:
-						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.ItemMoved, e.NewStartingIndex,
-							e.OldStartingIndex);
-						break;
-					case NotifyCollectionChangedAction.Reset:
-						bindingCollectionArgs = new ListChangedEventArgs(ListChangedType.Reset, 0);
-						break;
-					default:
-						throw new ArgumentOutOfRangeException();
-				}
-
-				bindingCollectionHandler(this, bindingCollectionArgs);
-			}
-		}
-	}
-
-
-	/// <summary>
 	///     Defines a collection that implements the <see cref="INotifyCollectionChanged" /> event in a dispatcher thread save
 	///     manner.
 	///     All Write Operations are synchronized to the Dispatcher. All Read operations will occur in the calling thread.
@@ -199,7 +35,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	[DebuggerTypeProxy(typeof(ThreadSaveObservableCollection<>.ThreadSaveObservableCollectionDebuggerProxy))]
 #endif
 	public class ThreadSaveObservableCollection<T> :
-		AsyncViewModelBase,
+		ViewModelBase,
 		IReadOnlyList<T>,
 		IProducerConsumerCollection<T>,
 		IList,
@@ -214,8 +50,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 #if !WINDOWS_UWP
 		[NonSerialized]
 #endif
-		private readonly ThreadSaveViewModelActor _actorHelper;
-
 		private readonly IList<T> _base;
 
 #if !WINDOWS_UWP
@@ -245,8 +79,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			{
 				_base = collection;
 			}
-
-			_actorHelper = this;
 		}
 
 		/// <inheritdoc />
@@ -262,9 +94,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <inheritdoc />
-		public ThreadSaveObservableCollection(Dispatcher fromThread)
+		public ThreadSaveObservableCollection(Dispatcher fromThread) : base(fromThread)
 		{
-			_actorHelper = new ViewModelBase(fromThread);
 			_base = new Collection<T>();
 			CollectionViews = new ConcurrentDictionary<string, ICollectionView>();
 		}
@@ -310,7 +141,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				return;
 			}
 
-			_actorHelper.ThreadSaveAction(
+			ThreadSaveAction(
 				() =>
 				{
 					_base.Clear();
@@ -334,7 +165,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			var tempItem = (T) value;
 			var indexOf = -1;
-			_actorHelper.ThreadSaveAction(
+			ThreadSaveAction(
 				() =>
 				{
 					indexOf = ((IList) _base).Add(tempItem);
@@ -386,7 +217,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				return;
 			}
 
-			_actorHelper.ThreadSaveAction(
+			ThreadSaveAction(
 				() =>
 				{
 					var old = _base[index];
@@ -434,7 +265,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 
 			var result = false;
-			_actorHelper.ThreadSaveAction(
+			ThreadSaveAction(
 				() =>
 				{
 					var index = IndexOf(item);
@@ -465,7 +296,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				return;
 			}
 
-			_actorHelper.ThreadSaveAction(
+			ThreadSaveAction(
 				() =>
 				{
 					_base.Insert(index, item);
@@ -635,7 +466,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 			BatchCommit = false;
 		}
-
+		
 		/// <summary>
 		///     Batches commands into a single statement that will run when the delegate will return true. Lock is optional but
 		///     recommend
@@ -762,7 +593,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			if (enumerable.Any())
 			{
-				_actorHelper.ThreadSaveAction(
+				ThreadSaveAction(
 					() =>
 					{
 						foreach (var variable in enumerable)
@@ -793,7 +624,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 			if (enumerable.Any())
 			{
-				_actorHelper.ThreadSaveAction(
+				ThreadSaveAction(
 					() =>
 					{
 						foreach (var variable in enumerable)
@@ -841,7 +672,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			}
 
 			T oldItem;
-			_actorHelper.ThreadSaveAction(
+			ThreadSaveAction(
 				() =>
 				{
 					if (index + 1 > Count)

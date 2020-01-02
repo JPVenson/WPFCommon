@@ -247,6 +247,9 @@
     <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\StrictDelegateCommand.cs">
       <Link>MVVM\DelegateCommand\StrictDelegateCommand.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\UiDelegateCommand.cs">
+      <Link>MVVM\DelegateCommand\UiDelegateCommand.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AcceptPendingChangeEventArgs.cs">
       <Link>MVVM\ViewModel\AcceptPendingChangeEventArgs.cs</Link>
     </Compile>
@@ -259,8 +262,14 @@
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AsyncViewModelBaseOptions.cs">
       <Link>MVVM\ViewModel\AsyncViewModelBaseOptions.cs</Link>
     </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\BindingListThreadSaveObservableCollection.cs">
+      <Link>MVVM\ViewModel\BindingListThreadSaveObservableCollection.cs</Link>
+    </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\DispatcherLock.cs">
       <Link>MVVM\ViewModel\DispatcherLock.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\DispatcherOperationLite.cs">
+      <Link>MVVM\ViewModel\DispatcherOperationLite.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\IAcceptPendingChange.cs">
       <Link>MVVM\ViewModel\IAcceptPendingChange.cs</Link>
@@ -327,6 +336,12 @@
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\NotificationCollector.cs">
       <Link>MVVM\ViewModel\NotificationCollector.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Progress\PercentProgressInfo.cs">
+      <Link>MVVM\ViewModel\Progress\PercentProgressInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Progress\TextProgressInfo.cs">
+      <Link>MVVM\ViewModel\Progress\TextProgressInfo.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveObservableCollection.cs">
       <Link>MVVM\ViewModel\ThreadSaveObservableCollection.cs</Link>

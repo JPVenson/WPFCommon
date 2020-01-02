@@ -9,61 +9,37 @@
         xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System"
         xmlns:validationRules="clr-namespace:JPB.ErrorValidation.ValidationRules;assembly=JPB.ErrorValidation"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+        xmlns:templates="clr-namespace:JPB.ErrorValidation.Resources.Templates;assembly=JPB.ErrorValidation"
         mc:Ignorable="d"
 
         Title="MainWindow" Height="350" Width="525"
         d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
 
 	<Window.Resources>
-        <SolidColorBrush Color="#FFCB2E2E" x:Key="ErrorForgroundColor"/>
-		<SolidColorBrush Color="#11FF0000" x:Key="ErrorBackgroundColor"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/JPB.ErrorValidation;component/Resources/Templates/CommonErrorResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-		<DataTemplate x:Key="Validation" DataType="{x:Type validationTyps:IValidation}">
-            <TextBlock Foreground="{StaticResource ErrorForgroundColor}" Text="{Binding ErrorText}" />
-        </DataTemplate>
+            <SolidColorBrush x:Key="{templates:GetStyleInfoKey templates:ErrorTemplateStyleResources.Fill}" Color="Red"/>
+            <SolidColorBrush x:Key="{templates:GetStyleInfoKey templates:ErrorTemplateStyleResources.BorderBrush}" Color="Red"/>
+            <SolidColorBrush x:Key="{templates:GetStyleInfoKey templates:ErrorTemplateStyleResources.Background}" Color="Red"/>
 
-        <DataTemplate DataType="{x:Type ValidationError}">
-            <ContentControl Content="{Binding ErrorContent}" ContentTemplate="{StaticResource Validation}"/>
-        </DataTemplate>
+            <Style TargetType="{x:Type Control}" x:Key="ControlWithValidation">
+                <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MultiErrorControlEx}" />
+            </Style>
 
-        <DataTemplate x:Key="ErrorPopupContent" DataType="{x:Type collections:IList}">
-            <GroupBox Header="{Binding Count}">
-                <ListBox ItemsSource="{Binding}" />
-            </GroupBox>
-        </DataTemplate>
+            <Style TargetType="{x:Type TextBox}" 
+                   BasedOn="{StaticResource ControlWithValidation}">
+            </Style>
 
-		<ControlTemplate x:Key="MultiErrorControl">
-			<Grid>
-				<Border BorderBrush="{StaticResource ErrorForgroundColor}" BorderThickness="1" Background="{StaticResource ErrorBackgroundColor}"
-                                    IsHitTestVisible="False" x:Name="errorBorder" />
-				<AdornedElementPlaceholder x:Name="placeholder" />
-				<Popup AllowsTransparency="True" HorizontalAlignment="Right" HorizontalOffset="0"
-                                   VerticalOffset="0" PopupAnimation="Fade" Placement="Right"
-                                   PlacementTarget="{Binding ElementName=errorBorder}"
-                                   IsOpen="{Binding ElementName=placeholder, Path=AdornedElement.IsFocused, Mode=OneWay}">
-					<StackPanel Orientation="Horizontal">
-						<Polygon VerticalAlignment="Top" Points="0,4 4,0 4,8" Fill="{StaticResource ErrorForgroundColor}"
-                                             Stretch="Fill" Margin="0 5 0 0" Stroke="{StaticResource ErrorForgroundColor}"
-                                             StrokeThickness="2" />
-						<Border Background="{StaticResource ErrorForgroundColor}" CornerRadius="4" Padding="4">
-							<ContentControl ContentTemplate="{StaticResource ErrorPopupContent}" Content="{Binding }"/>
-						</Border>
-					</StackPanel>
-				</Popup>
-			</Grid>
-		</ControlTemplate>
-		<Style TargetType="{x:Type TextBox}">
-			<Setter Property="Validation.ErrorTemplate" Value="{StaticResource MultiErrorControl}" />
-		</Style>
-		<Style TargetType="{x:Type ComboBox}">
-			<Setter Property="Validation.ErrorTemplate" Value="{StaticResource MultiErrorControl}" />
-		</Style>
+            <Style TargetType="{x:Type ComboBox}" 
+                   BasedOn="{StaticResource ControlWithValidation}">
+            </Style>
+        </ResourceDictionary>
 	</Window.Resources>
 
     <DockPanel>
-        <Button DockPanel.Dock="Top" Command="{Binding TaskACommand}">TaskA</Button>
-        <Button DockPanel.Dock="Top" Command="{Binding TaskBCommand}">TaskB</Button>
-        <Label DockPanel.Dock="Top" Content="{Binding IsValidating}" />
 		<DockPanel DockPanel.Dock="Top">
 			<TextBlock DockPanel.Dock="Right"
                        IsEnabled="False"

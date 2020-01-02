@@ -192,6 +192,102 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			return false;
 		}
 
+		private class AsyncViewModelBaseProgress<T> : IProgress<T>
+		{
+			private readonly AsyncViewModelBase _sender;
+
+			public AsyncViewModelBaseProgress(AsyncViewModelBase sender)
+			{
+				_sender = sender;
+			}
+
+			public T Progress { get; set; }
+
+			public void Report(T value)
+			{
+				Progress = value;
+				_sender.UpdateProgress(value);
+			}
+		}
+
+		private object _currentProgress;
+
+		public object CurrentProgress
+		{
+			get { return _currentProgress; }
+			set
+			{
+				SendPropertyChanging(() => CurrentProgress);
+				_currentProgress = value;
+				SendPropertyChanged(() => CurrentProgress);
+			}
+		}
+
+		protected virtual void UpdateProgress(object value)
+		{
+			CurrentProgress = value;
+		}
+
+		/// <summary>
+		///		Starts a new Complex Work
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="delegateTask">The delegate to the Action that executes the work. Should use the IProgress interface to report its progress back.</param>
+		/// <param name="continueWith">If set an action executed after the delgateTask has been finished</param>
+		/// <param name="setWorking">The the IsWorking property</param>
+		/// <param name="clearResult">If set, resets the CurrentProgress property to null</param>
+		/// <param name="taskName">The name of the Task</param>
+		/// <returns></returns>
+		public Task ComplexWork<T>(Action<IProgress<T>> delegateTask, [CanBeNull] Action<IProgress<T>> continueWith = null,
+			bool setWorking = true,
+			bool clearResult = true,
+			[CallerMemberName] string taskName = AnonymousTask)
+		{
+			if (delegateTask == null)
+			{
+				throw new ArgumentNullException(nameof(delegateTask));
+			}
+
+			var reporter = new AsyncViewModelBaseProgress<T>(this);
+			return SimpleWorkInternal(CreateNewTask(() => delegateTask(reporter)), s =>
+			{
+				if (continueWith != null)
+				{
+					ThreadSaveAction(() => continueWith(reporter));
+				}
+
+				if (clearResult && Equals(CurrentProgress, reporter.Progress))
+				{
+					UpdateProgress(null);
+				}
+			}, taskName, setWorking);
+		}
+		
+		public Task ComplexWorkAsync<T>(Func<IProgress<T>, Task> delegateTask, [CanBeNull] Action<IProgress<T>> continueWith = null,
+			bool setWorking = true,
+			bool clearResult = true,
+			[CallerMemberName] string taskName = AnonymousTask)
+		{
+			if (delegateTask == null)
+			{
+				throw new ArgumentNullException(nameof(delegateTask));
+			}
+
+			var reporter = new AsyncViewModelBaseProgress<T>(this);
+			return SimpleWorkInternal(CreateNewTaskAsync(async () => await delegateTask(reporter)), s =>
+			{
+				if (continueWith != null)
+				{
+					ThreadSaveAction(() => continueWith(reporter));
+				}
+
+				if (clearResult && Equals(CurrentProgress, reporter.Progress))
+				{
+					UpdateProgress(null);
+				}
+			}, taskName, setWorking);
+		}
+
 		/// <summary>
 		///     Runs the <paramref name="delegateTask" /> and schedules the <paramref name="continueWith" /> in the Dispatcher
 		/// </summary>
