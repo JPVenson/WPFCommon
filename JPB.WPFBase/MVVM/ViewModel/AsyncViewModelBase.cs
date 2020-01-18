@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using JetBrains.Annotations;
+using JPB.WPFBase.MVVM.ViewModel.Progress;
 
 #endregion
 
@@ -51,18 +52,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		{
 		}
 
-		/// <summary>
-		///     A Collection of all currently running Tasks
-		/// </summary>
-		[Obsolete("Please use the Tasks list instead")]
-		protected IReadOnlyCollection<Tuple<string, Task>> TaskList
-		{
-			get
-			{
-				return _namedTasks.Select(f => Tuple.Create(f.Value, f.Key)).ToArray();
-			}
-		}
-
 		protected IDictionary<Task, string> Tasks
 		{
 			get { return _namedTasks; }
@@ -86,23 +75,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		[NotNull]
 		protected virtual AsyncViewModelBaseOptions AsyncViewModelBaseOptions { get; set; }
-
-		/// <summary>
-		///     Checks the current Task list for the <paramref name="index" />
-		/// </summary>
-		/// <param name="index">The named task to check</param>
-		/// <returns>
-		///     <value>True</value>
-		///     when a task with the name of <paramref name="index" /> exists otherwise
-		///     <value>False</value>
-		/// </returns>
-
-		[Obsolete("Please use the Tasks list instead")]
-		public bool this[string index]
-		{
-			get { return Tasks.All(s => s.Value != index); }
-		}
-
+		
 		/// <summary>
 		///     Initializes this instance.
 		/// </summary>

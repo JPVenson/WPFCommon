@@ -49,9 +49,9 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.AsyncViewModel
 		{
 			var vm = new AsyncTestViewModelBase();
 			vm.SimpleWork(TestExecute, null, true, nameof(TestExecute));
-			Assert.That(vm.CheckCanExecuteCondition(nameof(CanTestExecute)), Is.False);
-			Thread.Sleep(1000);
 			Assert.That(vm.CheckCanExecuteCondition(nameof(CanTestExecute)), Is.True);
+			Thread.Sleep(1000);
+			Assert.That(vm.CheckCanExecuteCondition(nameof(CanTestExecute)), Is.False);
 		}
 
 		private void CanTestExecute()

@@ -42,7 +42,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		[NotNull]
 		[MustUseReturnValue]
 		[PublicAPI]
-		public IDisposable DeferNotification()
+		public virtual IDisposable DeferNotification()
 		{
 			if (DeferredNotification != null)
 			{
@@ -56,7 +56,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		/// <returns></returns>
 		[PublicAPI]
-		public void ResumeNotification()
+		public virtual void ResumeNotification()
 		{
 			DeferredNotification?.Dispose();
 		}
