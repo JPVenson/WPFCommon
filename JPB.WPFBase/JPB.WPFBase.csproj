@@ -91,6 +91,7 @@
     <Compile Include="MVVM\ViewModel\AcceptPendingChangeHandler.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModelBaseOptions.cs" />
+    <Compile Include="MVVM\ViewModel\AutoViewModelBase.cs" />
     <Compile Include="MVVM\ViewModel\BindingListThreadSaveObservableCollection.cs" />
     <Compile Include="MVVM\ViewModel\DispatcherLock.cs" />
     <Compile Include="MVVM\ViewModel\DispatcherOperationLite.cs" />

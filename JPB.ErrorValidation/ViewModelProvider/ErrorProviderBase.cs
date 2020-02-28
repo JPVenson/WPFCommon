@@ -138,12 +138,12 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			});
 		}
 
-		private void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		protected virtual void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			HandleUnboundProperties(e.PropertyName);
 		}
 
-		private void HandleUnboundProperties(string propName)
+		protected virtual void HandleUnboundProperties(string propName)
 		{
 			AsyncHelper.WaitSingle(ObManage(
 				UserErrors.Where(f =>

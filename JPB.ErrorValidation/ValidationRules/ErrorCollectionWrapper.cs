@@ -12,11 +12,11 @@ namespace JPB.ErrorValidation.ValidationRules
 	/// </summary>
 	public abstract class ErrorCollectionWrapper : IErrorCollectionBase
 	{
-		private readonly Type _validationType;
+		public Type ValidationType { get; }
 
 		protected ErrorCollectionWrapper(Type validationType)
 		{
-			_validationType = validationType ?? throw new ArgumentNullException(nameof(validationType));
+			ValidationType = validationType ?? throw new ArgumentNullException(nameof(validationType));
 		}
 
 		protected abstract ICollection<IValidation> Errors { get; }
@@ -47,7 +47,7 @@ namespace JPB.ErrorValidation.ValidationRules
 
 		public Type RetrunT()
 		{
-			return _validationType;
+			return ValidationType;
 		}
 
 		public IEnumerable<IValidation> FilterErrors(string columnName)

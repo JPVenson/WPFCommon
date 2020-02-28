@@ -40,6 +40,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -229,8 +230,8 @@
     <Compile Include="..\JPB.WPFBase\Converter\VisibilityBooleanConverter.cs">
       <Link>Converter\VisibilityBooleanConverter.cs</Link>
     </Compile>
-    <Compile Include="..\JPB.WPFBase\Logger\DispatcherStatusMonitor.cs">
-      <Link>MVVM\Logger\DispatcherStatusMonitor.cs</Link>
+    <Compile Include="..\JPB.WPFBase\Logger\DispatcherLogger\DispatcherStatusMonitor.cs">
+      <Link>Logger\DispatcherLogger\DispatcherStatusMonitor.cs</Link>
     </Compile>
     <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\AsyncDelegateCommand.cs">
       <Link>MVVM\DelegateCommand\AsyncDelegateCommand.cs</Link>

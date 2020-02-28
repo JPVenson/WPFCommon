@@ -35,7 +35,6 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		{
 			ErrorMapper = new ConcurrentDictionary<string, HashSet<IValidation>>();
 
-			PropertyChanged += AsyncErrorProviderBase_PropertyChanged;
 			LoadErrorMapperData();
 			AsyncValidationOption = new AsyncValidationOption
 			{
@@ -212,12 +211,16 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			}
 		}
 
-		private void AsyncErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		protected override void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			AsyncHelper.WaitSingle(ScheduleErrorUpdate(e.PropertyName));
-			// ReSharper disable once ExplicitCallerInfoArgument
-		}
+			if (!Validate)
+			{
+				return;
+			}
 
+			AsyncHelper.WaitSingle(ScheduleErrorUpdate(e.PropertyName));
+		}
+		
 		/// <summary>
 		/// Raises the <see cref="E:ErrorsChanged" /> event.
 		/// </summary>
@@ -226,8 +229,6 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		{
 			ErrorsChanged?.Invoke(this, e);
 		}
-
-		
 
 		private void RunAsyncTask(Func<Task<IValidation[]>> gerValidations,
 			AsyncRunState validation2Key,
