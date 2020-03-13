@@ -17,6 +17,15 @@ namespace JPB.Tasking.TaskManagement
 	/// </summary>
 	public static class AsyncHelper
 	{
+		public static Func<object> WrapAsFunc(this Action action)
+		{
+			return () =>
+			{
+				action();
+				return null;
+			}; 
+		}
+
 		public static Task<bool> WaitOneAsync(this WaitHandle waitHandle, TimeSpan timeoutMs)
 		{
 			if (waitHandle == null)
@@ -151,6 +160,10 @@ namespace JPB.Tasking.TaskManagement
 			/// </summary>
 			public void Dispose()
 			{
+				if (_taskCount == 0)
+				{
+					return;
+				}
 				try
 				{
 					_currentContext.BeginMessageLoop();

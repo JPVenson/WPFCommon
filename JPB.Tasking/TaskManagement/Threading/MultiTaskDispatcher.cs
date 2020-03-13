@@ -70,7 +70,7 @@ namespace JPB.Tasking.TaskManagement.Threading
 		}
 
 		/// <inheritdoc />
-		protected override Action GetNext()
+		protected override Func<object> GetNext()
 		{
 			if (!HasNext())
 			{
@@ -78,7 +78,11 @@ namespace JPB.Tasking.TaskManagement.Threading
 			}
 			Tuple<Action, object> next;
 			ConcurrentQueue.TryDequeue(out next);
-			return next?.Item1;
+			return () =>
+			{
+				next?.Item1();
+				return null;
+			};
 		}
 
 		/// <inheritdoc />

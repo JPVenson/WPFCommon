@@ -1,0 +1,57 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:JPB.DataInputWindow"
+                    xmlns:viewModel="clr-namespace:JPB.DataInputWindow.ViewModel"
+                    xmlns:templates="clr-namespace:JPB.ErrorValidation.Resources.Templates;assembly=JPB.ErrorValidation">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/JPB.ErrorValidation;component/Resources/Templates/CommonErrorResources.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <SolidColorBrush x:Key="{templates:GetStyleInfoKey templates:ErrorTemplateStyleResources.Fill}" Color="Red"/>
+    <SolidColorBrush x:Key="{templates:GetStyleInfoKey templates:ErrorTemplateStyleResources.BorderBrush}" Color="Red"/>
+    <SolidColorBrush x:Key="{templates:GetStyleInfoKey templates:ErrorTemplateStyleResources.Background}" Color="Red"/>
+
+    <Style TargetType="{x:Type Control}" x:Key="ControlWithValidation">
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MultiErrorControlEx}" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}" 
+           BasedOn="{StaticResource ControlWithValidation}">
+    </Style>
+
+    <Style TargetType="{x:Type ComboBox}" 
+           BasedOn="{StaticResource ControlWithValidation}">
+    </Style>
+
+    <local:DataInputTemplateSelector x:Key="DataInputTemplateSelector" />
+    <DataTemplate DataType="{x:Type viewModel:DataImportViewModel}">
+        <DockPanel>
+            <Label Content="TITLE" DockPanel.Dock="Top"/>
+            <DockPanel Dock="Bottom">
+                <Button Command="{Binding AcceptValuesCommand}">OK</Button>
+            </DockPanel>
+
+            <ItemsControl ItemsSource="{Binding Fields}"
+                         Grid.IsSharedSizeScope="True">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModel:DataImportFieldViewModelBase}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition SharedSizeGroup="DynamicWindow_LabelColumn" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Label Content="{Binding Caption}"
+                                  Grid.Column="0"/>
+                            <ContentControl Content="{Binding}"
+                                           Grid.Column="1"
+                                           MinWidth="100"
+                                           ContentTemplateSelector="{StaticResource DataInputTemplateSelector}"
+                           />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </DockPanel>
+    </DataTemplate>
+</ResourceDictionary>

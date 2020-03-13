@@ -73,19 +73,23 @@ namespace JPB.Tasking.TaskManagement.Threading
 		// ReSharper disable once InconsistentlySynchronizedField
 		public bool IsWorking => _isWorking;
 
-		protected abstract Action GetNext();
+		protected abstract Func<object> GetNext();
 		protected abstract bool HasNext();
 
 		internal void Worker()
 		{
 			try
 			{
-				Action action;
+				Func<object> action;
 				while ((action = GetNext()) != null && !_isDisposed)
 				{
 					try
 					{
-						action?.Invoke();
+						var invoke = action?.Invoke();
+						if (invoke is Task task)
+						{
+							task.Wait();
+						}
 					}
 					catch (Exception e)
 					{

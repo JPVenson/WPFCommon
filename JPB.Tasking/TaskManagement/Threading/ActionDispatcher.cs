@@ -67,11 +67,11 @@ namespace JPB.Tasking.TaskManagement.Threading
 			return true;
 		}
 
-		protected override Action GetNext()
+		protected override Func<object> GetNext()
 		{
 			Action next;
 			ConcurrentQueue.TryDequeue(out next);
-			return next;
+			return next.WrapAsFunc();
 		}
 
 		protected override bool HasNext()

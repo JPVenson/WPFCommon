@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CCA9A7DD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.ErrorValidation.Tests", "JPB.ErrorValidation.Tests\JPB.ErrorValidation.Tests.csproj", "{E7034029-2ADC-409A-B01D-66EFD7BD9409}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JPB.DataInputWindow", "JPB.DataInputWindow\JPB.DataInputWindow.csproj", "{64E77049-2B41-482C-8428-23BE086A3942}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,14 @@ Global
 		{E7034029-2ADC-409A-B01D-66EFD7BD9409}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E7034029-2ADC-409A-B01D-66EFD7BD9409}.Server|Any CPU.ActiveCfg = Release|Any CPU
 		{E7034029-2ADC-409A-B01D-66EFD7BD9409}.Server|Any CPU.Build.0 = Release|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.ExternalRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.ExternalRelease|Any CPU.Build.0 = Release|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.Server|Any CPU.ActiveCfg = Release|Any CPU
+		{64E77049-2B41-482C-8428-23BE086A3942}.Server|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

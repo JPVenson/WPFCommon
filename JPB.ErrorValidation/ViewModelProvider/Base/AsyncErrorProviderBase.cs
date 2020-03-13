@@ -217,7 +217,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			{
 				return;
 			}
-
+			
 			AsyncHelper.WaitSingle(ScheduleErrorUpdate(e.PropertyName));
 		}
 		
@@ -368,9 +368,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 
 		private async Task ValidateAsync(string propertyName)
 		{
-			HashSet<IValidation> errorJob;
-
-			if (!ErrorMapper.TryGetValue(propertyName, out errorJob))
+			if (!ErrorMapper.TryGetValue(propertyName, out var errorJob))
 			{
 				return;
 			}
