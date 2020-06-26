@@ -40,7 +40,7 @@ namespace JPB.DataInputWindow
 			foreach (var dataImportFieldViewModelBase in _dataImportViewModel.Fields)
 			{
 				dataImportFieldViewModelBase.LoadErrorMapperData();
-				dataImportFieldViewModelBase.ForceRefresh();
+				dataImportFieldViewModelBase.ForceRefreshAsync().GetAwaiter().GetResult();
 			}
 			var resDict = new ResourceDictionary();
 			resDict.BeginInit();

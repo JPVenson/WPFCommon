@@ -1,6 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Threading;
+using System.Xml.Serialization;
 
 namespace JPB.ErrorValidation.ViewModelProvider.Base
 {
@@ -33,6 +35,13 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			: base(dispatcher, errors)
 		{
 		}
+
+		/// <summary>
+		///     For IDataErrorInfo support with multiple Errors for one field.
+		/// </summary>
+		[Browsable(false)]
+		[XmlIgnore]
+		public Func<object, object, object> AggregateMultiError { get; set; }
 
 		public new string this[string columnName]
 		{

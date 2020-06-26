@@ -59,7 +59,7 @@ namespace JPB.DynamicInputBox.InfoWindow
                     var vm = value.DataContext as IQuestionAbstrViewModelBase;
                     //if (!vm.IsInit)
                     //    vm.Init();
-                    vm.ForceRefresh();
+                    vm.ForceRefreshAsync().GetAwaiter().GetResult();
 
                     _selectedStep = value;
                     SendPropertyChanged(() => SelectedStep);

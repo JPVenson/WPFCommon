@@ -55,28 +55,23 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		protected ValidationLogic Validation { get; set; }
 
 		/// <summary>
-		///     For IDataErrorInfo support with multiple Errors for one field.
-		/// </summary>
-		[Browsable(false)]
-		[XmlIgnore]
-		public Func<object, object, object> AggregateMultiError { get; set; }
-
-		/// <summary>
 		///     Check failed Errors on next Invoke even if they are not explicit called.
 		/// </summary>
 		[Browsable(false)]
 		public bool AlwaysCheckFailedInNextRun { get; set; }
+
+		/// <inheritdoc />
+		public virtual async Task ReplaceUserErrorCollection(IErrorCollectionBase newCollection)
+		{
+			ActiveValidationCases.Clear();
+			_userErrors = newCollection;
+			await Task.CompletedTask;
+		}
 		
 		/// <inheritdoc />
 		public virtual IErrorCollectionBase UserErrors
 		{
 			get { return _userErrors; }
-			set
-			{
-				ActiveValidationCases.Clear();
-				_userErrors = value;
-				ForceRefresh();
-			}
 		}
 
 		/// <inheritdoc />
@@ -95,12 +90,20 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		}
 
 		/// <inheritdoc />
-		[Browsable(false)]
-		public string MessageFormat { get; set; }
-
+		public virtual async Task ForceRefreshAsync()
+		{
+			if (Validate)
+			{
+				foreach (var error in UserErrors.SelectMany(s => s.ErrorIndicator).Distinct())
+				{
+					await ObManage(error, this);
+				}
+			}
+		}
 
 		/// <inheritdoc />
 		[Browsable(false)]
+		[Obsolete("use the ForceRefreshAsync method", true)]
 		public virtual void ForceRefresh()
 		{
 			if (Validate)
@@ -129,9 +132,8 @@ namespace JPB.ErrorValidation.ViewModelProvider
 			ThreadSaveAction(() =>
 			{
 				ActiveValidationCases = new ThreadSaveObservableCollection<IValidation>();
-				UserErrors = errors;
+				_userErrors = errors;
 				PropertyChanged += ErrorProviderBase_PropertyChanged;
-				MessageFormat = "{1}";
 				Validation = ValidationLogic.RunThroughAll;
 				Validate = true;
 				AlwaysCheckFailedInNextRun = true;
@@ -158,7 +160,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		[Browsable(false)]
 		protected virtual IEnumerable<IValidation> ValidateErrors(IEnumerable<IValidation> errorsForField)
 		{
-			throw new NotImplementedException("Please create your own Validation");
+			throw new NotImplementedException("You have enabled ValidateSelf but did not overwrite the 'ValidateErrors' method");
 		}
 
 		/// <summary>
@@ -214,7 +216,6 @@ namespace JPB.ErrorValidation.ViewModelProvider
 							errorsOfThisRun.Add(error);
 						}
 					}
-
 					break;
 				case ValidationLogic.BreakAtFirstFail:
 					foreach (var item in forField)
@@ -337,7 +338,6 @@ namespace JPB.ErrorValidation.ViewModelProvider
 		public new T UserErrors
 		{
 			get { return base.UserErrors as T; }
-			set { base.UserErrors = value; }
 		}
 	}
 }

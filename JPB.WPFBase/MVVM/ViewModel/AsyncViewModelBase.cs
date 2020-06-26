@@ -75,7 +75,7 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// </summary>
 		[NotNull]
 		protected virtual AsyncViewModelBaseOptions AsyncViewModelBaseOptions { get; set; }
-		
+
 		/// <summary>
 		///     Initializes this instance.
 		/// </summary>
@@ -168,16 +168,26 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			return false;
 		}
 
-		private class AsyncViewModelBaseProgress<T> : IProgress<T>
+		private class AsyncViewModelBaseProgress<T> : ViewModelBase, IProgress<T>
 		{
 			private readonly AsyncViewModelBase _sender;
+			private T _progress;
 
 			public AsyncViewModelBaseProgress(AsyncViewModelBase sender)
 			{
 				_sender = sender;
 			}
 
-			public T Progress { get; set; }
+			public T Progress
+			{
+				get { return _progress; }
+				set
+				{
+					SendPropertyChanging();
+					_progress = value;
+					SendPropertyChanged();
+				}
+			}
 
 			public void Report(T value)
 			{
@@ -205,15 +215,15 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///		Starts a new Complex Work
+		///		Runs the Task with a progress reporter and executes the <see cref="continueWith"/> after the <see cref="delegateTask"/> is finished.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="delegateTask">The delegate to the Action that executes the work. Should use the IProgress interface to report its progress back.</param>
-		/// <param name="continueWith">If set an action executed after the delgateTask has been finished</param>
-		/// <param name="setWorking">The the IsWorking property</param>
-		/// <param name="clearResult">If set, resets the CurrentProgress property to null</param>
-		/// <param name="taskName">The name of the Task</param>
-		/// <returns></returns>
+		/// <param name="delegateTask">The task to be executed. Accepts a <see cref="IProgress{T}"/></param>
+		/// <param name="continueWith">Can be null. A delegate that will be executed as soon as the <see cref="delegateTask"/> is finished</param>
+		/// <param name="setWorking">If true, the <see cref="IsWorking"/> property will be set</param>
+		/// <param name="clearResult">If true, the <see cref="CurrentProgress"/> property will be set to null after the <see cref="delegateTask"/> and the <see cref="continueWith"/> are finished</param>
+		/// <param name="taskName">The name of the Task within the list of all Tasks</param>
+		/// <returns>The task that will be created to hold both the executions of <see cref="delegateTask"/> and <see cref="continueWith"/></returns>
 		public Task ComplexWork<T>(Action<IProgress<T>> delegateTask, [CanBeNull] Action<IProgress<T>> continueWith = null,
 			bool setWorking = true,
 			bool clearResult = true,
@@ -238,7 +248,17 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				}
 			}, taskName, setWorking);
 		}
-		
+
+		/// <summary>
+		///		Runs the Task with a progress reporter and executes the <see cref="continueWith"/> after the <see cref="delegateTask"/> is finished.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="delegateTask">The task to be executed. Accepts a <see cref="IProgress{T}"/></param>
+		/// <param name="continueWith">Can be null. A delegate that will be executed as soon as the <see cref="delegateTask"/> is finished</param>
+		/// <param name="setWorking">If true, the <see cref="IsWorking"/> property will be set</param>
+		/// <param name="clearResult">If true, the <see cref="CurrentProgress"/> property will be set to null after the <see cref="delegateTask"/> and the <see cref="continueWith"/> are finished</param>
+		/// <param name="taskName">The name of the Task within the list of all Tasks</param>
+		/// <returns>The task that will be created to hold both the executions of <see cref="delegateTask"/> and <see cref="continueWith"/></returns>
 		public Task ComplexWorkAsync<T>(Func<IProgress<T>, Task> delegateTask, [CanBeNull] Action<IProgress<T>> continueWith = null,
 			bool setWorking = true,
 			bool clearResult = true,

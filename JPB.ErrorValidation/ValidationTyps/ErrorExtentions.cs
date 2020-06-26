@@ -7,7 +7,7 @@ using JPB.ErrorValidation.ValidationRules;
 
 namespace JPB.ErrorValidation.ValidationTyps
 {
-	public delegate IValidation<T> ValidationFactory<T>(string errorText, string fieldName, Func<T, bool> validator);
+	public delegate IValidation<T> ValidationFactory<T>(object errorText, string fieldName, Func<T, bool> validator);
 
 	/// <summary>
 	/// Common used Operations for IValidation objects

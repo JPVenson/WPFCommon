@@ -7,7 +7,7 @@ using JPB.WPFBase.MVVM.ViewModel;
 namespace JPB.ErrorValidation.ValidationTyps
 {
 	/// <summary>
-	///     Defines an Error
+	///     Defines an static Error that will be displayed when the condition is met
 	/// </summary>
 	public class Error<T> : IValidation<T>
 	{
@@ -52,33 +52,35 @@ namespace JPB.ErrorValidation.ValidationTyps
 		}
 
 		#region IValidation<T> Members
-
+		
+		/// <inheritdoc />
 		public virtual string[] ErrorIndicator
 		{
 			get { return _errorIndicator; }
 			set { _errorIndicator = value; }
 		}
-
+		
+		/// <inheritdoc />
 		public virtual object ErrorText
 		{
 			get { return _errorText; }
 			set { _errorText = value; }
 		}
-
+		
+		/// <inheritdoc />
 		public virtual Func<T, bool> Condition
 		{
 			get { return _condition; }
 			set { _condition = value; }
 		}
-
+		
+		/// <inheritdoc />
 		public virtual object ErrorType
 		{
 			get { return "Need"; }
 		}
-
-		/// <summary>
-		///     The Condition that indicates an Error. True error, False NoError
-		/// </summary>
+		
+		/// <inheritdoc />
 		Func<object, bool> IValidation.Condition
 		{
 			get
@@ -95,7 +97,8 @@ namespace JPB.ErrorValidation.ValidationTyps
 			}
 			set { Condition = arg => value(arg); }
 		}
-
+		
+		/// <inheritdoc />
 		public bool Unbound { get; set; }
 
 		#endregion
@@ -137,30 +140,35 @@ namespace JPB.ErrorValidation.ValidationTyps
 		
 
 		#region IValidation<T> Members
-
+		
+		/// <inheritdoc />
 		public virtual string[] ErrorIndicator
 		{
 			get { return _errorIndicator; }
 			set { _errorIndicator = value; }
 		}
-
+		
+		/// <inheritdoc />
 		public virtual object ErrorText
 		{
 			get { return _errorText; }
 			set { _errorText = value; }
 		}
-
+		
+		/// <inheritdoc />
 		public virtual Func<object, bool> Condition
 		{
 			get { return _condition; }
 			set { _condition = value; }
 		}
-
+		
+		/// <inheritdoc />
 		public virtual object ErrorType
 		{
 			get { return "Need"; }
 		}
 		
+		/// <inheritdoc />
 		public bool Unbound { get; set; }
 
 		#endregion

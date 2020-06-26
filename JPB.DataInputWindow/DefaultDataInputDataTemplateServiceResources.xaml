@@ -2,16 +2,16 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:JPB.DataInputWindow"
                     xmlns:viewModel="clr-namespace:JPB.DataInputWindow.ViewModel">
-    <local:DataInputDataTemplateService x:Key="DefaultDataInputDataTemplateService">
-        <local:DataImportDataTemplate DisplayKey="{x:Static local:DisplayTypes.Text}">
-            <DataTemplate DataType="{x:Type viewModel:DataImportFieldViewModelBase}">
-                <TextBox Text="{Binding Value}"/>
-            </DataTemplate>
-        </local:DataImportDataTemplate>
-        <local:DataImportDataTemplate DisplayKey="{x:Static local:DisplayTypes.Date}">
-            <DataTemplate DataType="{x:Type viewModel:DataImportFieldViewModelBase}">
-                <DatePicker SelectedDate="{Binding Value}"/>
-            </DataTemplate>
-        </local:DataImportDataTemplate>
-    </local:DataInputDataTemplateService>
+<local:DataInputDataTemplateService x:Key="DefaultDataInputDataTemplateService">
+    <local:DataImportDataTemplate DisplayKey="{x:Static local:DisplayTypes.Text}">
+        <DataTemplate DataType="{x:Type viewModel:DataImportFieldViewModelBase}">
+            <TextBox Text="{Binding Value}"/>
+        </DataTemplate>
+    </local:DataImportDataTemplate>
+    <local:DataImportDataTemplate DisplayKey="{x:Static local:DisplayTypes.Date}">
+        <DataTemplate DataType="{x:Type viewModel:DataImportFieldViewModelBase}">
+            <DatePicker SelectedDate="{Binding Value}"/>
+        </DataTemplate>
+    </local:DataImportDataTemplate>
+</local:DataInputDataTemplateService>
 </ResourceDictionary>

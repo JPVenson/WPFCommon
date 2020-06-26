@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using JPB.ErrorValidation.ValidationTyps;
 
 namespace JPB.ErrorValidation
@@ -12,22 +14,35 @@ namespace JPB.ErrorValidation
 		/// Enabled/Disable all validation
 		/// </summary>
 		bool Validate { get; set; }
-		/// <summary>
-		/// if and how messages should be formatted
-		/// </summary>
-		string MessageFormat { get; set; }
+		
 		/// <summary>
 		/// The Errors that are used for validation
 		/// </summary>
-		IErrorCollectionBase UserErrors { get; set; }
+		IErrorCollectionBase UserErrors { get; }
+
+		/// <summary>
+		///		Replaces the underlying error collection
+		/// </summary>
+		/// <param name="newCollection"></param>
+		/// <returns></returns>
+		Task ReplaceUserErrorCollection(IErrorCollectionBase newCollection);
+
 		/// <summary>
 		/// Are any Errors known?
 		/// </summary>
 		bool HasError { get; }
+
 		/// <summary>
 		/// Refresh the Errors
 		/// </summary>
+		[Obsolete("Please use the ForceRefreshAsync")]
 		void ForceRefresh();
+
+		/// <summary>
+		/// Refresh the Errors
+		/// </summary>
+		Task ForceRefreshAsync();
+
 		/// <summary>
 		/// Gets all Errors for the Field
 		/// </summary>
@@ -35,6 +50,7 @@ namespace JPB.ErrorValidation
 		/// <param name="obj"></param>
 		/// <returns></returns>
 		IValidation[] GetError(string columnName, object obj);
+
 		/// <summary>
 		/// The list of all Active Errors
 		/// </summary>

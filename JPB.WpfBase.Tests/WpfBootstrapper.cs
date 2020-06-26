@@ -1,5 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using NUnit.Framework;
 
 [SetUpFixture]
@@ -8,6 +12,11 @@ public class WpfBootstrapper
 	private Thread _appThread;
 
 	public static Application App { get; private set; }
+
+	public static async Task WaitForDispatcher()
+	{
+		await App.Dispatcher.BeginInvoke(new Action(() => Console.Write("")), DispatcherPriority.ApplicationIdle);
+	}
 
 	[OneTimeSetUp]
 	public void Setup()

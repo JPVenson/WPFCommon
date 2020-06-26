@@ -43,9 +43,6 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			};
 		}
 
-		/// <inheritdoc />
-		public override IErrorCollectionBase UserErrors { get; set; }
-
 		protected AsyncErrorProviderBase(IErrorCollectionBase errors) 
 			: this(null, errors)
 		{
@@ -86,7 +83,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			{
 				_errorTaskDispatcher.TryAdd(() =>
 				{
-					if (_errorTaskDispatcher.ConcurrentQueue.Count > 2)
+					if (_errorTaskDispatcher.ConcurrentQueue.Count > 1)
 					{
 						AddWaiter();
 					}
@@ -98,7 +95,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			}
 
 			AddWaiter();
-			await manualResetEvent.WaitHandle.WaitOneAsync(TimeSpan.MaxValue);
+			await manualResetEvent.WaitHandle.WaitOneAsync(new TimeSpan(0, 0, 0, 0, -1));
 		}
 
 		/// <summary>
@@ -119,7 +116,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			}
 
 			ErrorMapper.TryGetValue(propertyName, out var errorJob);
-			return errorJob?.Select(f => ValidationToUiError == null ? f : ValidationToUiError(f));
+			return errorJob?.Select(f => ValidationToUiError == null ? f : ValidationToUiError(f)) ?? Enumerable.Empty<IValidation>();
 		}
 
 		/// <inheritdoc />
@@ -174,16 +171,13 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 		}
 
 		/// <inheritdoc />
-		public override void ForceRefresh()
+		public override async Task ForceRefreshAsync()
 		{
 			if (ErrorMapper != null)
 			{
-				using (var async = AsyncHelper.Wait)
+				foreach (var errorMap in ErrorMapper)
 				{
-					foreach (var errorMap in ErrorMapper)
-					{
-						async.Run(ValidateAsync(errorMap.Key));
-					}
+					await ValidateAsync(errorMap.Key);
 				}
 			}
 		}
@@ -298,7 +292,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 			AsyncRunState validation2Key)
 		{
 			RunAsyncTask(() => ObManage(validation, this), validation2Key,
-				validations => { HandleErrors(validations, validation); },
+				validations => HandleErrors(validations, validation),
 				validation.Select(f => f.GetHashCode().ToString()).Aggregate((e, f) => e + f));
 		}
 

@@ -22,14 +22,14 @@ namespace WpfApplication1
 			var dataImportWindowFactory = new DataImportWindowFactory();
 			var dataImportViewModel = dataImportWindowFactory.ConstructInputWindow()
 				.Field(DisplayTypes.Text, "PROPA")
-				.Display("Test Text A")
+					.Display("Test Text A")
 				.Field(DisplayTypes.Text, "PROPB")
-				.Display("Test Required B")
-				.IsRequired("This field is Required")
+					.Display("Test Required B")
+					.IsRequired("This field is Required")
 				.Field(DisplayTypes.Text, "PROPC")
-				.Display("Test Required With Custom Validation")
-				.IsRequired("This field is Required")
-				.Validate("Should not start with any A", f => f.ToString().StartsWith("A"))
+					.Display("Test Required With Custom Validation")
+					.IsRequired("This field is Required")
+					.Validate("Should not start with any A", f => f.ToString().StartsWith("A"))
 				.Show();
 
 			foreach (var keyValuePair in dataImportViewModel.GetValues())
