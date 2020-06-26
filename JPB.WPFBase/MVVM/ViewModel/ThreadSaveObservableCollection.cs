@@ -28,40 +28,22 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	///     All Write Operations are synchronized to the Dispatcher. All Read operations will occur in the calling thread.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-#if !WINDOWS_UWP
 	[Serializable]
-	[DebuggerDisplay("Count = {Count}")]
 	[SuppressMessage("ReSharper", "NotResolvedInText")]
 	[DebuggerTypeProxy(typeof(ThreadSaveObservableCollection<>.ThreadSaveObservableCollectionDebuggerProxy))]
-#endif
 	public class ThreadSaveObservableCollection<T> :
 		ViewModelBase,
 		IReadOnlyList<T>,
 		IProducerConsumerCollection<T>,
 		IList,
 		IList<T>,
-		INotifyCollectionChanged,
-#if !WINDOWS_UWP
-		ICloneable,
-#endif
-		IDisposable
+		INotifyCollectionChanged 
 	{
-		protected static ConstructorInfo InitializerInfo;
-#if !WINDOWS_UWP
 		[NonSerialized]
-#endif
 		private readonly IList<T> _base;
 
-#if !WINDOWS_UWP
 		[NonSerialized]
-#endif
 		private bool _batchCommit;
-
-		static ThreadSaveObservableCollection()
-		{
-			InitializerInfo = typeof(T).GetConstructors(BindingFlags.CreateInstance | BindingFlags.Public)
-				.FirstOrDefault(e => !e.GetParameters().Any());
-		}
 
 		private ThreadSaveObservableCollection(IList<T> collection, bool copy)
 			: this(DispatcherLock.GetDispatcher())
@@ -115,22 +97,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <returns>
 		///     A new object that is a copy of this instance.
 		/// </returns>
-		public object Clone()
+		public ThreadSaveObservableCollection<T> Clone()
 		{
-			lock (Lock)
-			{
-				var newCollection = new ThreadSaveObservableCollection<T>(this);
-				return newCollection;
-			}
-		}
-
-		/// <inheritdoc />
-		public void Dispose()
-		{
-			lock (Lock)
-			{
-				_base.Clear();
-			}
+			return new ThreadSaveObservableCollection<T>(this);
 		}
 
 		/// <inheritdoc cref="ICollection" />
@@ -239,8 +208,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				{
 					return;
 				}
-
-				_base[index] = (T) value;
+				ReplaceItem(index, (T) value);
+				//_base[index] = (T) value;
 			}
 		}
 
@@ -317,8 +286,9 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				{
 					return;
 				}
-
-				_base[index] = value;
+				
+				ReplaceItem(index, value);
+				//_base[index] = value;
 			}
 		}
 
@@ -347,19 +317,19 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public object SyncRoot
 		{
-			get { return Lock; }
+			get { return Dispatcher; }
 		}
 
 		/// <inheritdoc />
 		public bool IsSynchronized
 		{
-			get { return Monitor.IsEntered(Lock); }
+			get { return Dispatcher.CheckAccess(); }
 		}
 
 		/// <inheritdoc />
 		public bool TryAdd(T item)
 		{
-			if (Monitor.IsEntered(Lock))
+			if (!IsSynchronized)
 			{
 				return false;
 			}
@@ -372,13 +342,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		public bool TryTake(out T item)
 		{
 			item = default(T);
-			if (!Monitor.IsEntered(Lock))
+			if (IsSynchronized)
 			{
-				lock (Lock)
-				{
-					item = this[Count - 1];
-					return true;
-				}
+				item = this[Count - 1];
+				return true;
 			}
 
 			return false;
@@ -387,10 +354,17 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		/// <inheritdoc />
 		public T[] ToArray()
 		{
-			lock (Lock)
+			if (ThreadSaveEnumeration)
 			{
-				return _base.ToArray();
+				T[] result = null;
+				ThreadSaveAction(() =>
+				{
+					result = _base.ToArray();
+				});
+				return result;
 			}
+
+			return _base.ToArray();
 		}
 
 		/// <inheritdoc />
@@ -400,7 +374,10 @@ namespace JPB.WPFBase.MVVM.ViewModel
 			if (ThreadSaveEnumeration)
 			{
 				IEnumerator<T> enumerator = null;
-				ThreadSaveAction(() => { enumerator = ToArray().Cast<T>().GetEnumerator(); });
+				ThreadSaveAction(() =>
+				{
+					enumerator = ((IEnumerable<T>)_base.ToArray()).GetEnumerator();
+				});
 				return enumerator;
 			}
 
@@ -545,8 +522,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 				{
 					Monitor.Exit(Lock);
 				}
-
-				cpy.Dispose();
 			}
 		}
 
@@ -561,17 +536,14 @@ namespace JPB.WPFBase.MVVM.ViewModel
 
 		private void CopyFrom(IEnumerable<T> collection)
 		{
-			lock (Lock)
+			var items = _base;
+			if (collection != null && items != null)
 			{
-				var items = _base;
-				if (collection != null && items != null)
+				using (var enumerator = collection.GetEnumerator())
 				{
-					using (var enumerator = collection.GetEnumerator())
+					while (enumerator.MoveNext())
 					{
-						while (enumerator.MoveNext())
-						{
-							items.Add(enumerator.Current);
-						}
+						items.Add(enumerator.Current);
 					}
 				}
 			}

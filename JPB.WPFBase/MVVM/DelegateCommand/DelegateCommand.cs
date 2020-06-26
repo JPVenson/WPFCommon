@@ -49,11 +49,33 @@ namespace JPB.WPFBase.MVVM.DelegateCommand
 		{
 		}
 
+		/// <summary>
+		///		Holds the underlying events for a manual event trigger
+		/// </summary>
+		protected virtual event EventHandler ManualCanExecuteChanged;
+
 		/// <inheritdoc />
 		public override event EventHandler CanExecuteChanged
 		{
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
+			add
+			{
+				CommandManager.RequerySuggested += value;
+				ManualCanExecuteChanged += value;
+			}
+			remove
+			{
+				CommandManager.RequerySuggested -= value;
+				ManualCanExecuteChanged -= value;
+			}
+		}
+
+		/// <summary>
+		///		Allows the raising of the CanExecuteChanged event in addition to the <see cref="CommandManager.RequerySuggested"/> event.
+		///		It is not necessary to call this method in most cases as the <see cref="CommandManager.RequerySuggested"/> will raise this event
+		/// </summary>
+		public virtual void RaiseCanExecuteChanged()
+		{
+			ManualCanExecuteChanged?.Invoke(this, EventArgs.Empty);
 		}
 	}
 
