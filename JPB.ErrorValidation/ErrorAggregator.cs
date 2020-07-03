@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
-using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation
 {

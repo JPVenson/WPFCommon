@@ -4,12 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wpfApplication1="clr-namespace:WpfApplication1"
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
-        xmlns:validationTyps="clr-namespace:JPB.ErrorValidation.ValidationTyps;assembly=JPB.ErrorValidation"
-        xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System"
-        xmlns:validationRules="clr-namespace:JPB.ErrorValidation.ValidationRules;assembly=JPB.ErrorValidation"
-        xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
-        xmlns:templates="clr-namespace:JPB.ErrorValidation.Resources.Templates;assembly=JPB.ErrorValidation"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:templates="clr-namespace:JPB.WPFToolsAwesome.Error.Resources.Templates;assembly=JPB.WPFToolsAwesome"
+        xmlns:eval="clr-namespace:JPB.WPFToolsAwesome.Behaviors.Eval;assembly=JPB.WPFToolsAwesome"
+        xmlns:evaluators="clr-namespace:JPB.WPFToolsAwesome.Behaviors.Eval.Evaluators;assembly=JPB.WPFToolsAwesome"
+        xmlns:actions="clr-namespace:JPB.WPFToolsAwesome.Behaviors.Eval.Actions;assembly=JPB.WPFToolsAwesome"
         mc:Ignorable="d"
 
         Title="MainWindow" Height="350" Width="525"
@@ -18,7 +17,7 @@
 	<Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/JPB.ErrorValidation;component/Resources/Templates/CommonErrorResources.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/JPB.WPFToolsAwesome;component/Error/Resources/Templates/CommonErrorResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <SolidColorBrush x:Key="{templates:GetStyleInfoKey templates:ErrorTemplateStyleResources.Fill}" Color="Red"/>
@@ -36,6 +35,7 @@
             <Style TargetType="{x:Type ComboBox}" 
                    BasedOn="{StaticResource ControlWithValidation}">
             </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
 	</Window.Resources>
 
@@ -43,14 +43,25 @@
 		<DockPanel DockPanel.Dock="Top">
 			<TextBlock DockPanel.Dock="Right"
                        IsEnabled="False"
-                       Text="{Binding IsValidating}"/>
+                       Text="TEST">
+                <b:Interaction.Behaviors>
+                    <eval:EvaluatePropertyBehavior>
+                        <evaluators:AndEvaluator>
+                           <evaluators:HasErrorEvaluator/>
+                        </evaluators:AndEvaluator>
+                        <eval:EvaluatePropertyBehavior.EvaluateActions>
+                            <actions:SetControlPropertyFieldNameAction FieldName="Visibility" Converter="{StaticResource BooleanToVisibilityConverter}" />
+                        </eval:EvaluatePropertyBehavior.EvaluateActions>
+                    </eval:EvaluatePropertyBehavior>
+                </b:Interaction.Behaviors>
+            </TextBlock>
 			<TextBox DockPanel.Dock="Left"
                  Text="{Binding ToValidationString, Mode=TwoWay,
                  ValidatesOnDataErrors=True,
                  NotifyOnValidationError=True,
                  UpdateSourceTrigger=PropertyChanged}"
                  Height="25" />
-		</DockPanel>
+        </DockPanel>
 
 
 		<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ActiveValidationCases}">

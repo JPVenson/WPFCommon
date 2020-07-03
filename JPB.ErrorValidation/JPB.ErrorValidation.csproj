@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ErrorAggregator.cs" />
+    <Compile Include="Eval\Evaluators\HasError.cs" />
     <Compile Include="IErrorCollectionBase.cs" />
     <Compile Include="IErrorValidatorBase.cs" />
     <Compile Include="Resources\Selectors\ErrorContentSelector.cs" />
@@ -88,17 +89,9 @@
     <Compile Include="ValidationTyps\Warning.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JPB.Extentions\JPB.Extensions.csproj">
-      <Project>{c1150265-60eb-4e75-b20b-61c9d8a88779}</Project>
-      <Name>JPB.Extensions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JPB.Tasking\JPB.Tasking.csproj">
       <Project>{0F6C25A5-DAF2-4BCE-8C4D-F6D6542A172E}</Project>
       <Name>JPB.Tasking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
-      <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
-      <Name>JPB.WPFBase</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

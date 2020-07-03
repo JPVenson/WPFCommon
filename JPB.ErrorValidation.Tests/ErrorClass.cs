@@ -2,9 +2,9 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using JPB.ErrorValidation.ValidationRules;
-using JPB.ErrorValidation.ValidationTyps;
-using JPB.ErrorValidation.ViewModelProvider.Base;
+using JPB.WPFToolsAwesome.Error.ValidationRules;
+using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ViewModelProvider.Base;
 
 namespace JPB.ErrorValidation.Tests
 {

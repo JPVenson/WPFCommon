@@ -6,8 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using JPB.WpfBase.Tests.MVVM.ViewModel.AsyncViewModel;
-using JPB.WPFBase.Logger;
-using JPB.WPFBase.MVVM.ViewModel;
+using JPB.WPFToolsAwesome.MVVM.ViewModel;
 using NUnit.Framework;
 
 namespace JPB.WpfBase.Tests.MVVM.ViewModel.ThreadSaveCollection

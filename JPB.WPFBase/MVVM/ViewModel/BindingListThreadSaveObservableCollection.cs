@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
 namespace JPB.WPFBase.MVVM.ViewModel
 {
@@ -13,24 +14,35 @@ namespace JPB.WPFBase.MVVM.ViewModel
 	public class BindingListThreadSaveObservableCollection<T> : ThreadSaveObservableCollection<T>,
 		IBindingList
 	{
+		static BindingListThreadSaveObservableCollection()
+		{
+			var defaultConstructor = typeof(T).GetConstructors(BindingFlags.CreateInstance | BindingFlags.Public)
+				.FirstOrDefault(e => !e.GetParameters().Any());
+			if (defaultConstructor != null)
+			{
+				Factory = () => (T)defaultConstructor.Invoke(null);
+			}
+		}
+
+		public static Func<T> Factory { get; set; }
+
 		private readonly IList<PropertyDescriptor> _searchIndexes = new List<PropertyDescriptor>();
 
 		/// <summary>
 		/// </summary>
 		public BindingListThreadSaveObservableCollection()
 		{
-			AllowNew = InitializerInfo != null;
 		}
 
 		/// <inheritdoc />
 		public object AddNew()
 		{
-			if (InitializerInfo == null)
+			if (Factory == null)
 			{
 				throw new NotSupportedException($"AllowNew for type '{typeof(T)}' is invalid");
 			}
 
-			return InitializerInfo.Invoke(null);
+			return Factory.Invoke();
 		}
 
 		/// <inheritdoc />
@@ -98,7 +110,13 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		}
 
 		/// <inheritdoc />
-		public bool AllowNew { get; }
+		public bool AllowNew
+		{
+			get
+			{
+				return Factory != null;
+			}
+		}
 
 		/// <inheritdoc />
 		public bool AllowEdit { get; set; }
@@ -122,8 +140,8 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		public PropertyDescriptor SortProperty { get; }
 
 		/// <inheritdoc />
-		public ListSortDirection SortDirection { get; } 
-		
+		public ListSortDirection SortDirection { get; }
+
 		/// <inheritdoc />
 		public event ListChangedEventHandler ListChanged;
 

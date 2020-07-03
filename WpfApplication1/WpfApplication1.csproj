@@ -98,20 +98,16 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JPB.DataInputWindow\JPB.DataInputWindow.csproj">
-      <Project>{64E77049-2B41-482C-8428-23BE086A3942}</Project>
-      <Name>JPB.DataInputWindow</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JPB.ErrorValidation\JPB.ErrorValidation.csproj">
-      <Project>{795AE2CF-4B7A-4C3B-8A29-618B727FB252}</Project>
-      <Name>JPB.ErrorValidation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
-      <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
-      <Name>JPB.WPFBase</Name>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
+      <Version>1.1.19</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JPB.WPFToolsAwesome.NetStandard\JPB.WPFToolsAwesome.NetStandard.csproj">
+      <Project>{C35B10AC-1A9C-46D9-AD17-F7D26D156E6F}</Project>
+      <Name>JPB.WPFToolsAwesome.NetStandard</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

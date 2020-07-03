@@ -5,8 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using JPB.ErrorValidation.ValidationTyps;
-using JPB.ErrorValidation.ViewModelProvider.Base;
+using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ViewModelProvider.Base;
 using NUnit.Framework;
 
 namespace JPB.ErrorValidation.Tests

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace JPB.ErrorValidation.ValidationTyps
+﻿namespace JPB.ErrorValidation.ValidationTyps
 {
     //public class Warning<T> : IValidation<T>
     //{

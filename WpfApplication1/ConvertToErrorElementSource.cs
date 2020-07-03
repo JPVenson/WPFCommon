@@ -1,15 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Markup;
-using JPB.WPFBase.Converter;
 
 namespace WpfApplication1
 {

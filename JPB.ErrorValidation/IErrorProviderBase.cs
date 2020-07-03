@@ -1,9 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq.Expressions;
-using JPB.ErrorValidation.ValidationTyps;
-
-namespace JPB.ErrorValidation
+﻿namespace JPB.ErrorValidation
 {
     //public interface IErrorProviderBase : INotifyPropertyChanged
     //{

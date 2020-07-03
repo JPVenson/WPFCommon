@@ -1,14 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using JPB.DataInputWindow;
-using JPB.ErrorValidation.ValidationRules;
-using JPB.ErrorValidation.ValidationTyps;
-using JPB.ErrorValidation.ViewModelProvider;
-using JPB.ErrorValidation.ViewModelProvider.Base;
-using JPB.WPFBase.MVVM.ViewModel;
+using JPB.WPFToolsAwesome.Error.ValidationRules;
+using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ViewModelProvider.Base;
+using JPB.WPFToolsAwesome.MVVM.ViewModel;
 
 namespace WpfApplication1
 {
@@ -19,26 +14,6 @@ namespace WpfApplication1
 
 		public TestWindowViewModel()
 		{
-			var dataImportWindowFactory = new DataImportWindowFactory();
-			var dataImportViewModel = dataImportWindowFactory.ConstructInputWindow()
-				.Field(DisplayTypes.Text, "PROPA")
-					.Display("Test Text A")
-				.Field(DisplayTypes.Text, "PROPB")
-					.Display("Test Required B")
-					.IsRequired("This field is Required")
-				.Field(DisplayTypes.Text, "PROPC")
-					.Display("Test Required With Custom Validation")
-					.IsRequired("This field is Required")
-					.Validate("Should not start with any A", f => f.ToString().StartsWith("A"))
-				.Show();
-
-			foreach (var keyValuePair in dataImportViewModel.GetValues())
-			{
-				Console.WriteLine("Key: " + keyValuePair.Key + " : " + keyValuePair.Value);
-			}
-			Console.WriteLine(dataImportViewModel);
-
-
 			ThreadSaveObservableCollection = new ThreadSaveObservableCollection<string>();
 
 			//SimpleWork(() =>

@@ -24,8 +24,6 @@ namespace JPB.WPFBase.MVVM.ViewModel
 		INotifyPropertyChanged,
 		INotifyPropertyChanging
 	{
-		
-
 		/// <inheritdoc />
 		public ViewModelBase(Dispatcher dispatcher)
 			: base(dispatcher)

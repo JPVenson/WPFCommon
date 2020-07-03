@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using JPB.ErrorValidation.ValidationRules;
-using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ValidationTyps
 {

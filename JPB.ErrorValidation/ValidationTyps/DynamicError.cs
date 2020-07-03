@@ -1,6 +1,5 @@
 ﻿using System;
 using JetBrains.Annotations;
-using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ValidationTyps
 {

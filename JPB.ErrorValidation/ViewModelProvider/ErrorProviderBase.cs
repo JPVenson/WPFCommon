@@ -8,7 +8,6 @@ using System.Windows.Threading;
 using System.Xml.Serialization;
 using JPB.ErrorValidation.ValidationTyps;
 using JPB.Tasking.TaskManagement;
-using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ViewModelProvider
 {

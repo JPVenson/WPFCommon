@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using JPB.WpfBase.Tests.MVVM.ViewModel.AsyncViewModel;
-using JPB.WPFBase.MVVM.DelegateCommand;
-using JPB.WPFBase.MVVM.ViewModel;
+using JPB.WPFToolsAwesome.MVVM.DelegateCommand;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 

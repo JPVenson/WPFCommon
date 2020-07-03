@@ -3,8 +3,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using JPB.WpfBase.Tests.MVVM.ViewModel.Memento.Models;
-using JPB.WPFBase.MVVM.ViewModel.Memento;
-using JPB.WPFBase.MVVM.ViewModel.Memento.Snapshots;
+using JPB.WPFToolsAwesome.MVVM.ViewModel.Memento;
+using JPB.WPFToolsAwesome.MVVM.ViewModel.Memento.Snapshots;
 using NUnit.Framework;
 
 namespace JPB.WpfBase.Tests.MVVM.ViewModel.Memento

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <TargetFrameworks>
@@ -9,109 +9,22 @@
       net471 ;
       net472 ;
       net48  ;
+      netcoreapp3.1
     </TargetFrameworks>
     <AssemblyName>JPB.WPFToolsAwesome</AssemblyName>
     <RootNamespace>JPB.WPFToolsAwesome</RootNamespace>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\JPB.ErrorValidation\IErrorCollectionBase.cs" Link="Error\IErrorCollectionBase.cs" />
-    <Compile Include="..\JPB.ErrorValidation\IErrorInfoProvider.cs" Link="Error\IErrorInfoProvider.cs" />
-    <Compile Include="..\JPB.ErrorValidation\IErrorProviderBase.cs" Link="Error\IErrorProviderBase.cs" />
-    <Compile Include="..\JPB.ErrorValidation\IErrorValidatorBase.cs" Link="Error\IErrorValidatorBase.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationRules\ErrorCollection.cs" Link="Error\ValidationRules\ErrorCollection.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationRules\ErrorCollectionWrapper.cs" Link="Error\ValidationRules\ErrorCollectionWrapper.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationRules\ErrorHashSet.cs" Link="Error\ValidationRules\ErrorHashSet.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationRules\ThreadSaveValidationRuleBase.cs" Link="Error\ValidationRules\ThreadSaveValidationRuleBase.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\AsyncError.cs" Link="Error\ValidationTyps\AsyncError.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\AsyncRunState.cs" Link="Error\ValidationTyps\AsyncRunState.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\AsyncState.cs" Link="Error\ValidationTyps\AsyncState.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\AsyncValidationOption.cs" Link="Error\ValidationTyps\AsyncValidationOption.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\DynamicError.cs" Link="Error\ValidationTyps\DynamicError.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\Error.cs" Link="Error\ValidationTyps\Error.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\ErrorExtentions.cs" Link="Error\ValidationTyps\ErrorExtentions.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\IAsyncValidation.cs" Link="Error\ValidationTyps\IAsyncValidation.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\IAsyncValidationOption.cs" Link="Error\ValidationTyps\IAsyncValidationOption.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\IValidation.cs" Link="Error\ValidationTyps\IValidation.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\NoError.cs" Link="Error\ValidationTyps\NoError.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ValidationTyps\Warning.cs" Link="Error\ValidationTyps\Warning.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\AsyncErrorProviderBase.cs" Link="Error\ViewModelProvider\Base\AsyncErrorProviderBase.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\Base\DataError.cs" Link="Error\ViewModelProvider\Base\DataError.cs" />
-    <Compile Include="..\JPB.ErrorValidation\ViewModelProvider\ErrorProviderBase.cs" Link="Error\ViewModelProvider\ErrorProviderBase.cs" />
-    <Compile Include="..\JPB.Extentions\Extensions\CollectionExtensions.cs" Link="Extensions\CollectionExtensions.cs" />
-    <Compile Include="..\JPB.Extentions\Extensions\CommonIEnumerableExtensions.cs" Link="Extensions\CommonIEnumerableExtensions.cs" />
-    <Compile Include="..\JPB.Extentions\Extensions\DateHelperExtention.cs" Link="Extensions\DateHelperExtention.cs" />
-    <Compile Include="..\JPB.Tasking\TaskManagement\AsyncHelper.cs" Link="TaskManagement\AsyncHelper.cs" />
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\ActionDispatcher.cs" Link="TaskManagement\Threading\ActionDispatcher.cs" />
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs" Link="TaskManagement\Threading\LimitedConcurrencyLevelTaskScheduler.cs" />
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\MultiTaskDispatcher.cs" Link="TaskManagement\Threading\MultiTaskDispatcher.cs" />
-    <Compile Include="..\JPB.Tasking\TaskManagement\Threading\SerialTaskDispatcherBase.cs" Link="TaskManagement\Threading\SerialTaskDispatcherBase.cs" />
-    <Compile Include="..\JPB.WPFBase\Converter\BooleanInverseConverter.cs" Link="Converter\BooleanInverseConverter.cs" />
-    <Compile Include="..\JPB.WPFBase\Converter\BooleanVisibilityConverter.cs" Link="Converter\BooleanVisibilityConverter.cs" />
-    <Compile Include="..\JPB.WPFBase\Converter\BooleanVisibilityInverseConverter.cs" Link="Converter\BooleanVisibilityInverseConverter.cs" />
-    <Compile Include="..\JPB.WPFBase\Converter\ChainConverter.cs" Link="Converter\ChainConverter.cs" />
-    <Compile Include="..\JPB.WPFBase\Converter\TypedParamValueConverter.cs" Link="Converter\TypedParamValueConverter.cs" />
-    <Compile Include="..\JPB.WPFBase\Converter\TypedValueConverter.cs" Link="Converter\TypedValueConverter.cs" />
-    <Compile Include="..\JPB.WPFBase\Converter\VisibilityBooleanConverter.cs" Link="Converter\VisibilityBooleanConverter.cs" />
-    <Compile Include="..\JPB.WPFBase\Logger\DispatcherLogger\DispatcherStatusMonitor.cs" Link="Logger\DispatcherLogger\DispatcherStatusMonitor.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\AsyncDelegateCommand.cs" Link="MVVM\DelegateCommand\AsyncDelegateCommand.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\AutoDelegateCommand.cs" Link="MVVM\DelegateCommand\AutoDelegateCommand.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\DelegateCommand.cs" Link="MVVM\DelegateCommand\DelegateCommand.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\DelegateCommandBase.cs" Link="MVVM\DelegateCommand\DelegateCommandBase.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\StrictDelegateCommand.cs" Link="MVVM\DelegateCommand\StrictDelegateCommand.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\DelegateCommand\UiDelegateCommand.cs" Link="MVVM\DelegateCommand\UiDelegateCommand.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AcceptPendingChangeEventArgs.cs" Link="MVVM\ViewModel\AcceptPendingChangeEventArgs.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AcceptPendingChangeHandler.cs" Link="MVVM\ViewModel\AcceptPendingChangeHandler.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AsyncViewModelBase.cs" Link="MVVM\ViewModel\AsyncViewModelBase.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\AsyncViewModelBaseOptions.cs" Link="MVVM\ViewModel\AsyncViewModelBaseOptions.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\BindingListThreadSaveObservableCollection.cs" Link="MVVM\ViewModel\BindingListThreadSaveObservableCollection.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\DispatcherLock.cs" Link="MVVM\ViewModel\DispatcherLock.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\DispatcherOperationLite.cs" Link="MVVM\ViewModel\DispatcherOperationLite.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\IAcceptPendingChange.cs" Link="MVVM\ViewModel\IAcceptPendingChange.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Attributes\IgnoreMementoAttribute.cs" Link="MVVM\ViewModel\Memento\Attributes\IgnoreMementoAttribute.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs" Link="MVVM\ViewModel\Memento\Attributes\MementoAttribute.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoDataStamp.cs" Link="MVVM\ViewModel\Memento\IMementoDataStamp.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoValueHolder.cs" Link="MVVM\ViewModel\Memento\IMementoValueHolder.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\IMementoValueProducer.cs" Link="MVVM\ViewModel\Memento\IMementoValueProducer.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\ImportFlags.cs" Link="MVVM\ViewModel\Memento\ImportFlags.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoController.cs" Link="MVVM\ViewModel\Memento\MementoController.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoDataStamp.cs" Link="MVVM\ViewModel\Memento\MementoDataStamp.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoDataStampProxy.cs" Link="MVVM\ViewModel\Memento\MementoDataStampProxy.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoOptions.cs" Link="MVVM\ViewModel\Memento\MementoOptions.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoSerializationOptions.cs" Link="MVVM\ViewModel\Memento\MementoSerializationOptions.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoValueProducer.cs" Link="MVVM\ViewModel\Memento\MementoValueProducer.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\MementoViewModelBase.cs" Link="MVVM\ViewModel\Memento\MementoViewModelBase.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\ResolvePropertyOnMomentHost.cs" Link="MVVM\ViewModel\Memento\ResolvePropertyOnMomentHost.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs" Link="MVVM\ViewModel\Memento\Snapshots\MementoObjectSnapshot.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs" Link="MVVM\ViewModel\Memento\Snapshots\MementoPropertySnaptshot.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\Snapshots\MementoSerialisationContext.cs" Link="MVVM\ViewModel\Memento\Snapshots\MementoSerialisationContext.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\UiMementoController.cs" Link="MVVM\ViewModel\Memento\UiMementoController.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\UiMementoProxy.cs" Link="MVVM\ViewModel\Memento\UiMementoProxy.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Memento\WeakMementoDataStamp.cs" Link="MVVM\ViewModel\Memento\WeakMementoDataStamp.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\NotificationCollector.cs" Link="MVVM\ViewModel\NotificationCollector.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Progress\PercentProgressInfo.cs" Link="MVVM\ViewModel\Progress\PercentProgressInfo.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\Progress\TextProgressInfo.cs" Link="MVVM\ViewModel\Progress\TextProgressInfo.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveObservableCollection.cs" Link="MVVM\ViewModel\ThreadSaveObservableCollection.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ThreadSaveViewModelActor.cs" Link="MVVM\ViewModel\ThreadSaveViewModelActor.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ViewModelBase.cs" Link="MVVM\ViewModel\ViewModelBase.cs" />
-    <Compile Include="..\JPB.WPFBase\MVVM\ViewModel\ViewModelBaseINPCCommonNames.cs" Link="MVVM\ViewModel\ViewModelBaseINPCCommonNames.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Converter\" />
-    <Folder Include="Error\ValidationRules\" />
-    <Folder Include="Error\ViewModelProvider\Base\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Logger\DispatcherLogger\" />
-    <Folder Include="MVVM\DelegateCommand\" />
-    <Folder Include="MVVM\ViewModel\Memento\Attributes\" />
-    <Folder Include="MVVM\ViewModel\Memento\Snapshots\" />
-    <Folder Include="MVVM\ViewModel\Progress\" />
-    <Folder Include="TaskManagement\Threading\" />
+    <Folder Include="Error\Resources\Templates\DataTemplates\" />
+    <Folder Include="Resources\Styles\" />
+    <Folder Include="Resources\Templates\DataTemplates\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 
@@ -133,6 +46,21 @@
     <Reference Include="WindowsBase">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\WindowsBase.dll</HintPath>
     </Reference>-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Error\Resources\Templates\CommonErrorControls.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Error\Resources\Templates\CommonErrorResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Error\Resources\Templates\DefaultErrorResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
 </Project>

@@ -58,16 +58,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JPB.WPFBase\JPB.WPFBase.csproj">
-      <Project>{5070CE1A-C5F1-4B6E-BDEA-C453224B8552}</Project>
-      <Name>JPB.WPFBase</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JPB.WPFToolsAwesome.NetStandard\JPB.WPFToolsAwesome.NetStandard.csproj">
+      <Project>{c35b10ac-1a9c-46d9-ad17-f7d26d156e6f}</Project>
+      <Name>JPB.WPFToolsAwesome.NetStandard</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

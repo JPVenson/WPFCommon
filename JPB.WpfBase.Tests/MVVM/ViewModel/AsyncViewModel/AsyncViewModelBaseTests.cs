@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using JPB.WPFBase.MVVM.ViewModel;
+using JPB.WPFToolsAwesome.MVVM.ViewModel;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
 

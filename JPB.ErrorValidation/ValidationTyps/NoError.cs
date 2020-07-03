@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace JPB.ErrorValidation.ValidationTyps
+﻿namespace JPB.ErrorValidation.ValidationTyps
 {
     ///// <summary>
     /////     Wird als Dummy benutzt um einen "kein" error zu simulieren

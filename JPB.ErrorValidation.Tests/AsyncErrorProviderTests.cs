@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using JPB.ErrorValidation.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ValidationTyps;
 using NUnit.Framework;
 
 namespace JPB.ErrorValidation.Tests

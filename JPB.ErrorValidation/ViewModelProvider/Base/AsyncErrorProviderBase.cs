@@ -236,7 +236,7 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 					{
 						_errorTaskDispatcher.TryAdd(() =>
 						{
-							var exec = AsyncHelper.WaitSingle(gerValidations());
+							var exec = gerValidations().GetAwaiter().GetResult();
 							BeginThreadSaveAction(() => { then(exec); });
 						}, key);
 					}
@@ -249,14 +249,14 @@ namespace JPB.ErrorValidation.ViewModelProvider.Base
 				case AsyncRunState.CurrentPlusOne:
 					_errorTaskDispatcher.TryAdd(() =>
 					{
-						var exec = AsyncHelper.WaitSingle(gerValidations());
+						var exec = gerValidations().GetAwaiter().GetResult();
 						BeginThreadSaveAction(() => { then(exec); });
 					}, key);
 					break;
 				case AsyncRunState.OnlyOnePerTime:
 					_errorTaskDispatcher.TryAdd(() =>
 					{
-						var exec = AsyncHelper.WaitSingle(gerValidations());
+						var exec = gerValidations().GetAwaiter().GetResult();
 						BeginThreadSaveAction(() => { then(exec); });
 					}, key, 1);
 					break;

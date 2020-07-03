@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Threading;
 using System.Windows.Threading;
 using JPB.ErrorValidation.ValidationTyps;
-using JPB.WPFBase.MVVM.ViewModel;
 
 namespace JPB.ErrorValidation.ValidationRules
 {

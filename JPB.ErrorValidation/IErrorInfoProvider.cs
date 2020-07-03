@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using JPB.WPFBase.MVVM.ViewModel;
+﻿using System.Collections.Specialized;
 
 namespace JPB.ErrorValidation
 {

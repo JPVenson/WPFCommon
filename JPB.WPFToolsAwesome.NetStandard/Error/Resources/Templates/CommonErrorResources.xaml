@@ -1,0 +1,116 @@
+﻿<ResourceDictionary 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+             xmlns:validationTyps="clr-namespace:JPB.WPFToolsAwesome.Error.ValidationTyps"
+             xmlns:templates="clr-namespace:JPB.WPFToolsAwesome.Error.Resources.Templates">
+    <DataTemplate x:Key="Validation"
+                  DataType="{x:Type validationTyps:IValidation}">
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Left"
+                       TextWrapping="Wrap"
+                       MaxWidth="250"
+                       Text="{Binding ErrorText}" />
+        </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ValidationError}">
+        <ContentControl Content="{Binding ErrorContent}"
+                        ContentTemplate="{StaticResource Validation}" />
+    </DataTemplate>
+
+
+    <DataTemplate x:Key="ErrorPopupContent"
+				  DataType="{x:Type collections:IEnumerable}">
+        <Border x:Name="errorBorder"
+                Background="{templates:GetStyleInfo {x:Static templates:ErrorTemplateStyleResources.BorderBrush}}"
+                Margin="0,0,8,8"
+                Opacity="1"
+                CornerRadius="4"
+                IsHitTestVisible="False"
+                MinHeight="25"
+                MaxHeight="300"
+                MaxWidth="280">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="4"
+                                  Color="Black"
+                                  Opacity="0.6"
+                                  Direction="315"
+                                  BlurRadius="4"/>
+            </Border.Effect>
+            <ItemsControl Margin="10" 
+                          ItemsSource="{Binding}" 
+                          Grid.IsSharedSizeScope="True"
+                          MinHeight="25"
+                          MaxHeight="300"
+                          MaxWidth="280"
+                          ItemTemplate="{templates:GetStyleInfo {x:Static templates:ErrorTemplateStyleResources.ErrorItemTemplate}}">
+            </ItemsControl>
+        </Border>
+    </DataTemplate>
+
+    <ControlTemplate x:Key="MultiErrorControlEx">
+        <StackPanel Orientation="Horizontal">
+            <!-- Defines TextBox outline border and the ToolTipCorner -->
+            <Border x:Name="border" BorderThickness="1.25"
+							  BorderBrush="{templates:GetStyleInfo {x:Static templates:ErrorTemplateStyleResources.BorderBrush}}">
+                <Grid>
+                    <Polygon x:Name="ToolTipCorner"
+				   Grid.ZIndex="2"
+				   Margin="-1"
+				   Points="9,9 9,0 0,0"
+				   Fill="{templates:GetStyleInfo {x:Static templates:ErrorTemplateStyleResources.Fill}}"
+				   HorizontalAlignment="Right"
+				   VerticalAlignment="Top"
+				   IsHitTestVisible="True"/>
+                    <Polyline Grid.ZIndex="3"
+					Points="10,10 0,0"
+					Margin="-1"
+					HorizontalAlignment="Right"
+					StrokeThickness="1.5"
+					StrokeEndLineCap="Round"
+					StrokeStartLineCap="Round"
+					Stroke="White"
+					VerticalAlignment="Top"
+					IsHitTestVisible="True"/>
+                    <AdornedElementPlaceholder x:Name="adorner"/>
+                </Grid>
+            </Border>
+            <!-- Defines the Popup -->
+            <Popup x:Name="placard"
+			 AllowsTransparency="True"
+			 PopupAnimation="Fade"
+			 Placement="Top"
+			 PlacementTarget="{Binding ElementName=ToolTipCorner}"
+			 PlacementRectangle="10,-1,0,0">
+                <!-- Used to reposition Popup when dialog moves or resizes -->
+                <!--<Interactions:Interaction.Behaviors>
+                    <dataGrid:RepositionPopupBehavior/>
+                </Interactions:Interaction.Behaviors>-->
+                <Popup.Style>
+                    <Style TargetType="{x:Type Popup}">
+                        <Style.Triggers>
+                            <!-- Shows Popup when TextBox has focus -->
+                            <DataTrigger Binding="{Binding ElementName=adorner, Path=AdornedElement.IsKeyboardFocusWithin}"
+						   Value="True">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </DataTrigger>
+                            <!-- Shows Popup when mouse hovers over ToolTipCorner -->
+                            <DataTrigger Binding="{Binding ElementName=ToolTipCorner, Path=IsMouseOver}"
+						   Value="True">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </DataTrigger>
+                            <!-- Hides Popup when window is no longer active -->
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=IsActive}"
+						   Value="False">
+                                <Setter Property="IsOpen" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Popup.Style>
+                <ContentControl ContentTemplate="{StaticResource ErrorPopupContent}" 
+                                Content="{Binding ElementName=adorner, Path=AdornedElement.(Validation.Errors)}" />
+            </Popup>
+        </StackPanel>
+    </ControlTemplate>
+</ResourceDictionary>
