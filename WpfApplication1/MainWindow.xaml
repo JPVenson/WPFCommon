@@ -7,14 +7,13 @@
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:templates="clr-namespace:JPB.WPFToolsAwesome.Error.Resources.Templates;assembly=JPB.WPFToolsAwesome"
         xmlns:eval="clr-namespace:JPB.WPFToolsAwesome.Behaviors.Eval;assembly=JPB.WPFToolsAwesome"
-        xmlns:evaluators="clr-namespace:JPB.WPFToolsAwesome.Behaviors.Eval.Evaluators;assembly=JPB.WPFToolsAwesome"
         xmlns:actions="clr-namespace:JPB.WPFToolsAwesome.Behaviors.Eval.Actions;assembly=JPB.WPFToolsAwesome"
+        xmlns:trigger="clr-namespace:JPB.WPFToolsAwesome.Behaviors.Eval.Trigger;assembly=JPB.WPFToolsAwesome"
         mc:Ignorable="d"
-
         Title="MainWindow" Height="350" Width="525"
         d:DataContext="{d:DesignInstance wpfApplication1:TestWindowViewModel}">
 
-	<Window.Resources>
+    <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/JPB.WPFToolsAwesome;component/Error/Resources/Templates/CommonErrorResources.xaml"/>
@@ -37,25 +36,37 @@
             </Style>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
-	</Window.Resources>
+    </Window.Resources>
 
     <DockPanel>
-		<DockPanel DockPanel.Dock="Top">
-			<TextBlock DockPanel.Dock="Right"
+        <DockPanel DockPanel.Dock="Top">
+            <TextBlock DockPanel.Dock="Right"
                        IsEnabled="False"
                        Text="TEST">
+                <!--<TextBlock.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger ></DataTrigger>
+                            <Trigger Property="" Value=""></Trigger>
+                            <EventTrigger >
+                            </EventTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>-->
                 <b:Interaction.Behaviors>
-                    <eval:EvaluatePropertyBehavior>
-                        <evaluators:AndEvaluator>
-                           <evaluators:HasErrorEvaluator/>
-                        </evaluators:AndEvaluator>
-                        <eval:EvaluatePropertyBehavior.EvaluateActions>
-                            <actions:SetControlPropertyFieldNameAction FieldName="Visibility" Converter="{StaticResource BooleanToVisibilityConverter}" />
-                        </eval:EvaluatePropertyBehavior.EvaluateActions>
-                    </eval:EvaluatePropertyBehavior>
+                    <eval:TriggerBehavior>
+                        <trigger:DataEqualityTrigger Property="IsEnabled" Value="true"/>
+                        <!--<trigger:AndTrigger>
+                           <trigger:HasErrorTrigger Properties="ToValidationString, Text"/>
+                        </trigger:AndTrigger>-->
+                        <eval:TriggerBehavior.TriggerActions>
+                            <actions:SetControlPropertyFieldNameAction FieldName="Visibility" 
+                                                                       Converter="{StaticResource BooleanToVisibilityConverter}" />
+                        </eval:TriggerBehavior.TriggerActions>
+                    </eval:TriggerBehavior>
                 </b:Interaction.Behaviors>
             </TextBlock>
-			<TextBox DockPanel.Dock="Left"
+            <TextBox DockPanel.Dock="Left"
                  Text="{Binding ToValidationString, Mode=TwoWay,
                  ValidatesOnDataErrors=True,
                  NotifyOnValidationError=True,
@@ -64,18 +75,18 @@
         </DockPanel>
 
 
-		<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ActiveValidationCases}">
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<TextBlock Text="{Binding ErrorText}" Foreground="Red" />
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl>
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ActiveValidationCases}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ErrorText}" Foreground="Red" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
-		<ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ThreadSaveObservableCollection}">
-		</ItemsControl>
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ThreadSaveObservableCollection}">
+        </ItemsControl>
 
-		<!--<TextBox
+        <!--<TextBox
             Style="{StaticResource {x:Type TextBox}}"
             DockPanel.Dock="Top"
                  Text="{Binding ToValidationString, ValidatesOnNotifyDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />

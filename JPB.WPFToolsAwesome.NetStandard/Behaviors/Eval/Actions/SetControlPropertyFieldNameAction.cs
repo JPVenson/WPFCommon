@@ -3,14 +3,14 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
-using JPB.WPFToolsAwesome.Behaviors.Eval.Evaluators;
+using JPB.WPFToolsAwesome.Behaviors.Eval.Trigger;
 
 namespace JPB.WPFToolsAwesome.Behaviors.Eval.Actions
 {
 	/// <summary>
 	///		Will set the property found in the AssociatedObject
 	/// </summary>
-	[ContentProperty("Converter")]
+	[ContentProperty(nameof(Converter))]
 	public class SetControlPropertyFieldNameAction : EvaluateActionBase
 	{
 		public static readonly DependencyProperty FieldNameProperty;
@@ -19,10 +19,10 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Actions
 		static SetControlPropertyFieldNameAction()
 		{
 			FieldNameProperty = DependencyProperty.Register(
-				"FieldName", typeof(string), typeof(SetControlPropertyFieldNameAction), new PropertyMetadata(default(string)));
+				nameof(FieldName), typeof(string), typeof(SetControlPropertyFieldNameAction), new PropertyMetadata(default(string)));
 
 			ConverterProperty = DependencyProperty.Register(
-				"Converter", typeof(IValueConverter), typeof(SetControlPropertyFieldNameAction), new PropertyMetadata(default(IValueConverter)));
+				nameof(Converter), typeof(IValueConverter), typeof(SetControlPropertyFieldNameAction), new PropertyMetadata(default(IValueConverter)));
 		}
 
 		public IValueConverter Converter
@@ -39,7 +39,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Actions
 
 		public override void SetValue(DependencyObject control, object dataContext, bool state)
 		{
-			var firstOrDefault = EvaluatorStepBase.GetDependencyProperties(control.GetType(), true)
+			var firstOrDefault = TriggerStepBase.GetDependencyProperties(control.GetType(), true)
 				.FirstOrDefault(e => e.Name.Equals(FieldName));
 			object value = state;
 			if (firstOrDefault != null)

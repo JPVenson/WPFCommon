@@ -7,22 +7,36 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using JetBrains.Annotations;
 
-namespace JPB.WPFToolsAwesome.Behaviors.Eval.Evaluators
+namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 {
 	/// <summary>
-	///		The base Implementation for an Evaluator. If there are any Dependency properties bound,
-	///		they should Ether call RegisterDependencyProperty or at least use the <see cref="PropertyChangedCallback"/>.
-	///<para></para>
-	/// <remarks>
-	///		If custom implementation is made take care to invoke the <see cref="OnPropertyChanged"/> and <see cref="PropertyChanging"/> whenever any of your bindings have changed to reevaluate the whole chain
-	/// </remarks>
+	///     The base Implementation for an Trigger. If there are any Dependency properties bound,
+	///     they should Ether call RegisterDependencyProperty or at least use the <see cref="PropertyChangedCallback" />.
+	///     <para></para>
+	///     <remarks>
+	///         If custom implementation is made take care to invoke the <see cref="OnPropertyChanged" /> and
+	///         <see cref="PropertyChanging" /> whenever any of your bindings have changed to reevaluate the whole chain
+	///     </remarks>
 	/// </summary>
-	public abstract class EvaluatorStepBase : FrameworkElement, IEvaluatorStep
+	public abstract class TriggerStepBase : FrameworkElement, ITriggerStep
 	{
-		public EvaluatorStepBase()
+		public abstract bool Evaluate(object dataContext, DependencyObject dependencyObject);
+
+		public virtual void SetDataContext(object dataContext)
 		{
+			DataContext = dataContext;
 		}
 
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		/// <summary>
+		///		Registers the Triggers <see cref="INotifyPropertyChanged.PropertyChanged"/> event to the <see cref="DependencyProperty"/>s <see cref="PropertyMetadata.PropertyChangedCallback"/> 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="propertyType"></param>
+		/// <param name="ownerType"></param>
+		/// <param name="typeMetadata"></param>
+		/// <returns></returns>
 		public static DependencyProperty Register(
 			string name,
 			Type propertyType,
@@ -44,11 +58,12 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Evaluators
 		public static IEnumerable<DependencyProperty> GetDependencyProperties(Type obj, bool inherted = false)
 		{
 			var flags = BindingFlags.Static |
-						BindingFlags.Public;
+			            BindingFlags.Public;
 			if (inherted)
 			{
 				flags |= BindingFlags.FlattenHierarchy;
 			}
+
 			return obj.GetFields(flags)
 				.Where(f => f.FieldType == typeof(DependencyProperty))
 				.Select(f => f.GetValue(null) as DependencyProperty)
@@ -62,20 +77,12 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Evaluators
 				return;
 			}
 
-			if (d is EvaluatorStepBase bas)
+			if (d is TriggerStepBase bas)
 			{
 				bas.OnPropertyChanging(e.Property, e.OldValue, e.NewValue);
 				bas.OnPropertyChanged(e.Property.Name);
 			}
 		}
-
-		public abstract bool Evaluate(object dataContext);
-		public virtual void SetDataContext(object dataContext)
-		{
-			DataContext = dataContext;
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
 
 		[NotifyPropertyChangedInvocator]
 		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -87,7 +94,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Evaluators
 
 		protected virtual void OnPropertyChanging(DependencyProperty property, object oldValue, object newValue)
 		{
-			PropertyChanging?.Invoke(property, oldValue,newValue);
+			PropertyChanging?.Invoke(property, oldValue, newValue);
 		}
 	}
 }
