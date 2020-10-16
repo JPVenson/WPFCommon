@@ -7,7 +7,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Actions
 	///		Will set the <see cref="Binding"/> with ether true or false
 	/// </summary>
 	[ContentProperty("Binding")]
-	public class SetControlPropertyBindingAction : EvaluateActionBase
+	public class SetControlPropertyBindingAction : TriggerActionBase
 	{
 		public static readonly DependencyProperty BindingProperty;
 		static SetControlPropertyBindingAction()
@@ -16,6 +16,9 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Actions
 				"Binding", typeof(object), typeof(SetControlPropertyBindingAction), new PropertyMetadata(default(object)));
 		}
 
+		/// <summary>
+		///		Sets the Binding to the state of the trigger
+		/// </summary>
 		public bool Binding
 		{
 			get { return (bool)GetValue(BindingProperty); }

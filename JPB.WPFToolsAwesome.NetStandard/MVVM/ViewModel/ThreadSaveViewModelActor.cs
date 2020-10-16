@@ -37,7 +37,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		}
 
 		/// <summary>
-		///		Gets the Dispatcher that are used for <seealso cref="ThreadSaveAction"/> and <seealso cref="BeginThreadSaveAction"/>
+		///		Gets the Dispatcher that are used for <seealso cref="ViewModelAction(System.Action)"/> and <seealso cref="BeginViewModelAction(System.Action)"/>
 		/// </summary>
 		[ProvidesContext]
 		protected Dispatcher Dispatcher { get; set; }
@@ -54,12 +54,81 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		[ProvidesContext]
 		protected bool IsLocked { get; set; }
 
+		///  <summary>
+		/// 		Dispatches an Action into the Dispatcher.
+		/// 		If this method is called from the dispatcher the action will be executed in this thread.
+		/// 		The action will be executed with <seealso cref="DispatcherPriority.DataBind"/>
+		///  </summary>
+		///  <param name="action">The action.</param>
+		///  <param name="priority">The Dispatcher Priority. Defaults to <see cref="DispatcherPriority.DataBind"/></param>
+		public void ViewModelAction([NotNull]Action action, DispatcherPriority priority = DispatcherPriority.DataBind)
+		{
+			try
+			{
+				if (Dispatcher.HasShutdownStarted)
+				{
+					return;
+				}
+
+				IsLocked = true;
+				if (Dispatcher.CheckAccess())
+				{
+					action();
+				}
+				else
+				{
+					Dispatcher.Invoke(action, DispatcherPriority.DataBind);
+				}
+			}
+			finally
+			{
+				IsLocked = false;
+			}
+		}
+
+		/// <summary>
+		///		Dispatches an Action into the Dispatcher and continues.
+		///		If this method is called from the dispatcher the action will be executed in this thread.
+		///		The action will be executed with <seealso cref="DispatcherPriority.DataBind"/>
+		/// </summary>
+		/// <param name="action">The action.</param>
+		///  <param name="priority">The Dispatcher Priority. Defaults to <see cref="DispatcherPriority.DataBind"/></param>
+		[CanBeNull]
+		[PublicAPI]
+		public DispatcherOperationLite BeginViewModelAction([NotNull]Action action,
+			DispatcherPriority priority = DispatcherPriority.DataBind)
+		{
+			if (Dispatcher.HasShutdownStarted)
+			{
+				return null;
+			}
+
+			if (!Dispatcher.CheckAccess())
+			{
+				return new DispatcherOperationLite(Dispatcher.BeginInvoke(action, priority));
+			}
+
+			try
+			{
+				IsLocked = true;
+				action();
+				return new DispatcherOperationLite(Dispatcher, 
+					priority,
+					DispatcherOperationStatus.Completed);
+			}
+			finally
+			{
+				IsLocked = false;
+			}
+		}
+		
 		/// <summary>
 		///		Dispatches an Action into the Dispatcher.
 		///		If this method is called from the dispatcher the action will be executed in this thread.
 		///		The action will be executed with <seealso cref="DispatcherPriority.DataBind"/>
 		/// </summary>
 		/// <param name="action">The action.</param>
+		[Obsolete("Use ViewModelAction")]
 		public void ThreadSaveAction([NotNull]Action action)
 		{
 			try
@@ -93,6 +162,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="action">The action.</param>
 		[CanBeNull]
 		[PublicAPI]
+		[Obsolete("Use BeginViewModelAction")]
 		public DispatcherOperationLite BeginThreadSaveAction([NotNull]Action action)
 		{
 			if (Dispatcher.HasShutdownStarted)

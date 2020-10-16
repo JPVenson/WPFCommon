@@ -109,7 +109,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				return;
 			}
 
-			ThreadSaveAction(
+			ViewModelAction(
 				() =>
 				{
 					_base.Clear();
@@ -133,7 +133,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 
 			var tempItem = (T) value;
 			var indexOf = -1;
-			ThreadSaveAction(
+			ViewModelAction(
 				() =>
 				{
 					indexOf = ((IList) _base).Add(tempItem);
@@ -185,7 +185,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				return;
 			}
 
-			ThreadSaveAction(
+			ViewModelAction(
 				() =>
 				{
 					var old = _base[index];
@@ -233,7 +233,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			}
 
 			var result = false;
-			ThreadSaveAction(
+			ViewModelAction(
 				() =>
 				{
 					var index = IndexOf(item);
@@ -264,7 +264,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				return;
 			}
 
-			ThreadSaveAction(
+			ViewModelAction(
 				() =>
 				{
 					_base.Insert(index, item);
@@ -356,7 +356,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			if (ThreadSaveEnumeration)
 			{
 				T[] result = null;
-				ThreadSaveAction(() =>
+				ViewModelAction(() =>
 				{
 					result = _base.ToArray();
 				});
@@ -373,7 +373,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			if (ThreadSaveEnumeration)
 			{
 				IEnumerator<T> enumerator = null;
-				ThreadSaveAction(() =>
+				ViewModelAction(() =>
 				{
 					enumerator = ((IEnumerable<T>)_base.ToArray()).GetEnumerator();
 				});
@@ -415,7 +415,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			}
 
 			ICollectionView source = null;
-			ThreadSaveAction(() =>
+			ViewModelAction(() =>
 			{
 				if (key == "Default")
 				{
@@ -564,7 +564,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 
 			if (enumerable.Any())
 			{
-				ThreadSaveAction(
+				ViewModelAction(
 					() =>
 					{
 						foreach (var variable in enumerable)
@@ -595,7 +595,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 
 			if (enumerable.Any())
 			{
-				ThreadSaveAction(
+				ViewModelAction(
 					() =>
 					{
 						foreach (var variable in enumerable)
@@ -643,7 +643,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			}
 
 			T oldItem;
-			ThreadSaveAction(
+			ViewModelAction(
 				() =>
 				{
 					if (index + 1 > Count)

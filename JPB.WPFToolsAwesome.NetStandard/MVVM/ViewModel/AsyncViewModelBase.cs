@@ -237,7 +237,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			{
 				if (continueWith != null)
 				{
-					ThreadSaveAction(() => continueWith(reporter));
+					ViewModelAction(() => continueWith(reporter));
 				}
 
 				if (clearResult && Equals(CurrentProgress, reporter.Progress))
@@ -272,7 +272,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			{
 				if (continueWith != null)
 				{
-					ThreadSaveAction(() => continueWith(reporter));
+					ViewModelAction(() => continueWith(reporter));
 				}
 
 				if (clearResult && Equals(CurrentProgress, reporter.Progress))
@@ -306,7 +306,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			{
 				if (continueWith != null)
 				{
-					ThreadSaveAction(() => continueWith(s.Result));
+					ViewModelAction(() => continueWith(s.Result));
 				}
 			}, taskName, setWorking);
 		}
@@ -334,7 +334,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			{
 				if (continueWith != null)
 				{
-					ThreadSaveAction(continueWith);
+					ViewModelAction(continueWith);
 				}
 			}, taskName, setWorking);
 		}
@@ -364,7 +364,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			{
 				if (continueWith != null)
 				{
-					ThreadSaveAction(() => continueWith(s.Result));
+					ViewModelAction(() => continueWith(s.Result));
 				}
 			}, taskName, setWorking);
 		}
@@ -394,7 +394,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				{
 					if (continueWith != null)
 					{
-						ThreadSaveAction(continueWith);
+						ViewModelAction(continueWith);
 					}
 				}, taskName, setWorking);
 		}
@@ -427,7 +427,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 					{
 						if (continueWith != null)
 						{
-							ThreadSaveAction(() => continueWith(t.Result));
+							ViewModelAction(() => continueWith(t.Result));
 						}
 					}, taskName, setWorking);
 		}
@@ -456,7 +456,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			{
 				if (continueWith != null)
 				{
-					ThreadSaveAction(continueWith);
+					ViewModelAction(continueWith);
 				}
 			}, taskName, setWorking);
 		}
@@ -492,7 +492,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			{
 				if (continueWith != null)
 				{
-					ThreadSaveAction(() => continueWith.DynamicInvoke());
+					ViewModelAction(() => continueWith.DynamicInvoke());
 				}
 			});
 		}
@@ -534,7 +534,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				_namedTasks.Add(task, taskName);
 
 				SendPropertyChanged(() => IsWorkingTask);
-				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
+				ViewModelAction(CommandManager.InvalidateRequerySuggested);
 				if (setWorking)
 				{
 					IsWorking = _namedTasks.Count > 0;
@@ -613,7 +613,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				EndWork();
 
 				SendPropertyChanged(() => IsWorkingTask);
-				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
+				ViewModelAction(CommandManager.InvalidateRequerySuggested);
 
 				OnTaskDone(continueTask);
 			}
@@ -705,7 +705,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				_isWorking = value;
 				SendPropertyChanged(() => IsWorking);
 				SendPropertyChanged(() => IsNotWorking);
-				ThreadSaveAction(CommandManager.InvalidateRequerySuggested);
+				ViewModelAction(CommandManager.InvalidateRequerySuggested);
 			}
 		}
 

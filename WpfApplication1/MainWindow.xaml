@@ -46,7 +46,11 @@
                 <!--<TextBlock.Style>
                     <Style>
                         <Style.Triggers>
-                            <DataTrigger ></DataTrigger>
+                            <DataTrigger >
+                                <DataTrigger.EnterActions>
+                                    
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
                             <Trigger Property="" Value=""></Trigger>
                             <EventTrigger >
                             </EventTrigger>
@@ -54,8 +58,15 @@
                     </Style>
                 </TextBlock.Style>-->
                 <b:Interaction.Behaviors>
+                    <!--<b:ConditionBehavior>
+                        <b:ConditionBehavior.Condition>
+                            <b:ConditionalExpression>
+                                <b:ComparisonCondition Operator=""></b:ComparisonCondition>
+                            </b:ConditionalExpression>
+                        </b:ConditionBehavior.Condition>
+                    </b:ConditionBehavior>-->
                     <eval:TriggerBehavior>
-                        <trigger:DataEqualityTrigger Property="IsEnabled" Value="true"/>
+                        <trigger:DataEqualityTrigger Property="Control.IsEnabled" Value="true"/>
                         <!--<trigger:AndTrigger>
                            <trigger:HasErrorTrigger Properties="ToValidationString, Text"/>
                         </trigger:AndTrigger>-->

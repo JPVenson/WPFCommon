@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace JPB.WPFToolsAwesome.MVVM.ViewModel
@@ -72,6 +74,38 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		public bool Abort()
 		{
 			return _operation?.Abort() ?? false;
+		}
+
+		public DispatcherOperationLiteAwaiter GetAwaiter()
+		{
+			return new DispatcherOperationLiteAwaiter(this);
+		}
+
+		public struct DispatcherOperationLiteAwaiter : INotifyCompletion
+		{
+			private readonly DispatcherOperationLite _dispatcherOperationLite;
+			private readonly object _awaiter;
+
+			public DispatcherOperationLiteAwaiter(DispatcherOperationLite dispatcherOperationLite)
+			{
+				_dispatcherOperationLite = dispatcherOperationLite;
+				_awaiter = _dispatcherOperationLite.GetTask().GetAwaiter();
+			}
+
+			public bool IsCompleted
+			{
+				get { return ((TaskAwaiter)_awaiter).IsCompleted; }
+			}
+
+			public void GetResult()
+			{
+				((TaskAwaiter)_awaiter).GetResult();
+			}
+
+			public void OnCompleted(Action continuation)
+			{
+				((TaskAwaiter)_awaiter).OnCompleted(continuation);
+			}
 		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Windows;
 namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 {
 	/// <summary>
-	///     Evaluates all Evaluators that are nested to this one and returns true if all of them evaluate to true
+	///     Evaluates all <see cref="MultiDelegatorTriggerStepBase.TriggerSteps"/> that are nested to this one and returns true if all of them evaluate to true
 	/// </summary>
 	public class AndTrigger : MultiDelegatorTriggerStepBase
 	{

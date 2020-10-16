@@ -10,6 +10,9 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 	[ContentProperty(nameof(TriggerStep))]
 	public abstract class DelegatorTriggerStepBase : TriggerStepBase
 	{
+		/// <summary>
+		///		The trigger to be evaluated
+		/// </summary>
 		public ITriggerStep TriggerStep { get; set; }
 
 		public override bool Evaluate(object dataContext, DependencyObject dependencyObject)

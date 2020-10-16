@@ -238,7 +238,7 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 						_errorTaskDispatcher.TryAdd(() =>
 						{
 							var exec = gerValidations().GetAwaiter().GetResult();
-							BeginThreadSaveAction(() => { then(exec); });
+							BeginViewModelAction(() => { then(exec); });
 						}, key);
 					}
 					else
@@ -251,14 +251,14 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 					_errorTaskDispatcher.TryAdd(() =>
 					{
 						var exec = gerValidations().GetAwaiter().GetResult();
-						BeginThreadSaveAction(() => { then(exec); });
+						BeginViewModelAction(() => { then(exec); });
 					}, key);
 					break;
 				case AsyncRunState.OnlyOnePerTime:
 					_errorTaskDispatcher.TryAdd(() =>
 					{
 						var exec = gerValidations().GetAwaiter().GetResult();
-						BeginThreadSaveAction(() => { then(exec); });
+						BeginViewModelAction(() => { then(exec); });
 					}, key, 1);
 					break;
 				default:
@@ -279,7 +279,7 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 			handler.HandleUneffected(newErrors, processed);
 			Interlocked.Add(ref _workerCount, processed.Length * -1);
 
-			BeginThreadSaveAction(() =>
+			BeginViewModelAction(() =>
 			{
 				SendPropertyChanged(() => IsValidating);
 				foreach (var listOfValidator in processed.SelectMany(f => f.ErrorIndicator).Distinct())
@@ -304,7 +304,7 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 
 		private void RunSyncToDispatcher(IValidation[] validation)
 		{
-			BeginThreadSaveAction(() =>
+			BeginViewModelAction(() =>
 			{
 				AsyncHelper.WaitSingle(RunSync(validation));
 			});
@@ -373,7 +373,7 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 			var errors = ProduceValidations(propertyName).ToList();
 			Interlocked.Add(ref _workerCount, errors.Count);
 
-			BeginThreadSaveAction(() => SendPropertyChanged(() => IsValidating));
+			BeginViewModelAction(() => SendPropertyChanged(() => IsValidating));
 
 			var nonAsync = errors.Where(f => !(f is IAsyncValidation)).ToArray();
 			if (nonAsync.Any())

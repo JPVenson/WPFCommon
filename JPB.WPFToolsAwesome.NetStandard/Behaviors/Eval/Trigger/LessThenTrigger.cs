@@ -19,13 +19,19 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 			RightProperty = Register(
 				"Right", typeof(int), typeof(LessThenTrigger), new PropertyMetadata(default(int)));
 		}
-
+		
+		/// <summary>
+		///		The object or binding to be compared with <see cref="Left"/>
+		/// </summary>
 		public IComparable Right
 		{
 			get { return (int) GetValue(RightProperty); }
 			set { SetValue(RightProperty, value); }
 		}
-
+		
+		/// <summary>
+		///		The object or binding to be compared with <see cref="Right"/>
+		/// </summary>
 		public IComparable Left
 		{
 			get { return (int) GetValue(LeftProperty); }

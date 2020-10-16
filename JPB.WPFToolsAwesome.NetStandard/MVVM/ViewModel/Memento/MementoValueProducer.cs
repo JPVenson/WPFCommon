@@ -144,7 +144,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel.Memento
 			}
 
 			var result = false;
-			mementoViewModelBase.ThreadSaveAction(() =>
+			mementoViewModelBase.ViewModelAction(() =>
 			{
 				var moment = ((IMementoValueHolder)this).GetValue(mementoViewModelBase);
 				if (!dataStemp.CanSetData(moment))
@@ -204,7 +204,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel.Memento
 		///  <returns></returns>
 		public void GoInHistory(MementoViewModelBase viewModel, int ages)
 		{
-			viewModel.ThreadSaveAction(() =>
+			viewModel.ViewModelAction(() =>
 			{
 				if (!CanGoInHistory(ages))
 				{

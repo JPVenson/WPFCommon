@@ -20,12 +20,18 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 				nameof(Right), typeof(object), typeof(EqualityTrigger), new PropertyMetadata(default(object)));
 		}
 
+		/// <summary>
+		///		The object or binding to be compared with <see cref="Left"/>
+		/// </summary>
 		public object Right
 		{
 			get { return GetValue(RightProperty); }
 			set { SetValue(RightProperty, value); }
 		}
-
+		
+		/// <summary>
+		///		The object or binding to be compared with <see cref="Right"/>
+		/// </summary>
 		public object Left
 		{
 			get { return GetValue(LeftProperty); }

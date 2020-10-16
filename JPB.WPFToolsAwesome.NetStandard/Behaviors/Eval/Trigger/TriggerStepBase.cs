@@ -11,7 +11,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 {
 	/// <summary>
 	///     The base Implementation for an Trigger. If there are any Dependency properties bound,
-	///     they should Ether call RegisterDependencyProperty or at least use the <see cref="PropertyChangedCallback" />.
+	///     they should be registered using <see cref="Register"/> or at least invoke the <see cref="PropertyChangedCallback" />.
 	///     <para></para>
 	///     <remarks>
 	///         If custom implementation is made take care to invoke the <see cref="OnPropertyChanged" /> and

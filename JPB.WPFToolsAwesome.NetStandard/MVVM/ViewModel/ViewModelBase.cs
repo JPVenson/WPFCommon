@@ -146,7 +146,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			var handler = PropertyChanged;
 			if (handler != null)
 			{
-				ThreadSaveAction(() => handler(this, e));
+				ViewModelAction(() => handler(this, e));
 			}
 		}
 
@@ -181,7 +181,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			var handler = PropertyChanging;
 			if (handler != null)
 			{
-				ThreadSaveAction(() => handler(this, e));
+				ViewModelAction(() => handler(this, e));
 			}
 		}
 

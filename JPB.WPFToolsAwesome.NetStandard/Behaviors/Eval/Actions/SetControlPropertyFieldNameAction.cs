@@ -11,7 +11,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Actions
 	///		Will set the property found in the AssociatedObject
 	/// </summary>
 	[ContentProperty(nameof(Converter))]
-	public class SetControlPropertyFieldNameAction : EvaluateActionBase
+	public class SetControlPropertyFieldNameAction : TriggerActionBase
 	{
 		public static readonly DependencyProperty FieldNameProperty;
 		public static readonly DependencyProperty ConverterProperty;

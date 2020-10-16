@@ -104,7 +104,7 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 		public DelegateCommand(Action<TParameter> execute, Func<TParameter, bool> canExecute)
 			: base(obj =>
 			{
-				if (obj is TParameter)
+				if (obj is TParameter || obj is null)
 				{
 					execute((TParameter)obj);
 				}
@@ -115,7 +115,7 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 					return true;
 				}
 
-				if (obj is TParameter)
+				if (obj is TParameter || obj is null)
 				{
 					return canExecute((TParameter)obj);
 				}

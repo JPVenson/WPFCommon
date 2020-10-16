@@ -40,12 +40,18 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval
 
 		public static readonly DependencyProperty IsRunningTriggersProperty;
 
+		/// <summary>
+		///		Gets the current state of the trigger execution
+		/// </summary>
 		public bool IsRunningTriggers
 		{
 			get { return (bool) GetValue(IsRunningTriggersProperty); }
 			set { SetValue(IsRunningTriggersProperty, value); }
 		}
 
+		/// <summary>
+		///		Defines when triggers should be executed 
+		/// </summary>
 		public TriggerExecutionType TriggerExecutionType
 		{
 			get { return (TriggerExecutionType) GetValue(TriggerExecutionTypeProperty); }
@@ -53,7 +59,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval
 		}
 
 		/// <summary>
-		///		Contains the list of all <see cref="EvaluateActionBase"/> that are executed when the <see cref="TriggerStep"/> s condition is met
+		///		Contains the list of all <see cref="TriggerActionBase"/> that are executed when the <see cref="TriggerStep"/> s condition is met
 		/// </summary>
 		public TriggerActionCollection TriggerActions
 		{

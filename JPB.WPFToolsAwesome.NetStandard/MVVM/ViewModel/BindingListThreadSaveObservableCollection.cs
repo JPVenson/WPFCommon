@@ -65,7 +65,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				sortedDict = this.OrderByDescending(e => property.GetValue(e));
 			}
 
-			ThreadSaveAction(() =>
+			ViewModelAction(() =>
 			{
 				var enumerable = sortedDict.ToArray();
 				for (var index = 0; index < enumerable.Length; index++)

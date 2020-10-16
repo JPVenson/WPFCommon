@@ -130,7 +130,7 @@ namespace JPB.ErrorValidation.ViewModelProvider
 
 		private void InitErrorProvider(IErrorCollectionBase errors)
 		{
-			ThreadSaveAction(() =>
+			ViewModelAction(() =>
 			{
 				ActiveValidationCases = new ThreadSaveObservableCollection<IValidation>();
 				_userErrors = errors;

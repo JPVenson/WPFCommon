@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using JPB.WPFToolsAwesome.Error.ValidationRules;
 using JPB.WPFToolsAwesome.Error.ValidationTyps;
@@ -85,6 +86,10 @@ namespace WpfApplication1
 
 		public void ExecuteTaskB(object sender)
 		{
+			Task.Run(new Func<Task>(async () =>
+			{
+				await base.BeginViewModelAction(() => { });
+			}));
 			Thread.CurrentThread.Join(10000);
 			ToValidationString = 1337.ToString();
 		}
