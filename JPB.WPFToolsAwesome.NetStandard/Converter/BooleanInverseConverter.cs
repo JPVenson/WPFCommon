@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using JetBrains.Annotations;
 
 namespace JPB.WPFToolsAwesome.Converter
 {
@@ -10,7 +9,6 @@ namespace JPB.WPFToolsAwesome.Converter
     /// </summary>
     /// <seealso cref="bool" />
     [ValueConversion(typeof (bool), typeof (bool))]
-    [PublicAPI]
     public class BooleanInverseConverter : TypedValueConverter<bool, bool>
     {
         #region Overrides of TypedValueConverter<bool,bool>

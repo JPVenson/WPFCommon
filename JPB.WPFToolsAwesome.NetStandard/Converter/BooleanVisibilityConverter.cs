@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using JetBrains.Annotations;
+
 
 namespace JPB.WPFToolsAwesome.Converter
 {
@@ -10,7 +10,7 @@ namespace JPB.WPFToolsAwesome.Converter
     ///     Converts the boolean value to a <see cref="Visibility"/> where true is <see cref="Visibility.Visible"/> and any other value is <see cref="Visibility.Collapsed"/>
     /// </summary>
     [ValueConversion(typeof(bool), typeof(Visibility))]
-    [PublicAPI]
+
     public class BooleanVisibilityConverter : TypedValueConverter<bool, Visibility>
     {
         #region IValueConverter Members

@@ -1,5 +1,5 @@
 ﻿using System;
-using JetBrains.Annotations;
+
 using JPB.WPFToolsAwesome.MVVM.ViewModel;
 
 namespace JPB.WPFToolsAwesome.Error.ValidationTyps
@@ -33,9 +33,9 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 		/// <param name="errorText">The Error object. This object is given to the UI to display this error.</param>
 		/// <param name="errorIndicator">Defines a single or Multiple Properties on the Target ViewModel that this validation relies on. This defines when the Validation will be executed as well as where it will be displayed.</param>
 		/// <param name="condition">The Condition on which this error defines as "Failed" or "Success"</param>
-		public DynamicError([CanBeNull] object errorText,
-			[CanBeNull] string errorIndicator,
-			[NotNull] Action<ErrorConditionModel> condition) 
+		public DynamicError( object errorText,
+			 string errorIndicator,
+			 Action<ErrorConditionModel> condition) 
 			: this(errorText, condition, errorIndicator)
 		{
 		}
@@ -46,9 +46,9 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 		/// <param name="errorText">The Error object. This object is given to the UI to display this error.</param>
 		/// <param name="errorIndicator">Defines a single or Multiple Properties on the Target ViewModel that this validation relies on. This defines when the Validation will be executed as well as where it will be displayed.</param>
 		/// <param name="condition">The Condition on which this error defines as "Failed" or "Success"</param>
-		public DynamicError([CanBeNull] object errorText, 
-			[NotNull] Action<ErrorConditionModel> condition, 
-			[NotNull] params string[] errorIndicator)
+		public DynamicError( object errorText, 
+			 Action<ErrorConditionModel> condition, 
+			 params string[] errorIndicator)
 		{
 			_errorIndicator = errorIndicator;
 			_errorText = errorText;

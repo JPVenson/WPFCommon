@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
+
 
 namespace JPB.WPFToolsAwesome.Extensions
 {
@@ -22,7 +22,7 @@ namespace JPB.WPFToolsAwesome.Extensions
         /// or
         /// predicate
         /// </exception>
-        [PublicAPI]
+    
         public static void RemoveWhere<T>(this IList<T> source, Func<T, bool> predicate)
         {
             if (source == null)
