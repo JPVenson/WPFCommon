@@ -44,7 +44,7 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 		[XmlIgnore]
 		public Func<object, object, object> AggregateMultiError { get; set; }
 
-		public new string this[string columnName]
+		public string this[string columnName]
 		{
 			get
 			{

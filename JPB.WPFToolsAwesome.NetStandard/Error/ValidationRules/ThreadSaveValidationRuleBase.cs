@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Threading;
 using System.Windows.Threading;
-using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ValidationTypes;
 using JPB.WPFToolsAwesome.MVVM.ViewModel;
 
 namespace JPB.WPFToolsAwesome.Error.ValidationRules

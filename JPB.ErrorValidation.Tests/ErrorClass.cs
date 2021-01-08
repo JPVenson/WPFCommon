@@ -3,7 +3,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using JPB.WPFToolsAwesome.Error.ValidationRules;
-using JPB.WPFToolsAwesome.Error.ValidationTyps;
 using JPB.WPFToolsAwesome.Error.ViewModelProvider.Base;
 
 namespace JPB.ErrorValidation.Tests

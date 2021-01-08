@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace JPB.WPFToolsAwesome.Error.ValidationTyps
+namespace JPB.WPFToolsAwesome.Error.ValidationTypes
 {
 	/// <summary>
 	///		Allows the scheduling of an async Validation. 

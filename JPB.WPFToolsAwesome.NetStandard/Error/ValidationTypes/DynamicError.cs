@@ -1,8 +1,7 @@
 ﻿using System;
-
 using JPB.WPFToolsAwesome.MVVM.ViewModel;
 
-namespace JPB.WPFToolsAwesome.Error.ValidationTyps
+namespace JPB.WPFToolsAwesome.Error.ValidationTypes
 {
 	/// <summary>
 	///		Defines an Error that will be displayed when the condition is met. Allows to update the ErrorText when the error changes
@@ -33,9 +32,9 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 		/// <param name="errorText">The Error object. This object is given to the UI to display this error.</param>
 		/// <param name="errorIndicator">Defines a single or Multiple Properties on the Target ViewModel that this validation relies on. This defines when the Validation will be executed as well as where it will be displayed.</param>
 		/// <param name="condition">The Condition on which this error defines as "Failed" or "Success"</param>
-		public DynamicError( object errorText,
+		public DynamicError(object errorText,
 			 string errorIndicator,
-			 Action<ErrorConditionModel> condition) 
+			 Action<ErrorConditionModel> condition)
 			: this(errorText, condition, errorIndicator)
 		{
 		}
@@ -46,30 +45,31 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 		/// <param name="errorText">The Error object. This object is given to the UI to display this error.</param>
 		/// <param name="errorIndicator">Defines a single or Multiple Properties on the Target ViewModel that this validation relies on. This defines when the Validation will be executed as well as where it will be displayed.</param>
 		/// <param name="condition">The Condition on which this error defines as "Failed" or "Success"</param>
-		public DynamicError( object errorText, 
-			 Action<ErrorConditionModel> condition, 
+		public DynamicError(object errorText,
+			 Action<ErrorConditionModel> condition,
 			 params string[] errorIndicator)
 		{
 			_errorIndicator = errorIndicator;
 			_errorText = errorText;
 
+			ErrorConditionModel model = null;
 			_condition = (vm) =>
 			{
-				var model = new ErrorConditionModel(vm);
+				model = model ?? new ErrorConditionModel(vm);
 				model.ErrorText = errorText;
 				condition(model);
 				errorText = model.ErrorText;
 				return model.IsError;
 			};
 		}
-		
+
 		/// <inheritdoc />
 		public virtual string[] ErrorIndicator
 		{
 			get { return _errorIndicator; }
 			set { _errorIndicator = value; }
 		}
-		
+
 		/// <inheritdoc />
 		public virtual object ErrorText
 		{
@@ -81,18 +81,12 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 				SendPropertyChanged();
 			}
 		}
-		
+
 		/// <inheritdoc />
 		public virtual Func<T, bool> Condition
 		{
 			get { return _condition; }
 			set { _condition = value; }
-		}
-
-		/// <inheritdoc />
-		public virtual object ErrorType
-		{
-			get { return "Need"; }
 		}
 
 		/// <inheritdoc />
@@ -107,7 +101,7 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 						return true;
 					}
 
-					return Condition((T) validator);
+					return Condition((T)validator);
 				};
 			}
 			set { Condition = arg => value(arg); }

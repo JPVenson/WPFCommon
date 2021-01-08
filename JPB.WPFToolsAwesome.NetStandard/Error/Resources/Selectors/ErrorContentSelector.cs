@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ValidationTypes;
 
 namespace JPB.WPFToolsAwesome.Error.Resources.Selectors
 {

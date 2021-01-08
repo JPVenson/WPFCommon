@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace JPB.WPFToolsAwesome.Error.ValidationTyps
+namespace JPB.WPFToolsAwesome.Error.ValidationTypes
 {
 	public delegate IValidation<T> ValidationFactory<T>(object errorText, string fieldName, Func<T, bool> validator);
 

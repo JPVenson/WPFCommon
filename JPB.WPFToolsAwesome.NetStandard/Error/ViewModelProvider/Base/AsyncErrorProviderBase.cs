@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using JPB.ErrorValidation.ViewModelProvider;
 using JPB.Tasking.TaskManagement;
-using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ValidationTypes;
 using JPB.WPFToolsAwesome.TaskManagement.Threading;
 
 namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
@@ -126,6 +126,13 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 			get { return HasError; }
 		}
 
+		public override async Task ReplaceUserErrorCollection(IErrorCollectionBase userErrors)
+		{
+			UserErrors.CollectionChanged -= UserErrorsCollectionChanged;
+			await base.ReplaceUserErrorCollection(userErrors);
+			LoadErrorMapperData();
+		}
+
 		/// <summary>
 		///		Fill the ErrorMapper with all known UserErrors
 		/// </summary>
@@ -206,14 +213,14 @@ namespace JPB.WPFToolsAwesome.Error.ViewModelProvider.Base
 			}
 		}
 
-		protected override void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		protected override async void ErrorProviderBase_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (!Validate)
 			{
 				return;
 			}
-			
-			AsyncHelper.WaitSingle(ScheduleErrorUpdate(e.PropertyName));
+
+			await ScheduleErrorUpdate(e.PropertyName);
 		}
 		
 		/// <summary>

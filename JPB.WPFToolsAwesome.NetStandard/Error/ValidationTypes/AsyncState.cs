@@ -1,4 +1,4 @@
-﻿namespace JPB.WPFToolsAwesome.Error.ValidationTyps
+﻿namespace JPB.WPFToolsAwesome.Error.ValidationTypes
 {
 	public enum AsyncState
 	{

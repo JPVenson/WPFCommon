@@ -1,15 +1,9 @@
 ﻿using System;
 
-namespace JPB.WPFToolsAwesome.Error.ValidationTyps
+namespace JPB.WPFToolsAwesome.Error.ValidationTypes
 {
 	public interface IValidation
 	{
-		/// <summary>
-		///		An description what kind of Validation is used e.g "Warning", "Error", "FYI"
-		/// </summary>
-		[Obsolete("This Property is Obsolete. If you need this functionality please build it yourself by packing it into the ErrorText")] 
-		object ErrorType { get; }
-
 		/// <summary>
 		///		An indicator for all fields that participate on the Validation
 		/// </summary>

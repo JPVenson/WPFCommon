@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ValidationTypes;
 
 namespace JPB.WPFToolsAwesome.Error.ValidationRules
 {
@@ -44,15 +44,10 @@ namespace JPB.WPFToolsAwesome.Error.ValidationRules
 		{
 			get { return Errors.IsReadOnly; }
 		}
-
-		public Type RetrunT()
+		
+		public IEnumerable<IValidation> FilterErrors(string fieldName)
 		{
-			return ValidationType;
-		}
-
-		public IEnumerable<IValidation> FilterErrors(string columnName)
-		{
-			return Errors.Where(s => s.ErrorIndicator.Contains(columnName) || !s.ErrorIndicator.Any());
+			return Errors.Where(s => s.ErrorIndicator.Contains(fieldName) || !s.ErrorIndicator.Any());
 		}
 
 		public void Add(IValidation item)

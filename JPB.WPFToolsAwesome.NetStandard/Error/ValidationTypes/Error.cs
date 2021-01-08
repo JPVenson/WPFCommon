@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using JPB.WPFToolsAwesome.MVVM.ViewModel;
 
-namespace JPB.WPFToolsAwesome.Error.ValidationTyps
+namespace JPB.WPFToolsAwesome.Error.ValidationTypes
 {
 	/// <summary>
 	///     Defines an static Error that will be displayed when the condition is met
@@ -71,12 +71,6 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 		{
 			get { return _condition; }
 			set { _condition = value; }
-		}
-		
-		/// <inheritdoc />
-		public virtual object ErrorType
-		{
-			get { return "Need"; }
 		}
 		
 		/// <inheritdoc />
@@ -159,12 +153,6 @@ namespace JPB.WPFToolsAwesome.Error.ValidationTyps
 		{
 			get { return _condition; }
 			set { _condition = value; }
-		}
-		
-		/// <inheritdoc />
-		public virtual object ErrorType
-		{
-			get { return "Need"; }
 		}
 		
 		/// <inheritdoc />

@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ValidationTypes;
 
 namespace JPB.WPFToolsAwesome.Error.ValidationRules
 {
-	/// <summary>
-	///		Defines a collection that is left empty
-	/// </summary>
-	public class NoErrors : ErrorCollection<object>
-	{
-	}
-
 	/// <summary>
 	///     Defines a simple Collection of Errors where duplicates can occur
 	/// </summary>
@@ -33,18 +26,5 @@ namespace JPB.WPFToolsAwesome.Error.ValidationRules
 			: base(typeof(T))
 		{
 		}
-	}
-
-	/// <summary>
-	///     Defines a simple Collection of Errors where duplicates can not occur
-	/// </summary>
-	public abstract class ErrorHashSet<T> : ErrorCollection<T>
-	{
-		public ErrorHashSet()
-		{
-			Errors = new HashSet<IValidation>();
-		}
-
-		protected override ICollection<IValidation> Errors { get; }
 	}
 }

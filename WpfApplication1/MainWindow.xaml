@@ -58,13 +58,6 @@
                     </Style>
                 </TextBlock.Style>-->
                 <b:Interaction.Behaviors>
-                    <!--<b:ConditionBehavior>
-                        <b:ConditionBehavior.Condition>
-                            <b:ConditionalExpression>
-                                <b:ComparisonCondition Operator=""></b:ComparisonCondition>
-                            </b:ConditionalExpression>
-                        </b:ConditionBehavior.Condition>
-                    </b:ConditionBehavior>-->
                     <eval:TriggerBehavior>
                         <trigger:DataEqualityTrigger Property="Control.IsEnabled" Value="true"/>
                         <!--<trigger:AndTrigger>

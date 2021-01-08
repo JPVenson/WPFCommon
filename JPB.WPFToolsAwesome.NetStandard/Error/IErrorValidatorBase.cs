@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JPB.WPFToolsAwesome.Error.ValidationTyps;
+using JPB.WPFToolsAwesome.Error.ValidationTypes;
 
 namespace JPB.WPFToolsAwesome.Error
 {
@@ -23,9 +23,9 @@ namespace JPB.WPFToolsAwesome.Error
 		/// <summary>
 		///		Replaces the underlying error collection
 		/// </summary>
-		/// <param name="newCollection"></param>
+		/// <param name="userErrors"></param>
 		/// <returns></returns>
-		Task ReplaceUserErrorCollection(IErrorCollectionBase newCollection);
+		Task ReplaceUserErrorCollection(IErrorCollectionBase userErrors);
 
 		/// <summary>
 		/// Are any Errors known?
@@ -35,21 +35,15 @@ namespace JPB.WPFToolsAwesome.Error
 		/// <summary>
 		/// Refresh the Errors
 		/// </summary>
-		[Obsolete("Please use the ForceRefreshAsync")]
-		void ForceRefresh();
-
-		/// <summary>
-		/// Refresh the Errors
-		/// </summary>
 		Task ForceRefreshAsync();
 
 		/// <summary>
 		/// Gets all Errors for the Field
 		/// </summary>
-		/// <param name="columnName"></param>
-		/// <param name="obj"></param>
+		/// <param name="fieldName"></param>
+		/// <param name="validationObject"></param>
 		/// <returns></returns>
-		IValidation[] GetError(string columnName, object obj);
+		IValidation[] GetError(string fieldName, object validationObject);
 
 		/// <summary>
 		/// The list of all Active Errors

@@ -136,6 +136,12 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval
 
 		protected override void OnAttached()
 		{
+			if (TriggerStep == null)
+			{
+				throw new InvalidOperationException(
+					"You cannot use the TriggerBehavior without setting the TriggerStep");
+			}
+
 			TriggerStep.PropertyChanged += TriggerStep_PropertyChanged;
 			var dataContext = GetDataContext();
 			if (dataContext != null)

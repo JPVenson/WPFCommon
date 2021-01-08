@@ -1,4 +1,4 @@
-﻿namespace JPB.WPFToolsAwesome.Error.ValidationTyps
+﻿namespace JPB.WPFToolsAwesome.Error.ValidationTypes
 {
     ///// <summary>
     /////     Wird als Dummy benutzt um einen "kein" error zu simulieren
