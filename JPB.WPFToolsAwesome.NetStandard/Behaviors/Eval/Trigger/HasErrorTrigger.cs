@@ -60,7 +60,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 
 		public override void SetDataContext(object dataContext)
 		{
-			if (dataContext is AsyncErrorProviderBase errorProvider)
+			if (dataContext is INotifyDataErrorInfo errorProvider)
 			{
 				WeakEventManager<INotifyDataErrorInfo, DataErrorsChangedEventArgs>
 					.RemoveHandler(errorProvider, nameof(INotifyDataErrorInfo.ErrorsChanged),
