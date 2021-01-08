@@ -91,7 +91,12 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 		public static readonly Func<TParameter, bool> True = obj => true;
 
 		/// <inheritdoc />
-		public DelegateCommand(Action execute) : this(obj => execute(), True)
+		public DelegateCommand(Action execute) : base(obj => execute())
+		{
+		}
+
+		/// <inheritdoc />
+		public DelegateCommand(Action execute, Func<bool> canExecute) : base(obj => execute(), obj => canExecute())
 		{
 		}
 
@@ -104,9 +109,13 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 		public DelegateCommand(Action<TParameter> execute, Func<TParameter, bool> canExecute)
 			: base(obj =>
 			{
-				if (obj is TParameter || obj is null)
+				if (obj is TParameter)
 				{
 					execute((TParameter)obj);
+				}
+				else
+				{
+					execute(default);
 				}
 			}, obj =>
 			{
@@ -122,11 +131,6 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 
 				return false;
 			})
-		{
-		}
-
-		/// <inheritdoc />
-		public DelegateCommand(Action execute, Func<bool> canExecute) : this(obj => execute(), obj => canExecute())
 		{
 		}
 	}

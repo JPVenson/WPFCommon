@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MVVM\Commanding\DelegateCommandTests.cs" />
+    <Compile Include="MVVM\Commanding\DelegateCommandTypedTests.cs" />
     <Compile Include="MVVM\ViewModel\ApplicationBaseTest.cs" />
     <Compile Include="MVVM\ViewModel\AsyncViewModel\AsyncViewModelBaseTests.cs" />
     <Compile Include="MVVM\ViewModel\Memento\MementoTests.cs" />

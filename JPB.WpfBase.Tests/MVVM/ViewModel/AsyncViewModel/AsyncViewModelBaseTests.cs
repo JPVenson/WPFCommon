@@ -61,7 +61,7 @@ namespace JPB.WpfBase.Tests.MVVM.ViewModel.AsyncViewModel
 
 		private void TestExecute()
 		{
-			Thread.Sleep(1000);
+			Thread.Sleep(500);
 		}
 
 		public static Task AttachTaskEndedHandler(AsyncViewModelBase vm)
