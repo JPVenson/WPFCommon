@@ -38,9 +38,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		If there is already an notification gathering in process, the same handle will be returned
 		/// </summary>
 		/// <returns></returns>
-		
-		
-		
 		public virtual IDisposable DeferNotification()
 		{
 			if (DeferredNotification != null)
@@ -54,7 +51,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		Resumes the Notification push
 		/// </summary>
 		/// <returns></returns>
-		
 		public virtual void ResumeNotification()
 		{
 			DeferredNotification?.Dispose();
@@ -65,13 +61,13 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <param name="propertyName">Name of the property.</param>
 		/// <param name="newValue">The new value.</param>
+		/// <param name="oldValue"></param>
 		/// <returns></returns>
-		
-		protected virtual bool RaiseAcceptPendingChange(
-			string propertyName,
-			object newValue)
+		protected virtual bool RaiseAcceptPendingChange(string propertyName,
+			object newValue, 
+			object oldValue)
 		{
-			var e = new AcceptPendingChangeEventArgs(propertyName, newValue);
+			var e = new AcceptPendingChangeEventArgs(propertyName, newValue, oldValue);
 			var handler = PendingChange;
 			if (handler != null)
 			{
@@ -91,19 +87,44 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <summary>
 		///     Allows to raise the AcceptPending Change for the Memento Pattern
 		/// </summary>
-		/// <param name="member"></param>
-		/// <param name="value"></param>
-		/// <param name="propertyName"></param>
-		
-		public virtual void SetProperty<TArgument>(ref TArgument member, TArgument value,
+		/// <param name="value">The value to update the member</param>
+		/// <param name="oldValue">The reference to the member that should be updated</param>
+		/// <param name="propertyName">The name of the property that should be notified</param>
+		/// <param name="changeAccepted">A delegate to be invoked when the changed is accepted</param>
+		public virtual bool SetProperty<TArgument>(Action<TArgument> changeAccepted,
+			TArgument value,
+			TArgument oldValue,
 			[CallerMemberName] string propertyName = null)
 		{
-			if (RaiseAcceptPendingChange(propertyName, value))
+			if (RaiseAcceptPendingChange(propertyName, value, oldValue))
+			{
+				SendPropertyChanging(propertyName);
+				changeAccepted(value);
+				SendPropertyChanged(propertyName);
+				return true;
+			}
+
+			return false;
+		}
+		
+		/// <summary>
+		///     Allows to raise the AcceptPending Change for the Memento Pattern
+		/// </summary>
+		/// <param name="member">The reference to the member that should be updated</param>
+		/// <param name="value">The value to update the member</param>
+		/// <param name="propertyName">The name of the property that should be notified</param>
+		public virtual bool SetProperty<TArgument>(ref TArgument member, TArgument value,
+			[CallerMemberName] string propertyName = null)
+		{
+			if (RaiseAcceptPendingChange(propertyName, value, member))
 			{
 				SendPropertyChanging(propertyName);
 				member = value;
 				SendPropertyChanged(propertyName);
+				return true;
 			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -135,7 +156,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		{
 			if (DeferredNotification != null)
 			{
-				DeferredNotification.SendNotifications.Add(e.PropertyName);
+				DeferredNotification.NotificationsSendPropertyChanged.Add(e.PropertyName);
 				return;
 			}
 
@@ -174,6 +195,11 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		
 		protected virtual void SendPropertyChanging(PropertyChangingEventArgs e)
 		{
+			if (DeferredNotification != null)
+			{
+				DeferredNotification.NotificationsSendPropertyChanging.Add(e.PropertyName);
+				return;
+			}
 			var handler = PropertyChanging;
 			if (handler != null)
 			{
@@ -185,7 +211,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanging event
 		/// </summary>
 		/// <param name="property">Arguments detailing the change</param>
-		
 		public virtual void SendPropertyChanging<TProperty>(Expression<Func<TProperty>> property)
 		{
 			SendPropertyChanging(GetPropertyName(property));

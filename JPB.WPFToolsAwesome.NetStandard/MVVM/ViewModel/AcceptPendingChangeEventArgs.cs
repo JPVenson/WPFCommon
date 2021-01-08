@@ -12,10 +12,11 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <param name="propertyName"></param>
 		/// <param name="newValue"></param>
-		public AcceptPendingChangeEventArgs(string propertyName, object newValue)
+		public AcceptPendingChangeEventArgs(string propertyName, object newValue, object oldValue)
 		{
 			PropertyName = propertyName;
 			NewValue = newValue;
+			OldValue = oldValue;
 		}
 
 		/// <summary>
@@ -27,6 +28,11 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     The value to be applied to the property
 		/// </summary>
 		public object NewValue { get; }
+
+		/// <summary>
+		///		The old value of the property
+		/// </summary>
+		public object OldValue { get; }
 
 		/// <summary>
 		///     If set to true inside the event handler, the value will be not applied to the property

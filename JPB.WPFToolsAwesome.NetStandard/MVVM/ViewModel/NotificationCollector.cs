@@ -11,22 +11,28 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 
 		public NotificationCollector(ViewModelBase vm)
 		{
-			SendNotifications = new ConcurrentHashSet<string>();
+			NotificationsSendPropertyChanged = new ConcurrentHashSet<string>();
+			NotificationsSendPropertyChanging = new ConcurrentHashSet<string>();
 			_vm = vm;
 		}
 
-		public ConcurrentHashSet<string> SendNotifications { get; private set; }
+		public ConcurrentHashSet<string> NotificationsSendPropertyChanged { get; private set; }
+		public ConcurrentHashSet<string> NotificationsSendPropertyChanging { get; private set; }
 
 		public void Dispose()
 		{
 			_vm.DeferredNotification = null;
-			foreach (var notification in SendNotifications)
+			foreach (var notification in NotificationsSendPropertyChanging)
+			{
+				_vm.SendPropertyChanging(notification);
+			}
+			foreach (var notification in NotificationsSendPropertyChanged)
 			{
 				_vm.SendPropertyChanged(notification);
 			}
-			SendNotifications.Clear();
-			SendNotifications.Dispose();
-			SendNotifications = null;
+			NotificationsSendPropertyChanged.Clear();
+			NotificationsSendPropertyChanged.Dispose();
+			NotificationsSendPropertyChanged = null;
 		}
 	}
 

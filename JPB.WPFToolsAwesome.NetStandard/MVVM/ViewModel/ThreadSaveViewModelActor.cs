@@ -74,7 +74,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				}
 				else
 				{
-					Dispatcher.Invoke(action, DispatcherPriority.DataBind);
+					Dispatcher.Invoke(action, priority);
 				}
 			}
 			finally
@@ -90,8 +90,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <param name="action">The action.</param>
 		///  <param name="priority">The Dispatcher Priority. Defaults to <see cref="DispatcherPriority.DataBind"/></param>
-		
-		
 		public DispatcherOperationLite BeginViewModelAction(Action action,
 			DispatcherPriority priority = DispatcherPriority.DataBind)
 		{
@@ -128,27 +126,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		[Obsolete("Use ViewModelAction")]
 		public void ThreadSaveAction(Action action)
 		{
-			try
-			{
-				if (Dispatcher.HasShutdownStarted)
-				{
-					return;
-				}
-
-				IsLocked = true;
-				if (Dispatcher.CheckAccess())
-				{
-					action();
-				}
-				else
-				{
-					Dispatcher.Invoke(action, DispatcherPriority.DataBind);
-				}
-			}
-			finally
-			{
-				IsLocked = false;
-			}
+			ViewModelAction(action);
 		}
 
 		/// <summary>
@@ -157,32 +135,10 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		The action will be executed with <seealso cref="DispatcherPriority.DataBind"/>
 		/// </summary>
 		/// <param name="action">The action.</param>
-		
-		
 		[Obsolete("Use BeginViewModelAction")]
 		public DispatcherOperationLite BeginThreadSaveAction(Action action)
 		{
-			if (Dispatcher.HasShutdownStarted)
-			{
-				return null;
-			}
-
-			if (!Dispatcher.CheckAccess())
-			{
-				return new DispatcherOperationLite(Dispatcher.BeginInvoke(action, DispatcherPriority.DataBind));
-			}
-
-			try
-			{
-				IsLocked = true;
-				action();
-				return new DispatcherOperationLite(Dispatcher, DispatcherPriority.DataBind,
-					DispatcherOperationStatus.Completed);
-			}
-			finally
-			{
-				IsLocked = false;
-			}
+			return BeginViewModelAction(action);
 		}
 	}
 }
