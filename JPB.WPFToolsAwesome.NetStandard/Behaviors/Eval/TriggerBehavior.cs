@@ -114,6 +114,18 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval
 			}
 		}
 
+		protected virtual void DetachDataContextChangeHandler()
+		{
+			if (AssociatedObject is FrameworkElement frameworkElement)
+			{
+				frameworkElement.DataContextChanged -= FrameworkElement_DataContextChanged;
+			}
+			if (AssociatedObject is FrameworkContentElement frameworkContentElement)
+			{
+				frameworkContentElement.DataContextChanged -= FrameworkElement_DataContextChanged;
+			}
+		}
+
 		protected virtual void FrameworkElement_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (e.NewValue != null)
@@ -137,6 +149,7 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval
 		protected override void OnDetaching()
 		{
 			TriggerStep.PropertyChanged -= TriggerStep_PropertyChanged;
+			DetachDataContextChangeHandler();
 		}
 
 		private void TriggerStep_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

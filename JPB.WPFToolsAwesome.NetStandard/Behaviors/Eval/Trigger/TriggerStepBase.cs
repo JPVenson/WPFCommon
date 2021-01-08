@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using JetBrains.Annotations;
 
 namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 {
@@ -84,7 +83,6 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 			}
 		}
 
-		[NotifyPropertyChangedInvocator]
 		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

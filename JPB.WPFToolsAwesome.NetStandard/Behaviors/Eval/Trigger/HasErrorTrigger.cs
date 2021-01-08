@@ -83,6 +83,17 @@ namespace JPB.WPFToolsAwesome.Behaviors.Eval.Trigger
 
 				return errorProvider.ActiveValidationCases.Any(f => f.ErrorIndicator.Any(e => Properties.Contains(e)));
 			}
+			else if (dataContext is INotifyDataErrorInfo errorInfo)
+			{
+				foreach (var property in Properties)
+				{
+					if (errorInfo.GetErrors(property).Cast<object>().Any())
+					{
+						return true;
+					}
+				}
+				return false;
+			}
 
 			return false;
 		}
