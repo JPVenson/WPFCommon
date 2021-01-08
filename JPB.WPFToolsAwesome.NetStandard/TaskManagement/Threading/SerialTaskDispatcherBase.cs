@@ -71,7 +71,10 @@ namespace JPB.WPFToolsAwesome.TaskManagement.Threading
 		/// Returns true if the Current Thread is working on any item inside the ConcurrentQueue
 		/// </summary>
 		// ReSharper disable once InconsistentlySynchronizedField
-		public bool IsWorking => _isWorking;
+		public bool IsWorking
+		{
+			get { return _isWorking; }
+		}
 
 		protected abstract Func<object> GetNext();
 		protected abstract bool HasNext();

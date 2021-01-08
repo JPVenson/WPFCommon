@@ -22,7 +22,10 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel.Memento
 	[IgnoreMemento]
 	public class MementoViewModelBase : AsyncViewModelBase, IDisposable
 	{
-		internal ConcurrentDictionary<string, IMementoValueHolder> MementoDataStore => _mementoDataStore;
+		internal ConcurrentDictionary<string, IMementoValueHolder> MementoDataStore
+		{
+			get { return _mementoDataStore; }
+		}
 
 		internal static IDictionary<Type, string[]> MementoIgnores { get; set; }
 

@@ -15,10 +15,8 @@ namespace JPB.WPFToolsAwesome.TaskManagement.Threading
 		private readonly int _maxRunPerKey;
 		
 		///  <summary>
-		/// 		Creates a new Instance of the SingelSerielTaskFactory and defines how many actions with the same key should be queued
+		/// 		Creates a new Instance of the MultiTaskDispatcher and defines how many actions with the same key should be queued
 		///  </summary>
-		/// <param name="keepRunning"></param>
-		/// <param name="maxRunPerKey"></param>
 		public MultiTaskDispatcher(bool keepRunning, int maxRunPerKey = 1, [CallerMemberName] string namedConsumer = null) : base(keepRunning)
 		{
 			_namedConsumer = namedConsumer;

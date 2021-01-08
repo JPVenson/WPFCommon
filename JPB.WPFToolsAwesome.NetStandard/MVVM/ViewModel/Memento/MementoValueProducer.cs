@@ -38,7 +38,10 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel.Memento
 		/// <summary>
 		///		Returns the Current age of the Property
 		/// </summary>
-		public int CurrentAge => _currentAge;
+		public int CurrentAge
+		{
+			get { return _currentAge; }
+		}
 
 		/// <summary>
 		///		The name of the Property to watch
@@ -48,8 +51,11 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel.Memento
 		/// <summary>
 		///		Returns a ReadOnly copy of the Current MementoData
 		/// </summary>
-		public IEnumerable<IMementoDataStamp> MementoDataStamps => ((IMementoValueHolder) this).MementoData.ToArray();
-		
+		public IEnumerable<IMementoDataStamp> MementoDataStamps
+		{
+			get { return ((IMementoValueHolder) this).MementoData.ToArray(); }
+		}
+
 		MementoPropertySnaptshot IMementoValueHolder.CreateSnapshot()
 		{
 			if (_propertyInfo == null)

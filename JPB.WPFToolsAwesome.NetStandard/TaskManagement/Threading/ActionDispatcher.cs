@@ -13,7 +13,7 @@ using JPB.Tasking.TaskManagement;
 namespace JPB.WPFToolsAwesome.TaskManagement.Threading
 {
 	/// <summary>
-	///		Creates a Queue of Actions that will be called asyncrolly as they are added
+	///		Creates a Queue of Actions that will be called async as they are added
 	/// </summary>
 	public class ActionDispatcher : SerialTaskDispatcherBase, IDisposable
 	{
