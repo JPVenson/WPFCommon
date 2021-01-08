@@ -34,9 +34,7 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 			get { return _tag; }
 			set
 			{
-				SendPropertyChanging(() => Tag);
-				_tag = value;
-				SendPropertyChanged(() => Tag);
+				SetProperty(ref _tag, value);
 			}
 		}
 
@@ -49,9 +47,7 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 			get { return _content; }
 			set
 			{
-				SendPropertyChanging(() => Content);
-				_content = value;
-				SendPropertyChanged(() => Content);
+				SetProperty(ref _content, value);
 			}
 		}
 
@@ -63,9 +59,7 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 			get { return _caption; }
 			set
 			{
-				SendPropertyChanging(() => Caption);
-				_caption = value;
-				SendPropertyChanged(() => Caption);
+				SetProperty(ref _caption, value);
 			}
 		}
 

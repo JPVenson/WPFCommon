@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using JetBrains.Annotations;
+
 
 #endregion
 
@@ -71,7 +71,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <summary>
 		///     Task options for this Instance
 		/// </summary>
-		[NotNull]
+		
 		protected virtual AsyncViewModelBaseOptions AsyncViewModelBaseOptions { get; set; }
 
 		/// <summary>
@@ -119,7 +119,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <param name="taskName"></param>
 		/// <returns></returns>
-		[UsedImplicitly]
 		public bool CheckCanExecuteCondition([CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (taskName == AnonymousTask)
@@ -181,9 +180,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 				get { return _progress; }
 				set
 				{
-					SendPropertyChanging();
-					_progress = value;
-					SendPropertyChanged();
+					SetProperty(ref _progress, value);
 				}
 			}
 
@@ -201,9 +198,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			get { return _currentProgress; }
 			set
 			{
-				SendPropertyChanging(() => CurrentProgress);
-				_currentProgress = value;
-				SendPropertyChanged(() => CurrentProgress);
+				SetProperty(ref _currentProgress, value);
 			}
 		}
 
@@ -222,7 +217,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="clearResult">If true, the <see cref="CurrentProgress"/> property will be set to null after the <see cref="delegateTask"/> and the <see cref="continueWith"/> are finished</param>
 		/// <param name="taskName">The name of the Task within the list of all Tasks</param>
 		/// <returns>The task that will be created to hold both the executions of <see cref="delegateTask"/> and <see cref="continueWith"/></returns>
-		public Task ComplexWork<T>(Action<IProgress<T>> delegateTask, [CanBeNull] Action<IProgress<T>> continueWith = null,
+		public Task ComplexWork<T>(Action<IProgress<T>> delegateTask,  Action<IProgress<T>> continueWith = null,
 			bool setWorking = true,
 			bool clearResult = true,
 			[CallerMemberName] string taskName = AnonymousTask)
@@ -257,7 +252,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="clearResult">If true, the <see cref="CurrentProgress"/> property will be set to null after the <see cref="delegateTask"/> and the <see cref="continueWith"/> are finished</param>
 		/// <param name="taskName">The name of the Task within the list of all Tasks</param>
 		/// <returns>The task that will be created to hold both the executions of <see cref="delegateTask"/> and <see cref="continueWith"/></returns>
-		public Task ComplexWorkAsync<T>(Func<IProgress<T>, Task> delegateTask, [CanBeNull] Action<IProgress<T>> continueWith = null,
+		public Task ComplexWorkAsync<T>(Func<IProgress<T>, Task> delegateTask,  Action<IProgress<T>> continueWith = null,
 			bool setWorking = true,
 			bool clearResult = true,
 			[CallerMemberName] string taskName = AnonymousTask)
@@ -291,9 +286,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="setWorking"></param>
 		/// <param name="taskName"></param>
 		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkAsync<T>([NotNull] Task<T> delegateTask, [CanBeNull] Action<T> continueWith = null,
+		
+		
+		public Task SimpleWorkAsync<T>( Task<T> delegateTask,  Action<T> continueWith = null,
 			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
@@ -319,9 +314,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="setWorking"></param>
 		/// <param name="taskName"></param>
 		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkAsync([NotNull] Task delegateTask, [CanBeNull] Action continueWith = null,
+		
+		
+		public Task SimpleWorkAsync( Task delegateTask,  Action continueWith = null,
 			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
@@ -349,9 +344,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="setWorking"></param>
 		/// <param name="taskName"></param>
 		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork<T>([NotNull] Func<T> delegateTask, [CanBeNull] Action<T> continueWith = null,
+		
+		
+		public Task SimpleWork<T>( Func<T> delegateTask,  Action<T> continueWith = null,
 			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
@@ -378,9 +373,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="setWorking"></param>
 		/// <param name="taskName"></param>
 		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkAsync([NotNull] Func<Task> delegateTask, [CanBeNull] Action continueWith = null,
+		
+		
+		public Task SimpleWorkAsync( Func<Task> delegateTask,  Action continueWith = null,
 			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
@@ -409,10 +404,10 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="setWorking"></param>
 		/// <param name="taskName"></param>
 		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWorkAsync<T>([NotNull] Func<Task<T>> delegateTask,
-			[CanBeNull] Action<T> continueWith,
+		
+		
+		public Task SimpleWorkAsync<T>( Func<Task<T>> delegateTask,
+			 Action<T> continueWith,
 			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
@@ -441,9 +436,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="setWorking"></param>
 		/// <param name="taskName"></param>
 		/// <returns>The created and running Task</returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Action delegateTask, [CanBeNull] Action continueWith = null,
+		
+		
+		public Task SimpleWork( Action delegateTask,  Action continueWith = null,
 			bool setWorking = true,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
@@ -471,9 +466,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </param>
 		/// <param name="taskName"></param>
 		/// <returns></returns>
-		[NotNull]
-		[PublicAPI]
-		public Task SimpleWork([NotNull] Delegate delegateTask, [CanBeNull] Delegate continueWith,
+		
+		
+		public Task SimpleWork( Delegate delegateTask,  Delegate continueWith,
 			[CallerMemberName] string taskName = AnonymousTask)
 		{
 			if (delegateTask == null)
@@ -508,9 +503,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Call it in a using and the dispose will wait until all actions started inside it will be complete
 		/// </summary>
 		/// <returns></returns>
-		[NotNull]
-		[MustUseReturnValue]
-		[PublicAPI]
+		
+		
+		
 		public AwaitMultiple BeginScope()
 		{
 			return new AwaitMultiple(this);
@@ -623,7 +618,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		Raises the TaskCreated Event
 		/// </summary>
 		/// <param name="e"></param>
-		protected virtual void OnTaskCreated([NotNull] Task e)
+		protected virtual void OnTaskCreated( Task e)
 		{
 			TaskCreated?.Invoke(this, e);
 		}
@@ -632,7 +627,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		Raises the TaskDone event
 		/// </summary>
 		/// <param name="e"></param>
-		protected virtual void OnTaskDone([NotNull] Task e)
+		protected virtual void OnTaskDone( Task e)
 		{
 			TaskDone?.Invoke(this, e);
 		}

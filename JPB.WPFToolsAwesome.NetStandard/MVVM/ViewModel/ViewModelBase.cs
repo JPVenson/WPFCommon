@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
-using JetBrains.Annotations;
+
 
 #endregion
 
@@ -38,9 +38,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		If there is already an notification gathering in process, the same handle will be returned
 		/// </summary>
 		/// <returns></returns>
-		[NotNull]
-		[MustUseReturnValue]
-		[PublicAPI]
+		
+		
+		
 		public virtual IDisposable DeferNotification()
 		{
 			if (DeferredNotification != null)
@@ -54,7 +54,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		Resumes the Notification push
 		/// </summary>
 		/// <returns></returns>
-		[PublicAPI]
+		
 		public virtual void ResumeNotification()
 		{
 			DeferredNotification?.Dispose();
@@ -66,10 +66,10 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="propertyName">Name of the property.</param>
 		/// <param name="newValue">The new value.</param>
 		/// <returns></returns>
-		[PublicAPI]
+		
 		protected virtual bool RaiseAcceptPendingChange(
-			[CanBeNull]string propertyName,
-			[CanBeNull]object newValue)
+			string propertyName,
+			object newValue)
 		{
 			var e = new AcceptPendingChangeEventArgs(propertyName, newValue);
 			var handler = PendingChange;
@@ -94,7 +94,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="member"></param>
 		/// <param name="value"></param>
 		/// <param name="propertyName"></param>
-		[PublicAPI]
+		
 		public virtual void SetProperty<TArgument>(ref TArgument member, TArgument value,
 			[CallerMemberName] string propertyName = null)
 		{
@@ -112,8 +112,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="member"></param>
 		/// <param name="value"></param>
 		/// <param name="property"></param>
-		[NotifyPropertyChangedInvocator("property")]
-		[PublicAPI]
 		public virtual void SetProperty<TProperty>(ref TProperty member, TProperty value, Expression<Func<TProperty>> property)
 		{
 			SetProperty(ref member, value, GetPropertyName(property));
@@ -123,8 +121,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanged event
 		/// </summary>
 		/// <param name="propertyName">Name of the property that has a new value</param>
-		[NotifyPropertyChangedInvocator("propertyName")]
-		[PublicAPI]
 		public virtual void SendPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 			SendPropertyChanged(new PropertyChangedEventArgs(propertyName));
@@ -134,7 +130,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanged event
 		/// </summary>
 		/// <param name="e">Arguments detailing the change</param>
-		[PublicAPI]
+		
 		protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
 		{
 			if (DeferredNotification != null)
@@ -155,7 +151,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <typeparam name="TProperty"></typeparam>
 		/// <param name="property"></param>
-		[PublicAPI]
+		
 		public virtual void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
 		{
 			SendPropertyChanged(GetPropertyName(property));
@@ -165,7 +161,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanged event
 		/// </summary>
 		/// <param name="propertyName">Name of the property that has a new value</param>
-		[PublicAPI]
+		
 		public virtual void SendPropertyChanging([CallerMemberName] string propertyName = null)
 		{
 			SendPropertyChanging(new PropertyChangingEventArgs(propertyName));
@@ -175,7 +171,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanging event
 		/// </summary>
 		/// <param name="e">Arguments detailing the change</param>
-		[PublicAPI]
+		
 		protected virtual void SendPropertyChanging(PropertyChangingEventArgs e)
 		{
 			var handler = PropertyChanging;
@@ -189,7 +185,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanging event
 		/// </summary>
 		/// <param name="property">Arguments detailing the change</param>
-		[PublicAPI]
+		
 		public virtual void SendPropertyChanging<TProperty>(Expression<Func<TProperty>> property)
 		{
 			SendPropertyChanging(GetPropertyName(property));
@@ -201,7 +197,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <typeparam name="TProperty">The type of the property.</typeparam>
 		/// <param name="property">The property.</param>
 		/// <returns></returns>
-		[PublicAPI]
+		
 		public static string GetPropertyName<TProperty>(Expression<Func<TProperty>> property)
 		{
 			return GetProperty(property).Name;

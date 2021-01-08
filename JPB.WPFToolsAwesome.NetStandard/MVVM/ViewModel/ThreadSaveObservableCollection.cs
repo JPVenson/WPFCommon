@@ -13,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Data;
 using System.Windows.Threading;
-using JetBrains.Annotations;
+
 
 // ReSharper disable ExplicitCallerInfoArgument
 
@@ -367,7 +367,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		}
 
 		/// <inheritdoc />
-		[MustUseReturnValue]
+		
 		public IEnumerator<T> GetEnumerator()
 		{
 			if (ThreadSaveEnumeration)
@@ -406,7 +406,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Obtains a ether new Collection view or a cached one
 		/// </summary>
 		/// <returns></returns>
-		[MustUseReturnValue]
+		
 		public ICollectionView ObtainView(string key = "Default")
 		{
 			if (CollectionViews.ContainsKey(key))
@@ -454,7 +454,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <param name="withLock">
 		///     When True the Source collection will be locked as long as the Transaction is running
 		/// </param>
-		[PublicAPI]
+		
 		public void InTransaction(Func<ThreadSaveObservableCollection<T>, bool> action,
 			bool withLock = true)
 		{
@@ -607,7 +607,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		}
 
 		// ReSharper disable once UnusedParameter.Local
-		private void CheckType([CanBeNull] object value)
+		private void CheckType( object value)
 		{
 			if (value != null && !(value is T))
 			{

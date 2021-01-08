@@ -11,7 +11,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 	/// <summary>
 	///		Can observe several status infos from the dispatcher
 	/// </summary>
-	public class DispatcherStatusMonitor
+	public class DispatcherStatusMonitor : IDisposable
 	{
 		private readonly Dispatcher _dispatcher;
 		private readonly EventDispatcherLimited _actionDispatcher;
@@ -21,7 +21,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 		/// </summary>
 		/// <param name="dispatcher"></param>
 		/// <param name="callback"></param>
-		public DispatcherStatusMonitor(Dispatcher dispatcher, Action<IDispatcherStatusOperationMessage> callback)
+		public DispatcherStatusMonitor(Dispatcher dispatcher, Action<IDispatcherFrameInfo> callback)
 		{
 			_dispatcher = dispatcher;
 			_actionDispatcher = new EventDispatcherLimited(200, callback);
@@ -29,21 +29,21 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 
 		private class EventDispatcherLimited
 		{
-			private readonly Action<IDispatcherStatusOperationMessage> _callback;
+			private readonly Action<IDispatcherFrameInfo> _callback;
 
-			public EventDispatcherLimited(int limit, Action<IDispatcherStatusOperationMessage> callback)
+			public EventDispatcherLimited(int limit, Action<IDispatcherFrameInfo> callback)
 			{
 				_callback = callback;
 				Limit = limit;
-				Messages = new BlockingCollection<IDispatcherStatusOperationMessage>();
+				Messages = new BlockingCollection<IDispatcherFrameInfo>();
 			}
 
 			public int Limit { get; }
 
 			private volatile int _messagesOmited;
-			private BlockingCollection<IDispatcherStatusOperationMessage> Messages { get; }
+			private BlockingCollection<IDispatcherFrameInfo> Messages { get; }
 
-			public void Add(IDispatcherStatusOperationMessage action)
+			public void Add(IDispatcherFrameInfo action)
 			{
 				if (Messages.Count > Limit)
 				{
@@ -61,13 +61,13 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 
 			public void Start()
 			{
-				Task.Run(() =>
+				Task.Factory.StartNew(() =>
 				{
 					foreach (var dispatcherStatusOperation in Messages.GetConsumingEnumerable())
 					{
 						_callback(dispatcherStatusOperation);
 					}
-				});
+				}, TaskCreationOptions.LongRunning);
 			}
 
 			public void Stop()
@@ -79,7 +79,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 		/// <summary>
 		///		Infos about a status information
 		/// </summary>
-		public interface IDispatcherStatusOperationMessage
+		public interface IDispatcherFrameInfo
 		{
 			/// <summary>
 			///		When does this action occured
@@ -90,7 +90,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 		/// <summary>
 		///		Is periodically raised
 		/// </summary>
-		public class TickDispatcherStatusOperationMessage : IDispatcherStatusOperationMessage
+		public class DispatcherFrameInfo : IDispatcherFrameInfo
 		{
 			/// <summary>
 			///		The snapshot of all known operations at this time
@@ -99,7 +99,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 
 			/// <param name="operationsSnapshot"></param>
 			/// <inheritdoc />
-			public TickDispatcherStatusOperationMessage(
+			public DispatcherFrameInfo(
 				KeyValuePair<DispatcherOperation, DispatcherOperationStatusMessage[]>[] operationsSnapshot)
 			{
 				OperationsSnapshot = operationsSnapshot;
@@ -172,6 +172,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 			}
 
 			_stopRequested.Cancel();
+			_stopRequested = null;
 			_dispatcher.Hooks.DispatcherInactive -= Hooks_DispatcherInactive;
 			_dispatcher.Hooks.OperationPosted -= Hooks_OperationPosted;
 			_dispatcher.Hooks.OperationStarted -= Hooks_OperationStarted;
@@ -182,7 +183,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 		}
 
 		/// <summary>
-		///		Starts observing the current dispatcher
+		///		Starts observing the current dispatcher. If not otherwise specified, the frame that is observed is one second
 		/// </summary>
 		public void Start(TimeSpan? observerFrame = null)
 		{
@@ -217,7 +218,7 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 					{
 						_dispatcherOperations.TryRemove(keyValuePair.Key, out _);
 					}
-					_actionDispatcher.Add(new TickDispatcherStatusOperationMessage(operationsSnapshot));
+					_actionDispatcher.Add(new DispatcherFrameInfo(operationsSnapshot));
 				}
 			}, TaskCreationOptions.LongRunning);
 		}
@@ -289,6 +290,11 @@ namespace JPB.WPFToolsAwesome.Logger.DispatcherLogger
 
 		private void Hooks_DispatcherInactive(object sender, EventArgs e)
 		{
+		}
+
+		public void Dispose()
+		{
+			_stopRequested?.Cancel();
 		}
 	}
 }

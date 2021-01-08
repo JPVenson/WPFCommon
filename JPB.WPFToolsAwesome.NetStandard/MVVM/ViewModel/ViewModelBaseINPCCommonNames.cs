@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
+
 
 namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 {
@@ -11,7 +11,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 	/// </summary>
 	public static class ViewModelBaseINPCCommonNames
 	{
-		[PublicAPI]
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void RaisePropertyChanged(this ViewModelBase viewModel,
 			[CallerMemberName] string propertyName = null)
@@ -19,7 +19,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			viewModel.SendPropertyChanged(propertyName);
 		}
 
-		[PublicAPI]
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void RaisePropertyChanged<TProperty>(this ViewModelBase viewModel,
 			Expression<Func<TProperty>> property)
@@ -27,7 +27,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			viewModel.SendPropertyChanged(property);
 		}
 
-		[PublicAPI]
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void OnPropertyChanged(this ViewModelBase viewModel,
 			[CallerMemberName] string propertyName = null)
@@ -35,7 +35,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			viewModel.SendPropertyChanged(propertyName);
 		}
 
-		[PublicAPI]
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void OnPropertyChanged<TProperty>(this ViewModelBase viewModel,
 			Expression<Func<TProperty>> property)
@@ -43,7 +43,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			viewModel.SendPropertyChanged(property);
 		}
 
-		[PublicAPI]
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void FirePropertyChanged(this ViewModelBase viewModel,
 			[CallerMemberName] string propertyName = null)
@@ -51,7 +51,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			viewModel.SendPropertyChanged(propertyName);
 		}
 
-		[PublicAPI]
+		
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void FirePropertyChanged<TProperty>(this ViewModelBase viewModel,
 			Expression<Func<TProperty>> property)

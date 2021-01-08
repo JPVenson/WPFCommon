@@ -10,7 +10,7 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 	///		for raising its CanExecute event. When it is Executed the Method will be wrapped into an Simple Work
 	/// </summary>
 	/// <seealso cref="System.Windows.Input.ICommand" />
-	public class AsyncDelegateCommand : DelegateCommandBase
+	public class AsyncDelegateCommand : DelegateCommand
 	{
 		private readonly AsyncViewModelBase _viewModelBase;
 
@@ -98,7 +98,7 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 					"The command is not valid for execution, check the CanExecute method before attempting to execute.");
 			}
 
-			_isWorking = _viewModelBase.SimpleWork(() => { execute(parameter); }, CommandManager.InvalidateRequerySuggested);
+			_isWorking = _viewModelBase.SimpleWork(() => { execute(parameter); }, base.RaiseCanExecuteChanged);
 		}
 	}
 }

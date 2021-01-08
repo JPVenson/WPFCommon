@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Threading;
-using JetBrains.Annotations;
+
 
 #if WINDOWS_UWP
 using Windows.UI.Xaml;
@@ -29,8 +29,8 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// Shorthand for <code>DispatcherLock.CatpureDispatcher()</code>
 		/// </summary>
 		/// <returns></returns>
-		[PublicAPI]
-		[MustUseReturnValue]
+		
+		
 		protected IDisposable Catch()
 		{
 			return DispatcherLock.CaptureDispatcher();
@@ -39,19 +39,16 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// <summary>
 		///		Gets the Dispatcher that are used for <seealso cref="ViewModelAction(System.Action)"/> and <seealso cref="BeginViewModelAction(System.Action)"/>
 		/// </summary>
-		[ProvidesContext]
 		protected Dispatcher Dispatcher { get; set; }
 
 		/// <summary>
 		///		The Internal LockRoot for async operations
 		/// </summary>
-		[ProvidesContext]
 		public object Lock { get; set; }
 
 		/// <summary>
 		///		Indicates a Running operation in the Dispatcher.
 		/// </summary>
-		[ProvidesContext]
 		protected bool IsLocked { get; set; }
 
 		///  <summary>
@@ -61,7 +58,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///  </summary>
 		///  <param name="action">The action.</param>
 		///  <param name="priority">The Dispatcher Priority. Defaults to <see cref="DispatcherPriority.DataBind"/></param>
-		public void ViewModelAction([NotNull]Action action, DispatcherPriority priority = DispatcherPriority.DataBind)
+		public void ViewModelAction(Action action, DispatcherPriority priority = DispatcherPriority.DataBind)
 		{
 			try
 			{
@@ -93,9 +90,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <param name="action">The action.</param>
 		///  <param name="priority">The Dispatcher Priority. Defaults to <see cref="DispatcherPriority.DataBind"/></param>
-		[CanBeNull]
-		[PublicAPI]
-		public DispatcherOperationLite BeginViewModelAction([NotNull]Action action,
+		
+		
+		public DispatcherOperationLite BeginViewModelAction(Action action,
 			DispatcherPriority priority = DispatcherPriority.DataBind)
 		{
 			if (Dispatcher.HasShutdownStarted)
@@ -129,7 +126,7 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <param name="action">The action.</param>
 		[Obsolete("Use ViewModelAction")]
-		public void ThreadSaveAction([NotNull]Action action)
+		public void ThreadSaveAction(Action action)
 		{
 			try
 			{
@@ -160,10 +157,10 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///		The action will be executed with <seealso cref="DispatcherPriority.DataBind"/>
 		/// </summary>
 		/// <param name="action">The action.</param>
-		[CanBeNull]
-		[PublicAPI]
+		
+		
 		[Obsolete("Use BeginViewModelAction")]
-		public DispatcherOperationLite BeginThreadSaveAction([NotNull]Action action)
+		public DispatcherOperationLite BeginThreadSaveAction(Action action)
 		{
 			if (Dispatcher.HasShutdownStarted)
 			{
