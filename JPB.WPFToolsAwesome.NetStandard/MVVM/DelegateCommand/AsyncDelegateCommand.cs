@@ -61,13 +61,6 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 		{
 		}
 
-		/// <inheritdoc />
-		public override event EventHandler CanExecuteChanged
-		{
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
-		}
-
 		/// <summary>
 		///		Awaits the execution of this Event if any is currently running
 		/// </summary>

@@ -91,12 +91,12 @@ namespace JPB.WPFToolsAwesome.MVVM.DelegateCommand
 		public static readonly Func<TParameter, bool> True = obj => true;
 
 		/// <inheritdoc />
-		public DelegateCommand(Action execute) : this(obj => execute())
+		public DelegateCommand(Action execute) : this(obj => execute(), True)
 		{
 		}
 
 		/// <inheritdoc />
-		public DelegateCommand(Action<TParameter> execute) : this(execute, True)
+		public DelegateCommand(Action<TParameter> execute) : this(execute, (d) => true)
 		{
 		}
 
