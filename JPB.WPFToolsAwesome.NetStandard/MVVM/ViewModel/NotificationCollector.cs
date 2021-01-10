@@ -33,6 +33,9 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 			NotificationsSendPropertyChanged.Clear();
 			NotificationsSendPropertyChanged.Dispose();
 			NotificationsSendPropertyChanged = null;
+			NotificationsSendPropertyChanging.Clear();
+			NotificationsSendPropertyChanging.Dispose();
+			NotificationsSendPropertyChanging = null;
 		}
 	}
 
