@@ -503,9 +503,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Call it in a using and the dispose will wait until all actions started inside it will be complete
 		/// </summary>
 		/// <returns></returns>
-
-
-
 		public AwaitMultiple BeginScope()
 		{
 			return new AwaitMultiple(this);

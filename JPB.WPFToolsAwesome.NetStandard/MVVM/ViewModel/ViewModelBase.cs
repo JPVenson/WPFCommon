@@ -151,7 +151,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanged event
 		/// </summary>
 		/// <param name="e">Arguments detailing the change</param>
-		
 		protected virtual void SendPropertyChanged(PropertyChangedEventArgs e)
 		{
 			if (DeferredNotification != null)
@@ -172,7 +171,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// </summary>
 		/// <typeparam name="TProperty"></typeparam>
 		/// <param name="property"></param>
-		
 		public virtual void SendPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
 		{
 			SendPropertyChanged(GetPropertyName(property));
@@ -182,7 +180,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanged event
 		/// </summary>
 		/// <param name="propertyName">Name of the property that has a new value</param>
-		
 		public virtual void SendPropertyChanging([CallerMemberName] string propertyName = null)
 		{
 			SendPropertyChanging(new PropertyChangingEventArgs(propertyName));
@@ -192,7 +189,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		///     Raises this ViewModels PropertyChanging event
 		/// </summary>
 		/// <param name="e">Arguments detailing the change</param>
-		
 		protected virtual void SendPropertyChanging(PropertyChangingEventArgs e)
 		{
 			if (DeferredNotification != null)

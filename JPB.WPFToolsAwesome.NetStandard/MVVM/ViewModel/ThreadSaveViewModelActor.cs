@@ -29,8 +29,6 @@ namespace JPB.WPFToolsAwesome.MVVM.ViewModel
 		/// Shorthand for <code>DispatcherLock.CatpureDispatcher()</code>
 		/// </summary>
 		/// <returns></returns>
-		
-		
 		protected IDisposable Catch()
 		{
 			return DispatcherLock.CaptureDispatcher();
